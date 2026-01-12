@@ -1,0 +1,19 @@
+import { Outlet } from "react-router-dom";
+
+const AuthLayout = () => {
+  return (
+    <div className="min-h-screen w-full bg-white flex items-center justify-center px-4">
+      <div className="w-full max-w-md">
+        <div className="rounded-xl border bg-white p-6 shadow-sm">
+          <div className="mb-6 text-center">
+            <div className="text-4xl font-extrabold tracking-wide">TASCHEN</div>
+          </div>
+
+          <div className="mb-4"></div>
+          <Outlet />
+        </div>
+      </div>
+    </div>
+  );
+};
+export default AuthLayout;
