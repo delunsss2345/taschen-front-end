@@ -41,7 +41,7 @@ const Footer = () => {
           <h2 className="text-2xl font-extrabold tracking-tight">
             TASCHEN. Books for Optimists Since 1980
           </h2>
-          <p className="mt-4 max-w-[1180px] text-sm leading-6 text-zinc-700">
+          <p className="mt-4 max-w-[var(--width-md)] text-sm leading-6 text-zinc-700">
             TASCHEN is the world’s leading art-book publisher, headquartered in
             Cologne with teams in Berlin, Brussels, Hong Kong, London, Los
             Angeles, Madrid, Miami, Milan, New York, Paris and Tokyo. For more

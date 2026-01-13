@@ -46,6 +46,8 @@
 
 :root {
   --container-main: 1640px;
+  --width-md: 1140px;
+
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);

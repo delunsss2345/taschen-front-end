@@ -53,7 +53,7 @@ const Hero = () => {
         {slides.map((s) => (
           <SwiperSlide key={s.id}>
             <div className="w-full">
-              <div className="relative h-[520px] w-full overflow-hidden">
+              <div className="relative h-[620px] w-full overflow-hidden">
                 <div
                   className="h-full w-full bg-cover bg-center"
                   style={{ backgroundImage: `url(${s.image})` }}
