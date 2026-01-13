@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Link } from "react-router-dom";
+import FooterCol from "./FooterCol";
 
 const connectLinks = [
   { label: "Affiliate Program", href: "#" },
@@ -56,9 +56,7 @@ const Footer = () => {
 
         <div className="grid grid-cols-12 gap-y-10 py-10">
           <FooterCol title="Connect" links={connectLinks} />
-
           <FooterCol title="Company" links={companyLinks} />
-
           <FooterCol title="Customer Information" links={customerLinks} />
 
           <div className="col-span-12 md:col-span-3 md:pl-2">
@@ -102,26 +100,4 @@ const Footer = () => {
   );
 };
 
-function FooterCol({
-  title,
-  links,
-}: {
-  title: string;
-  links: { label: string; href: string }[];
-}) {
-  return (
-    <div className="col-span-12 md:col-span-3">
-      <div className="text-sm font-semibold text-zinc-900">{title}</div>
-      <ul className="mt-4 space-y-3 text-sm text-zinc-800">
-        {links.map((l) => (
-          <li key={l.label}>
-            <Link to={l.href} className="hover:underline underline-offset-4">
-              {l.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
 export default Footer;
