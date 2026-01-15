@@ -1,5 +1,7 @@
 import Grid from "@/components/layouts/Grid";
 import useTranslator from "@/hooks/use-translator";
+import Hero from "@/layouts/DefaultLayout/Hero";
+import QuoteRandom from "@/layouts/DefaultLayout/QuoteRandom";
 
 type Item = {
   id: string;
@@ -81,6 +83,12 @@ const Home = () => {
     image: item.image,
   }));
 
-  return <Grid items={items} />;
+  return (
+    <>
+      <Hero />
+      <Grid items={items} />;
+      <QuoteRandom />
+    </>
+  );
 };
 export default Home;
