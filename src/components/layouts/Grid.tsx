@@ -1,5 +1,5 @@
-import type { BookMiniMalist } from "@/types/book.type";
 import useTranslator from "@/hooks/use-translator";
+import type { BookMiniMalist } from "@/types/book.type";
 
 const Grid = ({ items }: { items: BookMiniMalist[] }) => {
   const { t } = useTranslator();

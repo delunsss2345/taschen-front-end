@@ -1,71 +1,39 @@
-import { Input } from "@/components/ui/input";
+import { useIsMobile } from "@/hooks/use-mobile";
 import useTranslator from "@/hooks/use-translator";
-import { Heart, Search, ShoppingBag, User } from "lucide-react";
-
-const nav = [
-  { key: "books", to: "/books" },
-  { key: "limitedEditions", to: "/limited-editions" },
-  { key: "gifts", to: "/gifts" },
-  { key: "stores", to: "/stores" },
-  { key: "about", to: "/about" },
-];
+import { Heart, Menu, ShoppingBag } from "lucide-react";
+import Nav from "../Nav";
+import ProfileButton from "./ProfileButton";
+import SearchBar from "./Search";
+import SettingsTranslation from "./SettingTranslation";
 
 const Header = () => {
-  const { t, i18n } = useTranslator();
-  const activeLanguage = i18n.resolvedLanguage ?? i18n.language;
-  const isVn = activeLanguage?.startsWith("vn");
-  const nextLanguage = isVn ? "en" : "vn";
-
+  const { t } = useTranslator();
+  const isMobile = useIsMobile();
   return (
     <header className="w-full">
-      <div className="mx-auto flex h-16 w-full max-w-[var(--container-main)] items-center gap-6 px-6">
-        <nav className="flex gap-6">
-          {nav.map((item) => (
-            <a
-              key={item.to}
-              href={item.to}
-              className="text-xs tracking-widest uppercase hover:opacity-70"
-            >
-              {t(`nav.${item.key}`)}
-            </a>
-          ))}
-        </nav>
+      <div className="mx-auto flex h-16 w-full sm:max-w-[var(--container-main)] items-center justify-between gap-6  px-2 sm:px-1">
+        {isMobile ? (
+          <>
+            <div>
+              <Menu />
+            </div>
+          </>
+        ) : (
+          <Nav />
+        )}
 
-        <div className="flex flex-1 items-center justify-center">
-          <div className="text-3xl font-black tracking-wide">TASCHEN</div>
+        <div className="text-center">
+          <div className="text-3xl font-black ">TASCHEN</div>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="relative hidden w-[320px] items-center md:flex">
-            <Input
-              className="h-10 rounded-sm pr-10 text-sm"
-              placeholder={t("header.searchPlaceholder")}
-            />
-            <button
-              type="button"
-              className="absolute right-2 inline-flex h-8 w-8 items-center justify-center rounded-sm hover:bg-muted"
-              aria-label={t("header.aria.searchButton")}
-            >
-              <Search className="h-4 w-4" />
-            </button>
-          </div>
-
-          <button
-            type="button"
-            className="hidden whitespace-nowrap text-sm hover:opacity-70 md:inline-flex"
-            aria-label={t("header.aria.language")}
-            onClick={() => i18n.changeLanguage(nextLanguage)}
-          >
-            {t("header.languageToggle")}
-          </button>
-
-          <button
-            type="button"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-sm hover:bg-muted"
-            aria-label={t("header.aria.account")}
-          >
-            <User className="h-5 w-5" />
-          </button>
+          {!isMobile && (
+            <div className="flex items-center gap-2">
+              <SearchBar />
+              <SettingsTranslation />
+              <ProfileButton />
+            </div>
+          )}
 
           <button
             type="button"
