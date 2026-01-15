@@ -1,67 +1,72 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import useTranslator from "@/hooks/use-translator";
 import FooterCol from "./FooterCol";
 
-const connectLinks = [
-  { label: "Affiliate Program", href: "#" },
-  { label: "Corporate Contacts", href: "#" },
-  { label: "Facebook", href: "#" },
-  { label: "Instagram", href: "#" },
-  { label: "Newsletter", href: "#" },
-  { label: "TikTok", href: "#" },
-  { label: "Youtube", href: "#" },
-];
-
-const companyLinks = [
-  { label: "Accessibility", href: "#" },
-  { label: "Careers", href: "#" },
-  { label: "General Terms and Conditions", href: "#" },
-  { label: "Glossary", href: "#" },
-  { label: "Imprint", href: "#" },
-  { label: "Privacy Policy", href: "#" },
-  { label: "Project Proposals", href: "#" },
-];
-
-const customerLinks = [
-  { label: "Chat", href: "#" },
-  { label: "Customer Service", href: "#" },
-  { label: "Shipping & Returns", href: "#" },
-  { label: "Track Your Order", href: "#" },
-  { label: "Become a TASCHEN Reseller", href: "#" },
-  { label: "Corporate Deals", href: "#" },
-  { label: "B2B Shop Access", href: "#" },
-];
-
 const Footer = () => {
+  const { t } = useTranslator();
+  const connectLinks = [
+    "affiliateProgram",
+    "corporateContacts",
+    "facebook",
+    "instagram",
+    "newsletter",
+    "tiktok",
+    "youtube",
+  ].map((key) => ({
+    label: t(`footer.links.connect.${key}`),
+    href: "#",
+  }));
+
+  const companyLinks = [
+    "accessibility",
+    "careers",
+    "terms",
+    "glossary",
+    "imprint",
+    "privacy",
+    "projectProposals",
+  ].map((key) => ({
+    label: t(`footer.links.company.${key}`),
+    href: "#",
+  }));
+
+  const customerLinks = [
+    "chat",
+    "customerService",
+    "shippingReturns",
+    "trackOrder",
+    "becomeReseller",
+    "corporateDeals",
+    "b2bAccess",
+  ].map((key) => ({
+    label: t(`footer.links.customer.${key}`),
+    href: "#",
+  }));
+
   return (
     <footer className="w-full bg-white">
       <div className="mx-auto w-full max-w-[var(--container-main)] px-6">
         <div className="py-10">
           <h2 className="text-2xl font-extrabold tracking-tight">
-            TASCHEN. Books for Optimists Since 1980
+            {t("footer.tagline")}
           </h2>
           <p className="mt-4 max-w-[var(--width-md)] text-sm leading-6 text-zinc-700">
-            TASCHEN is the world’s leading art-book publisher, headquartered in
-            Cologne with teams in Berlin, Brussels, Hong Kong, London, Los
-            Angeles, Madrid, Miami, Milan, New York, Paris and Tokyo. For more
-            than 40 years, we have been on a mission to publish innovative
-            illustrated books on art, architecture, design, fashion, film,
-            lifestyle, travel, photography and pop culture and to bring them to
-            the world. We aspire to be inclusive, independent, inspirational.
+            {t("footer.description")}
           </p>
         </div>
 
         <Separator />
 
         <div className="grid grid-cols-12 gap-y-10 py-10">
-          <FooterCol title="Connect" links={connectLinks} />
-          <FooterCol title="Company" links={companyLinks} />
-          <FooterCol title="Customer Information" links={customerLinks} />
+          <FooterCol title={t("footer.connectTitle")} links={connectLinks} />
+          <FooterCol title={t("footer.companyTitle")} links={companyLinks} />
+          <FooterCol title={t("footer.customerTitle")} links={customerLinks} />
 
           <div className="col-span-12 md:col-span-3 md:pl-2">
             <div className="text-sm font-semibold text-zinc-900">
-              Sign up for our newsletter:
+              {t("footer.newsletterTitle")}
             </div>
 
             <form
@@ -70,7 +75,7 @@ const Footer = () => {
             >
               <Input
                 className="h-10 rounded-sm"
-                placeholder="Your e-mail-address"
+                placeholder={t("footer.emailPlaceholder")}
                 type="email"
               />
               <Button
@@ -78,7 +83,7 @@ const Footer = () => {
                 variant="outline"
                 className="h-10 w-fit rounded-sm px-6"
               >
-                Submit
+                {t("footer.submit")}
               </Button>
             </form>
           </div>
@@ -91,8 +96,7 @@ const Footer = () => {
             TASCHEN
           </div>
           <div className="text-xs text-zinc-700">
-            © {new Date().getFullYear()} – TASCHEN GmbH, Hohenzollernring 53,
-            D–50672 Cologne
+            {t("footer.copyright", { year: new Date().getFullYear() })}
           </div>
         </div>
       </div>

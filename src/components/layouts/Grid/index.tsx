@@ -1,11 +1,13 @@
 import type { BookMiniMalist } from "@/types/book.type";
+import useTranslator from "@/hooks/use-translator";
 
 const Grid = ({ items }: { items: BookMiniMalist[] }) => {
+  const { t } = useTranslator();
   return (
     <section className="w-full bg-white">
       <div className="mx-auto max-w-[var(--container-main)] px-6 py-16">
         <h2 className="text-center text-2xl font-extrabold text-zinc-900">
-          New &amp; Trending
+          {t("grid.title")}
         </h2>
 
         <div className="mt-12 grid grid-cols-2 gap-x-12 gap-y-14 md:grid-cols-4">

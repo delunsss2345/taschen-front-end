@@ -4,6 +4,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import useTranslator from "@/hooks/use-translator";
 
 type SlideItem = {
   id: string;
@@ -13,34 +14,35 @@ type SlideItem = {
   image: string;
 };
 
-const slides: SlideItem[] = [
-  {
-    id: "1",
-    title: "Massimo Listri. Italian Palaces",
-    cta: "Discover Now",
-    href: "#",
-    image:
-      "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=2400&q=80",
-  },
-  {
-    id: "2",
-    title: "New Releases",
-    cta: "Shop Now",
-    href: "#",
-    image:
-      "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=2400&q=80",
-  },
-  {
-    id: "3",
-    title: "Limited Editions",
-    cta: "Explore",
-    href: "#",
-    image:
-      "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=2400&q=80",
-  },
-];
-
 const Hero = () => {
+  const { t } = useTranslator();
+  const slides: SlideItem[] = [
+    {
+      id: "1",
+      title: t("hero.slides.1.title"),
+      cta: t("hero.slides.1.cta"),
+      href: "#",
+      image:
+        "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=2400&q=80",
+    },
+    {
+      id: "2",
+      title: t("hero.slides.2.title"),
+      cta: t("hero.slides.2.cta"),
+      href: "#",
+      image:
+        "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=2400&q=80",
+    },
+    {
+      id: "3",
+      title: t("hero.slides.3.title"),
+      cta: t("hero.slides.3.cta"),
+      href: "#",
+      image:
+        "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=2400&q=80",
+    },
+  ];
+
   return (
     <section className="w-full">
       <Swiper

@@ -1,4 +1,5 @@
 import Grid from "@/components/layouts/Grid";
+import useTranslator from "@/hooks/use-translator";
 
 type Item = {
   id: string;
@@ -9,58 +10,77 @@ type Item = {
   image: string;
 };
 
-const items: Item[] = [
+type ItemData = {
+  id: string;
+  badgeKey?: string;
+  titleKey: string;
+  subtitleKey?: string;
+  priceKey: string;
+  image: string;
+};
+
+const itemsData: ItemData[] = [
   {
     id: "1",
-    badge: "NEW",
-    title: "Hokusai.",
-    subtitle: "Thirty-six Views of Mount Fuji",
-    price: "US$ 80",
+    badgeKey: "common.badge.new",
+    titleKey: "home.items.1.title",
+    subtitleKey: "home.items.1.subtitle",
+    priceKey: "home.items.1.price",
     image:
       "https://images.unsplash.com/photo-1541963463532-d68292c34b19?auto=format&fit=crop&w=900&q=80",
   },
   {
     id: "2",
-    badge: "NEW",
-    title: "Japanese Woodblock Prints",
-    price: "US$ 150",
+    badgeKey: "common.badge.new",
+    titleKey: "home.items.2.title",
+    priceKey: "home.items.2.price",
     image:
       "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=900&q=80",
   },
   {
     id: "3",
-    badge: "NEW",
-    title: "Costume Jewelry",
-    price: "US$ 125",
+    badgeKey: "common.badge.new",
+    titleKey: "home.items.3.title",
+    priceKey: "home.items.3.price",
     image:
       "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=900&q=80",
   },
   {
     id: "4",
-    badge: "NEW",
-    title: "Sophia by Eisenstaedt",
-    price: "US$ 1,000",
+    badgeKey: "common.badge.new",
+    titleKey: "home.items.4.title",
+    priceKey: "home.items.4.price",
     image:
       "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=900&q=80",
   },
   {
     id: "5",
-    badge: "NEW",
-    title: "Sophia by Eisenstaedt",
-    price: "US$ 1,000",
+    badgeKey: "common.badge.new",
+    titleKey: "home.items.5.title",
+    priceKey: "home.items.5.price",
     image:
       "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=900&q=80",
   },
   {
     id: "6",
-    badge: "NEW",
-    title: "Sophia by Eisenstaedt",
-    price: "US$ 1,000",
+    badgeKey: "common.badge.new",
+    titleKey: "home.items.6.title",
+    priceKey: "home.items.6.price",
     image:
       "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=900&q=80",
   },
 ];
 const Home = () => {
+  const { t } = useTranslator();
+  const items: Item[] = itemsData.map((item) => ({
+    id: item.id,
+    badge: item.badgeKey ? t(item.badgeKey) : undefined,
+    title: t(item.titleKey),
+    subtitle: item.subtitleKey ? t(item.subtitleKey) : undefined,
+    price: t(item.priceKey),
+    image: item.image,
+  }));
+
   return <Grid items={items} />;
 };
 export default Home;

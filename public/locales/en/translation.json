@@ -1,0 +1,135 @@
+{
+  "nav": {
+    "books": "Books",
+    "limitedEditions": "Limited Editions",
+    "gifts": "Gifts",
+    "stores": "Stores",
+    "about": "About Us"
+  },
+  "header": {
+    "searchPlaceholder": "Search",
+    "aria": {
+      "searchButton": "Search",
+      "language": "Language and country",
+      "account": "Account",
+      "wishlist": "Wishlist",
+      "cart": "Cart"
+    },
+    "languageToggle": "VN / EN"
+  },
+  "common": {
+    "badge": {
+      "new": "NEW"
+    }
+  },
+  "grid": {
+    "title": "New & Trending"
+  },
+  "hero": {
+    "slides": {
+      "1": {
+        "title": "Massimo Listri. Italian Palaces",
+        "cta": "Discover Now"
+      },
+      "2": {
+        "title": "New Releases",
+        "cta": "Shop Now"
+      },
+      "3": {
+        "title": "Limited Editions",
+        "cta": "Explore"
+      }
+    }
+  },
+  "home": {
+    "items": {
+      "1": {
+        "title": "Hokusai.",
+        "subtitle": "Thirty-six Views of Mount Fuji",
+        "price": "US$ 80"
+      },
+      "2": {
+        "title": "Japanese Woodblock Prints",
+        "price": "US$ 150"
+      },
+      "3": {
+        "title": "Costume Jewelry",
+        "price": "US$ 125"
+      },
+      "4": {
+        "title": "Sophia by Eisenstaedt",
+        "price": "US$ 1,000"
+      },
+      "5": {
+        "title": "Sophia by Eisenstaedt",
+        "price": "US$ 1,000"
+      },
+      "6": {
+        "title": "Sophia by Eisenstaedt",
+        "price": "US$ 1,000"
+      }
+    }
+  },
+  "quote": {
+    "sectionLabel": "Costume Jewelry",
+    "textStart": "\"Don't skimp - go big: the coolest jewels of the 20th century. TASCHEN has published a nine pound illustrated volume on the subject: ",
+    "textEm": "Costume Jewelry",
+    "textEnd": ".\"",
+    "cite": "Stern",
+    "imageAlt": "Costume Jewelry",
+    "productTitle": "Costume Jewelry",
+    "productPrice": "US$ 125"
+  },
+  "footer": {
+    "tagline": "TASCHEN. Books for Optimists Since 1980",
+    "description": "TASCHEN is the world's leading art-book publisher, headquartered in Cologne with teams in Berlin, Brussels, Hong Kong, London, Los Angeles, Madrid, Miami, Milan, New York, Paris and Tokyo. For more than 40 years, we have been on a mission to publish innovative illustrated books on art, architecture, design, fashion, film, lifestyle, travel, photography and pop culture and to bring them to the world. We aspire to be inclusive, independent, inspirational.",
+    "connectTitle": "Connect",
+    "companyTitle": "Company",
+    "customerTitle": "Customer Information",
+    "newsletterTitle": "Sign up for our newsletter:",
+    "emailPlaceholder": "Your e-mail address",
+    "submit": "Submit",
+    "links": {
+      "connect": {
+        "affiliateProgram": "Affiliate Program",
+        "corporateContacts": "Corporate Contacts",
+        "facebook": "Facebook",
+        "instagram": "Instagram",
+        "newsletter": "Newsletter",
+        "tiktok": "TikTok",
+        "youtube": "YouTube"
+      },
+      "company": {
+        "accessibility": "Accessibility",
+        "careers": "Careers",
+        "terms": "General Terms and Conditions",
+        "glossary": "Glossary",
+        "imprint": "Imprint",
+        "privacy": "Privacy Policy",
+        "projectProposals": "Project Proposals"
+      },
+      "customer": {
+        "chat": "Chat",
+        "customerService": "Customer Service",
+        "shippingReturns": "Shipping & Returns",
+        "trackOrder": "Track Your Order",
+        "becomeReseller": "Become a TASCHEN Reseller",
+        "corporateDeals": "Corporate Deals",
+        "b2bAccess": "B2B Shop Access"
+      }
+    },
+    "copyright": "c {{year}} - TASCHEN GmbH, Hohenzollernring 53, D-50672 Cologne"
+  },
+  "auth": {
+    "emailLabel": "Email",
+    "emailPlaceholder": "Email",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Password",
+    "submit": "Continue",
+    "submitting": "Logging in...",
+    "errors": {
+      "emailInvalid": "Invalid email address",
+      "passwordMin": "Password must be at least {{count}} characters"
+    }
+  }
+}

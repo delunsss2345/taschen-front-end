@@ -1,3 +1,5 @@
+import * as React from "react";
+import type { TFunction } from "i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -12,13 +14,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import useTranslator from "@/hooks/use-translator";
 
-const loginSchema = z.object({
-  email: z.string().email("Email không hợp lệ"),
-  password: z.string().min(6, "Mật khẩu tối thiểu 6 ký tự"),
-});
+const getLoginSchema = (t: TFunction) =>
+  z.object({
+    email: z.string().email(t("auth.errors.emailInvalid")),
+    password: z.string().min(6, t("auth.errors.passwordMin", { count: 6 })),
+  });
 
-export type LoginValues = z.infer<typeof loginSchema>;
+export type LoginValues = z.infer<ReturnType<typeof getLoginSchema>>;
 
 type LoginFormProps = {
   isLoading?: boolean;
@@ -26,6 +30,8 @@ type LoginFormProps = {
 };
 
 const LoginForm = ({ isLoading = false, onSubmit }: LoginFormProps) => {
+  const { t } = useTranslator();
+  const loginSchema = React.useMemo(() => getLoginSchema(t), [t]);
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
@@ -44,11 +50,11 @@ const LoginForm = ({ isLoading = false, onSubmit }: LoginFormProps) => {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>{t("auth.emailLabel")}</FormLabel>
               <FormControl>
                 <Input
                   type="email"
-                  placeholder="Email"
+                  placeholder={t("auth.emailPlaceholder")}
                   autoComplete="email"
                   {...field}
                 />
@@ -63,11 +69,11 @@ const LoginForm = ({ isLoading = false, onSubmit }: LoginFormProps) => {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Mật khẩu</FormLabel>
+              <FormLabel>{t("auth.passwordLabel")}</FormLabel>
               <FormControl>
                 <Input
                   type="password"
-                  placeholder="Mật khẩu"
+                  placeholder={t("auth.passwordPlaceholder")}
                   autoComplete="current-password"
                   {...field}
                 />
@@ -78,7 +84,7 @@ const LoginForm = ({ isLoading = false, onSubmit }: LoginFormProps) => {
         />
 
         <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Đang đăng nhập..." : "Continue"}
+          {isLoading ? t("auth.submitting") : t("auth.submit")}
         </Button>
       </form>
     </Form>
