@@ -125,11 +125,40 @@
     "emailPlaceholder": "Email",
     "passwordLabel": "Mật khẩu",
     "passwordPlaceholder": "Mật khẩu",
+    "confirmPasswordLabel": "Xác nhận mật khẩu",
+    "confirmPasswordPlaceholder": "Xác nhận mật khẩu",
+    "firstNameLabel": "Tên",
+    "firstNamePlaceholder": "Tên",
+    "lastNameLabel": "Họ",
+    "lastNamePlaceholder": "Họ",
+    "verifyTokenLabel": "Mã xác minh",
+    "verifyTokenPlaceholder": "Nhập mã xác minh",
+    "registerTitle": "Tạo tài khoản",
+    "registerSubtitle": "Nhập thông tin để bắt đầu.",
+    "forgotTitle": "Quên mật khẩu",
+    "forgotSubtitle": "Chúng tôi sẽ gửi liên kết đặt lại mật khẩu.",
+    "verifyTitle": "Xác minh tài khoản",
+    "verifySubtitle": "Nhập mã xác minh đã gửi qua email.",
     "submit": "Tiếp tục",
     "submitting": "Đang đăng nhập...",
+    "registerSubmit": "Tạo tài khoản",
+    "registering": "Đang tạo tài khoản...",
+    "forgotSubmit": "Gửi liên kết",
+    "forgotSubmitting": "Đang gửi...",
+    "verifySubmit": "Xác minh",
+    "verifying": "Đang xác minh...",
+    "success": {
+      "register": "Đăng ký thành công. Hãy kiểm tra email để nhận mã xác minh.",
+      "verify": "Xác minh thành công. Bạn có thể đăng nhập.",
+      "forgot": "Nếu email tồn tại, chúng tôi sẽ gửi hướng dẫn đặt lại đến {{email}}."
+    },
     "errors": {
       "emailInvalid": "Email không hợp lệ",
-      "passwordMin": "Mật khẩu tối thiểu {{count}} ký tự"
+      "passwordMin": "Mật khẩu tối thiểu {{count}} ký tự",
+      "required": "Bắt buộc",
+      "passwordMismatch": "Mật khẩu không khớp",
+      "requestFailed": "Có lỗi xảy ra. Vui lòng thử lại.",
+      "missingVerifyId": "Thiếu mã định danh xác minh."
     }
   }
 }

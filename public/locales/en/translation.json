@@ -125,11 +125,40 @@
     "emailPlaceholder": "Email",
     "passwordLabel": "Password",
     "passwordPlaceholder": "Password",
+    "confirmPasswordLabel": "Confirm password",
+    "confirmPasswordPlaceholder": "Confirm password",
+    "firstNameLabel": "First name",
+    "firstNamePlaceholder": "First name",
+    "lastNameLabel": "Last name",
+    "lastNamePlaceholder": "Last name",
+    "verifyTokenLabel": "Verification token",
+    "verifyTokenPlaceholder": "Enter your verification token",
+    "registerTitle": "Create your account",
+    "registerSubtitle": "Enter your details to get started.",
+    "forgotTitle": "Forgot password",
+    "forgotSubtitle": "We will send a reset link to your email.",
+    "verifyTitle": "Verify your account",
+    "verifySubtitle": "Enter the token sent to your email.",
     "submit": "Continue",
     "submitting": "Logging in...",
+    "registerSubmit": "Create account",
+    "registering": "Creating account...",
+    "forgotSubmit": "Send reset link",
+    "forgotSubmitting": "Sending reset link...",
+    "verifySubmit": "Verify account",
+    "verifying": "Verifying...",
+    "success": {
+      "register": "Registration successful. Check your email for the verification token.",
+      "verify": "Verification successful. You can log in now.",
+      "forgot": "If the email exists, we will send reset instructions to {{email}}."
+    },
     "errors": {
       "emailInvalid": "Invalid email address",
-      "passwordMin": "Password must be at least {{count}} characters"
+      "passwordMin": "Password must be at least {{count}} characters",
+      "required": "This field is required",
+      "passwordMismatch": "Passwords do not match",
+      "requestFailed": "Something went wrong. Please try again.",
+      "missingVerifyId": "Verification link is missing an id."
     }
   }
 }

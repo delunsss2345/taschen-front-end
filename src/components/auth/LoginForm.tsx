@@ -11,8 +11,8 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
+import { FormMessageI18n } from "@/components/common/FormMessageI18n";
 import { Input } from "@/components/ui/input";
 import useTranslator from "@/hooks/use-translator";
 
@@ -59,7 +59,7 @@ const LoginForm = ({ isLoading = false, onSubmit }: LoginFormProps) => {
                   {...field}
                 />
               </FormControl>
-              <FormMessage />
+              <FormMessageI18n />
             </FormItem>
           )}
         />
@@ -78,7 +78,7 @@ const LoginForm = ({ isLoading = false, onSubmit }: LoginFormProps) => {
                   {...field}
                 />
               </FormControl>
-              <FormMessage />
+              <FormMessageI18n />
             </FormItem>
           )}
         />
