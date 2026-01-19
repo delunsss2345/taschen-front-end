@@ -40,7 +40,7 @@ export type RefreshTokenResponseData = {
 };
 
 export type LoginResponse = ApiResponse<LoginResponseData>;
-export type RefreshResponse = ApiResponse<RefreshTokenResponseData>;
+export type RefreshTokenResponse = ApiResponse<RefreshTokenResponseData>;
 export type RegisterResponse = ApiResponse<RegisterResponseData>;
 export type LogoutResponse = void;
 export type ChangePasswordResponse = void;
