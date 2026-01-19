@@ -1,170 +1,178 @@
-// import axios, {
-//   type AxiosInstance,
-//   type AxiosRequestConfig,
-//   type AxiosResponse,
-// } from "axios";
+import type { PromiseHandlers } from "@/types/lib/axios";
+import axios, {
+  type AxiosInstance,
+  type AxiosRequestConfig,
+  type AxiosResponse,
+} from "axios";
+import { isPublicApi } from "./isPublicPath";
 
-// const baseURL = import.meta.env.VITE_BASE_API;
+const baseURL = import.meta.env.VITE_BASE_API;
 
-// export const axiosInstance: AxiosInstance = axios.create({
-//   baseURL: import.meta.env.VITE_BASE_API,
-// });
+export const axiosInstance: AxiosInstance = axios.create({
+  baseURL: import.meta.env.VITE_BASE_API,
+});
 
-// const refreshAxiosInstance: AxiosInstance = axios.create({
-//   baseURL: import.meta.env.VITE_BASE_API,
-// });
+const refreshAxiosInstance: AxiosInstance = axios.create({
+  baseURL: import.meta.env.VITE_BASE_API,
+});
 
-// axiosInstance.interceptors.request.use((config) => {
-//   //   const accessToken = localStorage.getItem("accessToken");
-//   //   return config;
-// });
+// Mỗi request đều gắn accessToken
+axiosInstance.interceptors.request.use((config) => {
+  const accessToken = localStorage.getItem("accessToken");
 
-// // Có đang refreshToken không
-// let isRefreshing = false;
-// // Ngăn xếp queue
-// let failedQueue: Promise<any>[] = [];
+  if (!isPublicApi(config.url) && accessToken) {
+    config.headers.set("Authorization", `Bearer ${accessToken}`);
+  }
 
-// // Xử lí queue
-// const processQueue = (error: unknown) => {
-//   failedQueue.forEach((prom) => {
-//     if (error) {
-//       prom.reject(error);
-//     } else {
-//       prom.resolve();
-//     }
-//   });
+  return config;
+});
 
-//   failedQueue = [];
-// };
+// Có đang refreshToken không
+let isRefreshing = false;
+// Ngăn xếp queue
+let failedQueue: PromiseHandlers[] = [];
 
-// // Gọi refreshToken
-// const refreshToken = async () => {
-//   try {
-//     const result = await refreshAxiosInstance.post(`${baseURL}/auth/refresh`, {
-//       refresh_token: localStorage.getItem("refreshToken"),
-//     });
+// Xử lí queue
+const processQueue = (error: unknown) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve();
+    }
+  });
 
-//     localStorage.setItem("accessToken", result.data.data.access_token);
-//     localStorage.setItem("refreshToken", result.data.data.refresh_token);
+  failedQueue = [];
+};
 
-//     // Gắn queue  null nếu thành công
-//     processQueue(null);
-//   } catch (error) {
-//     processQueue(error);
-//     localStorage.removeItem("accessToken");
-//     localStorage.removeItem("refreshToken");
+// Gọi refreshToken
+const refreshToken = async () => {
+  try {
+    const result = await refreshAxiosInstance.post(`${baseURL}/auth/refresh`, {
+      refresh_token: localStorage.getItem("refreshToken"),
+    });
 
-//     throw error;
-//   }
-// };
+    localStorage.setItem("accessToken", result.data.data.access_token);
+    localStorage.setItem("refreshToken", result.data.data.refresh_token);
 
-// // Get token mới
-// const getNewToken = async () => {
-//   // Chưa refresh token thì đánh giấu
-//   if (!isRefreshing) {
-//     isRefreshing = true;
-//     await refreshToken(); // gọi lại
-//     isRefreshing = false; // thành công đánh dấu
-//     return;
-//   }
+    // Gắn queue  null nếu thành công
+    processQueue(null);
+  } catch (error) {
+    processQueue(error);
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
 
-//   // đã từng gọi thì push mảng lỗi
-//   return new Promise((resolve, reject) => {
-//     failedQueue.push({ resolve, reject });
-//   });
-// };
+    throw error;
+  }
+};
 
-// /// Sử dụng bắt request
-// axiosInstance.interceptors.response.use(
-//   (response: AxiosResponse) => response,
+// Get token mới
+const getNewToken = async () => {
+  // Chưa refresh token thì đánh giấu
+  if (!isRefreshing) {
+    isRefreshing = true;
+    await refreshToken(); // gọi lại
+    isRefreshing = false; // thành công đánh dấu
+    return;
+  }
 
-//   async (error: unknown) => {
-//     const originalRequest = error.config;
-//     const isAuthApi = isPublicApi(originalRequest?.url);
+  // đã từng gọi thì push mảng lỗi
+  return new Promise((resolve, reject) => {
+    failedQueue.push({ resolve, reject });
+  });
+};
 
-//     const shouldRenewToken =
-//       error.response?.status === 401 &&
-//       !isAuthApi &&
-//       localStorage.getItem("refreshToken") &&
-//       !originalRequest?._retry;
+/// Sử dụng bắt request
+axiosInstance.interceptors.response.use(
+  (response: AxiosResponse) => response,
 
-//     if (shouldRenewToken) {
-//       originalRequest._retry = true;
+  async (error) => {
+    const originalRequest = error.config;
+    const isAuthApi = isPublicApi(originalRequest?.url);
 
-//       try {
-//         await getNewToken();
-//         return axiosInstance(originalRequest);
-//       } catch (error) {
-//         return Promise.reject(error);
-//       }
-//     }
-//     return Promise.reject(error);
-//   }
-// );
+    // Đánh dấu lỗi
+    const shouldRenewToken =
+      error.response?.status === 401 &&
+      !isAuthApi &&
+      localStorage.getItem("refreshToken") &&
+      !originalRequest?._retry;
 
-// class AxiosHttp {
-//   private _send = async <T = unknown>(
-//     method: "get" | "post" | "put" | "delete" | "patch",
-//     path: string,
-//     data?: unknown,
-//     config?: AxiosRequestConfig
-//   ) => {
-//     try {
-//       const response = await axiosInstance.request<T>({
-//         method,
-//         url: path,
-//         data,
-//         ...config,
-//       });
+    // Nếu chưa từng đánh dấu thì vào
+    if (shouldRenewToken) {
+      // đánh dấu
+      originalRequest._retry = true;
 
-//       return response.data;
-//     } catch (error: unknown) {
-//       const err: ApiError = {
-//         status: error.response?.status || 500,
-//         message: error.response?.data?.message || "Server Error",
-//         errors: error.response?.data?.errors,
-//       };
+      // Gọi lại
+      try {
+        await getNewToken();
+        return axiosInstance(originalRequest); // Trả request
+      } catch (error) {
+        return Promise.reject(error); // Lỗi ném reject
+      }
+    }
+    // Đã từng đánh dấu thì ném reject
+    return Promise.reject(error);
+  },
+);
 
-//       throw err;
-//     }
-//   };
+// != T mặc định là any
+class AxiosHttp {
+  private _send = async <T = unknown>(
+    method: "get" | "post" | "put" | "delete" | "patch",
+    path: string,
+    data: object | undefined,
+    config?: AxiosRequestConfig,
+  ) => {
+    try {
+      const response = await axiosInstance.request<T>({
+        method,
+        url: path,
+        data,
+        ...config,
+      });
 
-//   get = <T = unknown>(
-//     path: string,
-//     config?: AxiosRequestConfig
-//   ): Promise<T> => {
-//     return this._send<T>("get", path, undefined, config);
-//   };
+      return response.data;
+    } catch (error) {
+      throw new Error(String(error));
+    }
+  };
 
-//   post = <T = unknown>(
-//     path: string,
-//     data?: object,
-//     config?: AxiosRequestConfig
-//   ): Promise<T> => {
-//     return this._send<T>("post", path, data, config);
-//   };
+  get = <T = unknown>(
+    path: string,
+    config?: AxiosRequestConfig,
+  ): Promise<T> => {
+    return this._send<T>("get", path, undefined, config);
+  };
 
-//   put = <T = unknown>(
-//     path: string,
-//     data: object,
-//     config?: AxiosRequestConfig
-//   ): Promise<T> => {
-//     return this._send<T>("put", path, data, config);
-//   };
+  post = <T = unknown>(
+    path: string,
+    data?: object,
+    config?: AxiosRequestConfig,
+  ): Promise<T> => {
+    return this._send<T>("post", path, data, config);
+  };
 
-//   patch = <T = unknown>(
-//     path: string,
-//     data: object,
-//     config?: AxiosRequestConfig
-//   ): Promise<T> => {
-//     return this._send<T>("patch", path, data, config);
-//   };
+  put = <T = unknown>(
+    path: string,
+    data: object,
+    config?: AxiosRequestConfig,
+  ): Promise<T> => {
+    return this._send<T>("put", path, data, config);
+  };
 
-//   del = <T = unknown>(
-//     path: string,
-//     config?: AxiosRequestConfig
-//   ): Promise<T> => {
-//     return this._send<T>("delete", path, undefined, config);
-//   };
-// }
-// export const http = new AxiosHttp();
+  patch = <T = unknown>(
+    path: string,
+    data: object,
+    config?: AxiosRequestConfig,
+  ): Promise<T> => {
+    return this._send<T>("patch", path, data, config);
+  };
+
+  del = <T = unknown>(
+    path: string,
+    config?: AxiosRequestConfig,
+  ): Promise<T> => {
+    return this._send<T>("delete", path, undefined, config);
+  };
+}
+export const http = new AxiosHttp();

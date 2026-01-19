@@ -15,6 +15,7 @@ import type {
   RegisterResponse,
   VerifyAccountResponse,
 } from "@/types/response/auth.response";
+import { http } from "@/utils/http";
 
 export const authApi = {
   login: (payload: LoginPayload) =>

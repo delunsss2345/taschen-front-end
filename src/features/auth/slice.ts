@@ -8,11 +8,12 @@ import type {
   LoginResponse,
   LogoutResponse,
   RegisterResponse,
+  UserLoginResponse,
 } from "@/types/response/auth.response";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 export type AuthState = {
-  currentUser: any | null;
+  currentUser: UserLoginResponse | null;
   accessToken: string | null;
   authLoading: boolean;
 };
@@ -81,12 +82,15 @@ export const authSlice = createSlice({
 
     builder.addCase(login.fulfilled, (state, action) => {
       state.authLoading = false;
-
-      state.currentUser = action.payload.data.user;
-      state.accessToken = action.payload.data.access_token;
-
-      localStorage.setItem("accessToken", action.payload.data.access_token);
-      localStorage.setItem("refreshToken", action.payload.data.refresh_token);
+      const data = action.payload.data;
+      const user = {
+        email: data.email,
+        roles: data.roles,
+        id: data.userId,
+      };
+      state.currentUser = user;
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
     });
 
     builder.addCase(login.rejected, (state) => {
@@ -117,14 +121,10 @@ export const authSlice = createSlice({
 
     builder.addCase(logout.fulfilled, (state) => {
       state.authLoading = false;
-      state.currentUser = null;
-      state.accessToken = null;
     });
 
     builder.addCase(logout.rejected, (state) => {
       state.authLoading = false;
-      state.currentUser = null;
-      state.accessToken = null;
     });
   },
 });
