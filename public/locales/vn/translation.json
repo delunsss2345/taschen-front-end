@@ -120,6 +120,45 @@
     },
     "copyright": "c {{year}} - TASCHEN GmbH, Hohenzollernring 53, D-50672 Cologne"
   },
+  "profile": {
+    "header": {
+      "orderHistory": "Lịch sử đơn hàng",
+      "menu": {
+        "profile": "Hồ sơ",
+        "orders": "Đơn hàng",
+        "signOut": "Đăng xuất"
+      },
+      "countries": {
+        "germany": "Đức",
+        "france": "Pháp",
+        "unitedStates": "Hoa Kỳ",
+        "unitedKingdom": "Vương quốc Anh"
+      }
+    },
+    "links": {
+      "refundPolicy": "Chính sách hoàn tiền",
+      "shipping": "Vận chuyển",
+      "privacyPolicy": "Chính sách quyền riêng tư",
+      "legalNotice": "Thông báo pháp lý",
+      "cancellations": "Hủy đơn",
+      "contactInformation": "Thông tin liên hệ"
+    },
+    "footer": {
+      "copyright": "© {{year}} TASCHEN"
+    },
+    "page": {
+      "contactDetailsTitle": "Chi tiết liên hệ",
+      "nameLabel": "Tên",
+      "emailLabel": "Email",
+      "addressesTitle": "Địa chỉ",
+      "addAddress": "+ Thêm",
+      "noAddresses": "Chưa có địa chỉ",
+      "giftCardsTitle": "Thẻ quà tặng của bạn",
+      "noGiftCards": "Bạn chưa có thẻ quà tặng",
+      "giftCardPlaceholder": "Nhập mã thẻ quà tặng",
+      "editName": "Chỉnh sửa tên"
+    }
+  },
   "auth": {
     "emailLabel": "Email",
     "emailPlaceholder": "Email",

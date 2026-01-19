@@ -1,16 +1,29 @@
+import { Link } from "react-router-dom";
 import { ChevronDown, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
-import { Link } from "react-router-dom";
+import useTranslator from "@/hooks/use-translator";
 
 const Header = () => {
+  const { t } = useTranslator();
+  const countryKeys = ["germany", "france", "unitedStates", "unitedKingdom"];
+  const policyLinks = [
+    { to: "/refund-policy", key: "refundPolicy" },
+    { to: "/shipping", key: "shipping" },
+    { to: "/privacy-policy", key: "privacyPolicy" },
+    { to: "/legal-notice", key: "legalNotice" },
+    { to: "/cancellations", key: "cancellations" },
+    { to: "/contact", key: "contactInformation" },
+  ];
+  const activeCountryKey = "germany";
+
   return (
     <header className="w-full">
       <div className="border-b bg-background">
@@ -20,7 +33,9 @@ const Header = () => {
               TASCHEN
             </Link>
 
-            <Link to="/account/orders">Order History</Link>
+            <Link to="/account/orders">
+              {t("profile.header.orderHistory")}
+            </Link>
           </div>
 
           <DropdownMenu>
@@ -31,13 +46,17 @@ const Header = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuItem asChild>
-                <Link to="/account/profile">Profile</Link>
+                <Link to="/account/profile">
+                  {t("profile.header.menu.profile")}
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/account/orders">Orders</Link>
+                <Link to="/account/orders">
+                  {t("profile.header.menu.orders")}
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/logout">Sign out</Link>
+                <Link to="/logout">{t("profile.header.menu.signOut")}</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -52,51 +71,31 @@ const Header = () => {
                 variant="ghost"
                 className="h-8 px-2 text-sm text-foreground"
               >
-                <span>Germany</span>
+                <span>{t(`profile.header.countries.${activeCountryKey}`)}</span>
                 <ChevronDown className="ml-1 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
-              <DropdownMenuItem>Germany</DropdownMenuItem>
-              <DropdownMenuItem>France</DropdownMenuItem>
-              <DropdownMenuItem>United States</DropdownMenuItem>
-              <DropdownMenuItem>United Kingdom</DropdownMenuItem>
+              {countryKeys.map((countryKey) => (
+                <DropdownMenuItem key={countryKey}>
+                  {t(`profile.header.countries.${countryKey}`)}
+                </DropdownMenuItem>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
 
           <Separator orientation="vertical" className="h-5" />
 
           <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
-            <Link
-              to="/refund-policy"
-              className="text-foreground hover:underline"
-            >
-              Refund policy
-            </Link>
-            <Link to="/shipping" className="text-foreground hover:underline">
-              Shipping
-            </Link>
-            <Link
-              to="/privacy-policy"
-              className="text-foreground hover:underline"
-            >
-              Privacy policy
-            </Link>
-            <Link
-              to="/legal-notice"
-              className="text-foreground hover:underline"
-            >
-              Legal notice
-            </Link>
-            <Link
-              to="/cancellations"
-              className="text-foreground hover:underline"
-            >
-              Cancellations
-            </Link>
-            <Link to="/contact" className="text-foreground hover:underline">
-              Contact information
-            </Link>
+            {policyLinks.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className="text-foreground hover:underline"
+              >
+                {t(`profile.links.${link.key}`)}
+              </Link>
+            ))}
           </nav>
         </div>
       </div>

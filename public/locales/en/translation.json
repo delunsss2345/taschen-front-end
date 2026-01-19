@@ -120,6 +120,45 @@
     },
     "copyright": "c {{year}} - TASCHEN GmbH, Hohenzollernring 53, D-50672 Cologne"
   },
+  "profile": {
+    "header": {
+      "orderHistory": "Order History",
+      "menu": {
+        "profile": "Profile",
+        "orders": "Orders",
+        "signOut": "Sign out"
+      },
+      "countries": {
+        "germany": "Germany",
+        "france": "France",
+        "unitedStates": "United States",
+        "unitedKingdom": "United Kingdom"
+      }
+    },
+    "links": {
+      "refundPolicy": "Refund policy",
+      "shipping": "Shipping",
+      "privacyPolicy": "Privacy policy",
+      "legalNotice": "Legal notice",
+      "cancellations": "Cancellations",
+      "contactInformation": "Contact information"
+    },
+    "footer": {
+      "copyright": "\u00a9 {{year}} TASCHEN"
+    },
+    "page": {
+      "contactDetailsTitle": "Contact Details",
+      "nameLabel": "Name",
+      "emailLabel": "Email",
+      "addressesTitle": "Addresses",
+      "addAddress": "+ Add",
+      "noAddresses": "No addresses added",
+      "giftCardsTitle": "Your Gift Cards",
+      "noGiftCards": "You don't have any gift cards",
+      "giftCardPlaceholder": "Enter gift card code",
+      "editName": "Edit name"
+    }
+  },
   "auth": {
     "emailLabel": "Email",
     "emailPlaceholder": "Email",
