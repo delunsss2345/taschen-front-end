@@ -1,9 +1,6 @@
 import { A11y, Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
 import useTranslator from "@/hooks/use-translator";
 
 type SlideItem = {
