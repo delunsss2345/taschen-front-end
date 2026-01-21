@@ -12,21 +12,24 @@ import {
 import { REGISTER } from "redux-persist/es/constants";
 import persistReducer from "redux-persist/es/persistReducer";
 import storage from "redux-persist/lib/storage";
+import { authSlice } from "@/features/auth/slice";
+
+const AUTH_SLICE_KEY = authSlice.name;
 
 const persistConfig = {
   key: "root",
   storage,
-  blacklist: [authSlice.reducerPath],
+  blacklist: [AUTH_SLICE_KEY],
 };
 
 const authPersistConfig = {
-  key: authSlice.reducerPath,
+  key: AUTH_SLICE_KEY,
   storage: storage,
   blacklist: ["fetching"],
 };
 
 export const rootReducer = combineReducers({
-  [authSlice.reducerPath]: persistReducer(authPersistConfig, authSlice.reducer),
+  [AUTH_SLICE_KEY]: persistReducer(authPersistConfig, authSlice.reducer),
 });
 
 const store = configureStore({
