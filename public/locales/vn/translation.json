@@ -1,0 +1,203 @@
+{
+  "nav": {
+    "books": "Sách",
+    "limitedEditions": "Phiên bản giới hạn",
+    "gifts": "Quà tặng",
+    "stores": "Cửa hàng",
+    "about": "Về chúng tôi"
+  },
+  "header": {
+    "searchPlaceholder": "Tìm kiếm",
+    "aria": {
+      "searchButton": "Tìm kiếm",
+      "language": "Ngôn ngữ và quốc gia",
+      "account": "Tài khoản",
+      "wishlist": "Yêu thích",
+      "cart": "Giỏ hàng"
+    },
+    "languageToggle": "VN / EN"
+  },
+  "common": {
+    "badge": {
+      "new": "MỚI"
+    }
+  },
+  "grid": {
+    "title": "Mới & Thịnh hành"
+  },
+  "hero": {
+    "slides": {
+      "1": {
+        "title": "Massimo Listri. Cung điện Ý",
+        "cta": "Khám phá ngay"
+      },
+      "2": {
+        "title": "Phát hành mới",
+        "cta": "Mua ngay"
+      },
+      "3": {
+        "title": "Phiên bản giới hạn",
+        "cta": "Khám phá"
+      }
+    }
+  },
+  "home": {
+    "items": {
+      "1": {
+        "title": "Hokusai.",
+        "subtitle": "Ba mươi sáu cảnh núi Phú Sĩ",
+        "price": "US$ 80"
+      },
+      "2": {
+        "title": "Tranh in mộc Nhật Bản",
+        "price": "US$ 150"
+      },
+      "3": {
+        "title": "Trang sức giả",
+        "price": "US$ 125"
+      },
+      "4": {
+        "title": "Sophia bởi Eisenstaedt",
+        "price": "US$ 1,000"
+      },
+      "5": {
+        "title": "Sophia bởi Eisenstaedt",
+        "price": "US$ 1,000"
+      },
+      "6": {
+        "title": "Sophia bởi Eisenstaedt",
+        "price": "US$ 1,000"
+      }
+    }
+  },
+  "quote": {
+    "sectionLabel": "Trang sức giả",
+    "textStart": "\"Đừng tiết kiệm - hãy thật lớn: những món trang sức mát mẻ nhất của thế kỷ 20. TASCHEN đã xuất bản một tập sách minh họa nặng chín pound về chủ đề: ",
+    "textEm": "Trang sức giả",
+    "textEnd": ".\"",
+    "cite": "Stern",
+    "imageAlt": "Trang sức giả",
+    "productTitle": "Trang sức giả",
+    "productPrice": "US$ 125"
+  },
+  "footer": {
+    "tagline": "TASCHEN. Sách cho những người lạc quan từ 1980",
+    "description": "TASCHEN là nhà xuất bản sách nghệ thuật hàng đầu thế giới, đặt trụ sở tại Cologne với các đội ngũ ở Berlin, Brussels, Hong Kong, London, Los Angeles, Madrid, Miami, Milan, New York, Paris và Tokyo. Hơn 40 năm qua, chúng tôi có sứ mệnh xuất bản những cuốn sách minh họa đổi mới về nghệ thuật, kiến trúc, thiết kế, thời trang, điện ảnh, lối sống, du lịch, nhiếp ảnh và văn hóa đại chúng và đưa chúng đến với thế giới. Chúng tôi mong muốn trở nên bao hàm, độc lập, truyền cảm hứng.",
+    "connectTitle": "Kết nối",
+    "companyTitle": "Công ty",
+    "customerTitle": "Thông tin khách hàng",
+    "newsletterTitle": "Đăng ký nhận bản tin:",
+    "emailPlaceholder": "Địa chỉ email của bạn",
+    "submit": "Gửi",
+    "links": {
+      "connect": {
+        "affiliateProgram": "Chương trình liên kết",
+        "corporateContacts": "Liên hệ doanh nghiệp",
+        "facebook": "Facebook",
+        "instagram": "Instagram",
+        "newsletter": "Newsletter",
+        "tiktok": "TikTok",
+        "youtube": "YouTube"
+      },
+      "company": {
+        "accessibility": "Khả năng truy cập",
+        "careers": "Tuyển dụng",
+        "terms": "Điều khoản và điều kiện chung",
+        "glossary": "Thuật ngữ",
+        "imprint": "Thông tin pháp lý",
+        "privacy": "Chính sách quyền riêng tư",
+        "projectProposals": "Đề xuất dự án"
+      },
+      "customer": {
+        "chat": "Trò chuyện",
+        "customerService": "Dịch vụ khách hàng",
+        "shippingReturns": "Vận chuyển & Đổi trả",
+        "trackOrder": "Theo dõi đơn hàng",
+        "becomeReseller": "Trở thành đại lý TASCHEN",
+        "corporateDeals": "Ưu đãi doanh nghiệp",
+        "b2bAccess": "Truy cập cửa hàng B2B"
+      }
+    },
+    "copyright": "c {{year}} - TASCHEN GmbH, Hohenzollernring 53, D-50672 Cologne"
+  },
+  "profile": {
+    "header": {
+      "orderHistory": "Lịch sử đơn hàng",
+      "menu": {
+        "profile": "Hồ sơ",
+        "orders": "Đơn hàng",
+        "signOut": "Đăng xuất"
+      },
+      "countries": {
+        "germany": "Đức",
+        "france": "Pháp",
+        "unitedStates": "Hoa Kỳ",
+        "unitedKingdom": "Vương quốc Anh"
+      }
+    },
+    "links": {
+      "refundPolicy": "Chính sách hoàn tiền",
+      "shipping": "Vận chuyển",
+      "privacyPolicy": "Chính sách quyền riêng tư",
+      "legalNotice": "Thông báo pháp lý",
+      "cancellations": "Hủy đơn",
+      "contactInformation": "Thông tin liên hệ"
+    },
+    "footer": {
+      "copyright": "© {{year}} TASCHEN"
+    },
+    "page": {
+      "contactDetailsTitle": "Chi tiết liên hệ",
+      "nameLabel": "Tên",
+      "emailLabel": "Email",
+      "addressesTitle": "Địa chỉ",
+      "addAddress": "+ Thêm",
+      "noAddresses": "Chưa có địa chỉ",
+      "giftCardsTitle": "Thẻ quà tặng của bạn",
+      "noGiftCards": "Bạn chưa có thẻ quà tặng",
+      "giftCardPlaceholder": "Nhập mã thẻ quà tặng",
+      "editName": "Chỉnh sửa tên"
+    }
+  },
+  "auth": {
+    "emailLabel": "Email",
+    "emailPlaceholder": "Email",
+    "passwordLabel": "Mật khẩu",
+    "passwordPlaceholder": "Mật khẩu",
+    "confirmPasswordLabel": "Xác nhận mật khẩu",
+    "confirmPasswordPlaceholder": "Xác nhận mật khẩu",
+    "firstNameLabel": "Tên",
+    "firstNamePlaceholder": "Tên",
+    "lastNameLabel": "Họ",
+    "lastNamePlaceholder": "Họ",
+    "verifyTokenLabel": "Mã xác minh",
+    "verifyTokenPlaceholder": "Nhập mã xác minh",
+    "registerTitle": "Tạo tài khoản",
+    "registerSubtitle": "Nhập thông tin để bắt đầu.",
+    "forgotTitle": "Quên mật khẩu",
+    "forgotSubtitle": "Chúng tôi sẽ gửi liên kết đặt lại mật khẩu.",
+    "verifyTitle": "Xác minh tài khoản",
+    "verifySubtitle": "Nhập mã xác minh đã gửi qua email.",
+    "submit": "Tiếp tục",
+    "submitting": "Đang đăng nhập...",
+    "registerSubmit": "Tạo tài khoản",
+    "registering": "Đang tạo tài khoản...",
+    "forgotSubmit": "Gửi liên kết",
+    "forgotSubmitting": "Đang gửi...",
+    "verifySubmit": "Xác minh",
+    "verifying": "Đang xác minh...",
+    "success": {
+      "register": "Đăng ký thành công. Hãy kiểm tra email để nhận mã xác minh.",
+      "verify": "Xác minh thành công. Bạn có thể đăng nhập.",
+      "forgot": "Nếu email tồn tại, chúng tôi sẽ gửi hướng dẫn đặt lại đến {{email}}."
+    },
+    "errors": {
+      "emailInvalid": "Email không hợp lệ",
+      "passwordMin": "Mật khẩu tối thiểu {{count}} ký tự",
+      "required": "Bắt buộc",
+      "passwordMismatch": "Mật khẩu không khớp",
+      "requestFailed": "Có lỗi xảy ra. Vui lòng thử lại.",
+      "missingVerifyId": "Thiếu mã định danh xác minh."
+    }
+  }
+}
