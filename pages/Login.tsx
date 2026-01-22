@@ -1,4 +1,5 @@
 import LoginForm, { type LoginValues } from "@/components/auth/LoginForm";
+import { LoginButtons } from "@/components/auth/LoginWithGoogle";
 import * as React from "react";
 
 const Login = () => {
@@ -13,6 +14,9 @@ const Login = () => {
     }
   };
 
-  return <LoginForm isLoading={loading} onSubmit={onSubmit} />;
+  return <>
+    <LoginForm isLoading={loading} onSubmit={onSubmit} />
+    <LoginButtons />
+  </>
 };
 export default Login;
