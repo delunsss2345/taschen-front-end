@@ -1,7 +1,6 @@
 "use client";
 
 import i18n from "@/i18n";
-import DefaultLayout from "@/layouts/DefaultLayout";
 import { SessionProvider } from "next-auth/react";
 import { I18nextProvider } from "react-i18next";
 

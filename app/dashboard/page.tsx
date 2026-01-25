@@ -1,3 +1,5 @@
+import { Dashboard } from "@/layouts/AdminLayout";
+
 export default function Page() {
-  return <>Coming Soon</>;
+  return <Dashboard/>;
 }
