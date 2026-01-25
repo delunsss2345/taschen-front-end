@@ -35,13 +35,13 @@ export function NavGroup({ title, items }: any) {
       <SidebarMenu>
         {items.map((item) => {
           const key = `${item.title}-${item.url}`
-
+          console.log(item)
           if (!item.items) {
-              return <SidebarMenuLink key={key} item={item} href={""} />
+              return <SidebarMenuLink key={key} item={item} href={item.url} />
           }
           
 
-          return <SidebarMenuCollapsible key={key} item={item} href={""} />
+          return <SidebarMenuCollapsible key={key} item={item} href={null} />
         })}
       </SidebarMenu>
     </SidebarGroup>
@@ -166,10 +166,10 @@ function SidebarMenuCollapsedDropdown({
 function checkIsActive(href: string, item: any, mainNav = false) {
   return (
     href === item.url || // /endpint?search=param
-    href.split('?')[0] === item.url || // endpoint
-    !!item?.items?.filter((i) => i.url === href).length || // if child nav is active
-    (mainNav &&
-      href.split('/')[1] !== '' &&
-      href.split('/')[1] === item?.url?.split('/')[1])
+    // href.split('?')[0] === item.url || // endpoint
+    !!item?.items?.filter((i) => i.url === href).length 
+    // (mainNav &&
+    //   href.split('/')[1] !== '' &&
+    //   href.split('/')[1] === item?.url?.split('/')[1])
   )
 }
