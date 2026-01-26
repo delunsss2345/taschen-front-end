@@ -12,9 +12,11 @@ export function Main({ fixed, className, fluid, ...props }: MainProps) {
       data-layout={fixed ? 'fixed' : 'auto'}
       className={cn(
         'px-4 py-6',
+
         fixed && 'flex grow flex-col overflow-hidden',
+
         !fluid &&
-          '@7xl/content:mx-auto @7xl/content:w-full @7xl/content:max-w-7xl',
+          'mx-auto w-full max-w-7xl 2xl:mx-auto 2xl:w-full 2xl:max-w-7xl',
         className
       )}
       {...props}

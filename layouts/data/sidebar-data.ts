@@ -1,8 +1,6 @@
+import { SidebarData } from '@/types/layouts/sidebar.type'
 import {
-  AudioWaveform,
   Bell,
-  Command,
-  GalleryVerticalEnd,
   HelpCircle,
   LayoutDashboard,
   ListTodo,
@@ -16,28 +14,13 @@ import {
   Wrench
 } from 'lucide-react'
 
-export const sidebarData: any = {
+
+export const sidebarData: SidebarData = {
   user: {
     name: 'phamthanhhuy',
     email: 'huydev@gmail.com',
+    avatar : ""
   },
-  teams: [
-    {
-      name: 'Shadcn Admin',
-      logo: Command,
-      plan: 'Vite + ShadcnUI',
-    },
-    {
-      name: 'Acme Inc',
-      logo: GalleryVerticalEnd,
-      plan: 'Enterprise',
-    },
-    {
-      name: 'Acme Corp.',
-      logo: AudioWaveform,
-      plan: 'Startup',
-    },
-  ],
   navGroups: [
     {
       title: 'General',

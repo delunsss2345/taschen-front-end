@@ -1,8 +1,8 @@
-
+'use client'
 import {
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger,
+  CollapsibleTrigger
 } from '@/components/ui/collapsible'
 import {
   SidebarGroup,
@@ -13,8 +13,9 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  useSidebar,
+  useSidebar
 } from '@/components/ui/sidebar'
+import { NavCollapsible, NavGroup as NavGroupProps, NavItem, NavLink } from '@/types/layouts/sidebar.type'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { type ReactNode } from 'react'
@@ -28,14 +29,14 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu'
 
-export function NavGroup({ title, items }: any) {
+export function NavGroup({ title, items }: NavGroupProps) {
   return (
     <SidebarGroup>
       <SidebarGroupLabel>{title}</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
           const key = `${item.title}-${item.url}`
-          console.log(item)
+
           if (!item.items) {
               return <SidebarMenuLink key={key} item={item} href={item.url} />
           }
@@ -52,7 +53,7 @@ function NavBadge({ children }: { children: ReactNode }) {
   return <Badge className='rounded-full px-1 py-0 text-xs'>{children}</Badge>
 }
 
-function SidebarMenuLink({ item, href }: { item: any; href: string }) {
+function SidebarMenuLink({ item, href }: { item: NavLink; href: string }) {
   const { setOpenMobile } = useSidebar()
   return (
     <SidebarMenuItem>
@@ -75,7 +76,7 @@ function SidebarMenuCollapsible({
   item,
   href,
 }: {
-  item: any
+  item: NavCollapsible
   href: string
 }) {
   const { setOpenMobile } = useSidebar()
@@ -121,7 +122,7 @@ function SidebarMenuCollapsedDropdown({
   item,
   href,
 }: {
-  item: any
+  item: NavCollapsible
   href: string
 }) {
   return (
@@ -163,13 +164,9 @@ function SidebarMenuCollapsedDropdown({
   )
 }
 
-function checkIsActive(href: string, item: any, mainNav = false) {
+function checkIsActive(href: string, item: NavItem, mainNav = false) {
   return (
-    href === item.url || // /endpint?search=param
-    // href.split('?')[0] === item.url || // endpoint
+    href === item.url || 
     !!item?.items?.filter((i) => i.url === href).length 
-    // (mainNav &&
-    //   href.split('/')[1] !== '' &&
-    //   href.split('/')[1] === item?.url?.split('/')[1])
   )
 }
