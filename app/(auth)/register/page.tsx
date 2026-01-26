@@ -1,9 +1,9 @@
 "use client";
 
-import Register from "@/pages/Register";
+import VerifyEmailForm from "@/components/auth/VerifyForm";
 
 const Page = () => {
-  return <Register />;
+  return <VerifyEmailForm />;
 };
 
 export default Page;

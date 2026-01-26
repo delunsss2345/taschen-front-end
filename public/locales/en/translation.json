@@ -178,6 +178,8 @@
     "forgotSubtitle": "We will send a reset link to your email.",
     "verifyTitle": "Verify your account",
     "verifySubtitle": "Enter the token sent to your email.",
+    "sendVerifyEmail": "Send verification email",
+    "sending": "Sending...",
     "submit": "Continue",
     "submitting": "Logging in...",
     "registerSubmit": "Create account",

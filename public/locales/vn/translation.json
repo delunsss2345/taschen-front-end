@@ -178,6 +178,8 @@
     "forgotSubtitle": "Chúng tôi sẽ gửi liên kết đặt lại mật khẩu.",
     "verifyTitle": "Xác minh tài khoản",
     "verifySubtitle": "Nhập mã xác minh đã gửi qua email.",
+    "sendVerifyEmail": "Gửi email xác minh",
+    "sending": "Đang gửi...",
     "submit": "Tiếp tục",
     "submitting": "Đang đăng nhập...",
     "registerSubmit": "Tạo tài khoản",
