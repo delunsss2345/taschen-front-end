@@ -81,10 +81,8 @@ export const authSlice = createSlice({
       console.log(state.authLoading);
       state.authLoading = false;
       const data = action.payload.data;
-      console.log(data);
-      // state.currentUser = user;
-      // localStorage.setItem("accessToken", data.accessToken);
-      // localStorage.setItem("refreshToken", data.refreshToken);
+      state.currentUser = data.user;
+      localStorage.setItem("accessToken", data.accessToken);
     });
 
     builder.addCase(login.rejected, (state) => {

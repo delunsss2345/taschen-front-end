@@ -83,9 +83,10 @@ const LoginForm = ({ isLoading, onSubmit }: LoginFormProps) => {
           )}
         />
 
-        <Button type="submit" className={`w-full ${isLoading ? "hidden" : ""}`} disabled={isLoading}>
-          {isLoading ? 'Đang đăng nhập': 'Đăng nhập'}
+        <Button type="submit" className="w-full cursor-pointer" disabled={isLoading}>
+          {isLoading ? "Đang đăng nhập" : "Đăng nhập"}
         </Button>
+
       </form>
     </Form>
   );

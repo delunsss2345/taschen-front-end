@@ -4,13 +4,13 @@ import { login, selectAuthLoading } from "@/features/auth";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { toast } from "sonner";
 const Login = () => {
-  const {authLoading} = useAppSelector(selectAuthLoading)
-  const dispatch = useAppDispatch() ; 
+  const { authLoading } = useAppSelector(selectAuthLoading)
+  const dispatch = useAppDispatch();
   const onSubmit = async (values: LoginValues) => {
-    console.log(authLoading) ; 
+    console.log(authLoading);
     toast.promise(dispatch(login(values)).unwrap(), {
-      loading: 'Đang loading',
-      success: 'Loading thành công',
+      loading: 'Đang đăng nhập',
+      success: 'Đăng nhập thành công',
       error: 'Loading lỗi',
     });
   };

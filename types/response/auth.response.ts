@@ -5,13 +5,13 @@ export type ApiResponse<T> = {
   data: T;
 };
 
-export type AuthTokenData = {
-  userId: number;
+export type UserLoginResponse = {
+  id: number;
   email: string;
-  expiresIn: number;
-  tokenType: string;
-  refreshToken: string;
-  accessToken: string;
+  firstName: string;
+  lastName: string;
+  gender: "MALE" | "FEMALE" | string | null;
+  phoneNumber: string | null;
   roles: string[];
 };
 
@@ -28,15 +28,21 @@ export type UserResponse = {
   addresses: unknown[] | null;
 };
 
-export type UserLoginResponse = {
-  id: number;
-  email: string;
-  roles: string[];
+export type AuthTokenData = {
+  tokenType: string;
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
 };
 
-export type RegisterResponseData = UserResponse;
-export type LoginResponseData = AuthTokenData;
+export type LoginResponseData = AuthTokenData & {
+  user: UserLoginResponse;
+};
+
 export type RefreshTokenResponseData = AuthTokenData;
+
+export type RegisterResponseData = UserResponse;
+
 export type LoginResponse = ApiResponse<LoginResponseData>;
 export type RefreshTokenResponse = ApiResponse<RefreshTokenResponseData>;
 export type RegisterResponse = ApiResponse<RegisterResponseData>;
