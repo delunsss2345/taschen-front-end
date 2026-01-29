@@ -1,21 +1,22 @@
 import LoginForm, { type LoginValues } from "@/components/auth/LoginForm";
 import { LoginButtons } from "@/components/auth/LoginWithGoogle";
-import * as React from "react";
-
+import { login, selectAuthLoading } from "@/features/auth";
+import { useAppDispatch, useAppSelector } from "@/store";
+import { toast } from "sonner";
 const Login = () => {
-  const [loading, setLoading] = React.useState(false);
-
+  const {authLoading} = useAppSelector(selectAuthLoading)
+  const dispatch = useAppDispatch() ; 
   const onSubmit = async (values: LoginValues) => {
-    try {
-      setLoading(true);
-      console.log("login:", values);
-    } finally {
-      setLoading(false);
-    }
+    console.log(authLoading) ; 
+    toast.promise(dispatch(login(values)).unwrap(), {
+      loading: 'Đang loading',
+      success: 'Loading thành công',
+      error: 'Loading lỗi',
+    });
   };
 
   return <>
-    <LoginForm isLoading={loading} onSubmit={onSubmit} />
+    <LoginForm isLoading={authLoading} onSubmit={onSubmit} />
     <LoginButtons />
   </>
 };

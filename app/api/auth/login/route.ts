@@ -45,16 +45,10 @@ export async function POST(request: NextRequest) {
             ...COOKIE_OPTIONS,
             maxAge: 60 * 60 * 24 * 7,
         });
-
         return NextResponse.json({
             success: true,
             data: {
-                user: {
-                    id: backendData.data.userId,
-                    email: backendData.data.email,
-                    roles: backendData.data.roles,
-                },
-                accessToken: backendData.data.accessToken
+                ...backendData.data
             },
         });
 

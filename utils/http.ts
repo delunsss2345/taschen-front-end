@@ -1,3 +1,4 @@
+import { envConfig } from "@/config/envConfig";
 import type { PromiseHandlers } from "@/types/lib/axios";
 import axios, {
   type AxiosInstance,
@@ -6,7 +7,7 @@ import axios, {
 } from "axios";
 import { isPublicApi } from "./isPublicPath";
 
-const baseURL = process.env.NEXT_PUBLIC_BASE_API ?? "";
+const baseURL = envConfig.NEXT_PUBLIC_BASE_API ?? "";
 
 export const axiosInstance: AxiosInstance = axios.create({
   baseURL,
@@ -52,16 +53,15 @@ const refreshToken = async () => {
       refresh_token: localStorage.getItem("refreshToken"),
     });
 
-    localStorage.setItem("accessToken", result.data.data.access_token);
-    localStorage.setItem("refreshToken", result.data.data.refresh_token);
+    localStorage.setItem("accessToken", result.data.data.accessToken);
+    // localStorage.setItem("refreshToken", result.data.data.refresh_token);
 
     // Gắn queue  null nếu thành công
     processQueue(null);
   } catch (error) {
     processQueue(error);
     localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-
+    // localStorage.removeItem("refreshToken");
     throw error;
   }
 };

@@ -73,18 +73,16 @@ export const authSlice = createSlice({
   extraReducers: (builder) => {
     // login
     builder.addCase(login.pending, (state) => {
+      console.log(state.authLoading);
       state.authLoading = true;
     });
 
     builder.addCase(login.fulfilled, (state, action) => {
+      console.log(state.authLoading);
       state.authLoading = false;
       const data = action.payload.data;
-      const user = {
-        email: data.email,
-        roles: data.roles,
-        id: data.userId,
-      };
-      state.currentUser = user;
+      console.log(data);
+      // state.currentUser = user;
       // localStorage.setItem("accessToken", data.accessToken);
       // localStorage.setItem("refreshToken", data.refreshToken);
     });

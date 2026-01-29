@@ -1,9 +1,10 @@
-import * as React from "react";
-import type { TFunction } from "i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { TFunction } from "i18next";
+import * as React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { FormMessageI18n } from "@/components/common/FormMessageI18n";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -12,7 +13,6 @@ import {
   FormItem,
   FormLabel,
 } from "@/components/ui/form";
-import { FormMessageI18n } from "@/components/common/FormMessageI18n";
 import { Input } from "@/components/ui/input";
 import useTranslator from "@/hooks/use-translator";
 
@@ -25,11 +25,11 @@ const getLoginSchema = (t: TFunction) =>
 export type LoginValues = z.infer<ReturnType<typeof getLoginSchema>>;
 
 type LoginFormProps = {
-  isLoading?: boolean;
+  isLoading: boolean;
   onSubmit?: (values: LoginValues) => void | Promise<void>;
 };
 
-const LoginForm = ({ isLoading = false, onSubmit }: LoginFormProps) => {
+const LoginForm = ({ isLoading, onSubmit }: LoginFormProps) => {
   const { t } = useTranslator();
   const loginSchema = React.useMemo(() => getLoginSchema(t), [t]);
   const form = useForm<LoginValues>({
@@ -83,8 +83,8 @@ const LoginForm = ({ isLoading = false, onSubmit }: LoginFormProps) => {
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? t("auth.submitting") : t("auth.submit")}
+        <Button type="submit" className={`w-full ${isLoading ? "hidden" : ""}`} disabled={isLoading}>
+          {isLoading ? 'Đang đăng nhập': 'Đăng nhập'}
         </Button>
       </form>
     </Form>
