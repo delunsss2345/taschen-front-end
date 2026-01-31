@@ -1,4 +1,6 @@
+import { envConfig } from "@/config/envConfig";
 import "server-only";
+const BACKEND_URL = envConfig.BACKEND_API_URL;
 
 export class HttpError<T = unknown> extends Error {
     status: number;
@@ -43,7 +45,6 @@ async function request<T>(method: string, path: string, opt: ApiOptions = {}): P
     } = opt;
 
     const url = buildUrl(baseURL, path, query);
-
     const header = new Headers(headers);
     if (body !== undefined) header.set("content-type", "application/json");
 
@@ -86,9 +87,11 @@ export const fetchApi = (defaults: Pick<ApiOptions, "baseURL" | "headers"> = {})
 
     return {
         get<T>(path: string, opt?: ApiOptions) {
+
             return request<T>("GET", path, withDefaults(opt));
         },
         post<T>(path: string, body?: unknown, opt?: ApiOptions) {
+            console.log(path);
             return request<T>("POST", path, withDefaults({ ...opt, body }));
         },
         put<T>(path: string, body?: unknown, opt?: ApiOptions) {
@@ -102,3 +105,8 @@ export const fetchApi = (defaults: Pick<ApiOptions, "baseURL" | "headers"> = {})
         },
     };
 };
+
+
+export const api = fetchApi({
+    baseURL: BACKEND_URL
+})

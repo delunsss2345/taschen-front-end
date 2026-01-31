@@ -1,10 +1,12 @@
-import { envConfig } from "@/config/envConfig";
+import { API_MESSAGE } from "@/constants/api/messageApi";
+import { api } from "@/lib/api/fetchHandler";
 import { ResponseApi } from "@/lib/api/responseHandler";
+import { LoginResponse } from "@/types/response/auth.response";
+import { LoginSchema } from "@/validation/auth/loginValidation";
 import { HttpStatusCode } from "axios";
 import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
-const BACKEND_URL = envConfig.BACKEND_API_URL;
 const COOKIE_OPTIONS = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -13,50 +15,31 @@ const COOKIE_OPTIONS = {
 
 export async function POST(request: NextRequest) {
     try {
-        const body = await request.json();
-        if (!body.email || !body.password) {
-            return ResponseApi.error('Tài khoản hoặc mật khẩu không được trống', HttpStatusCode.UnprocessableEntity)
+        const payload = await request.json();
+        const parsed = LoginSchema.safeParse(payload);
+        if (!parsed.success) {
+            return ResponseApi.error(API_MESSAGE.AUTH_EMAIL_PASSWORD_EMPTY, HttpStatusCode.UnprocessableEntity)
         }
-        const backendResponse = await fetch(`${BACKEND_URL}/auth/login`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                email: body.email,
-                password: body.password,
-            }),
-        });
+        console.log(payload);
+        const response = await api.post<LoginResponse>("auth/login", {
+            ...payload
+        })
 
-        const backendData = await backendResponse.json();
-        if (!backendResponse.ok) {
-            return NextResponse.json(
-                {
-                    success: false,
-                    message: backendData.message || "Đăng nhập thất bại"
-                },
-                { status: backendResponse.status }
-            );
-        }
         const cookieStore = await cookies();
 
-        cookieStore.set("refreshToken", backendData.data.refreshToken, {
+        cookieStore.set("refreshToken", response.data.refreshToken, {
             ...COOKIE_OPTIONS,
             maxAge: 60 * 60 * 24 * 7,
         });
-        return NextResponse.json({
-            success: true,
-            data: {
-                ...backendData.data
-            },
-        });
+        return ResponseApi.success(response.data, HttpStatusCode.Ok);
 
     }
     catch (error) {
-        console.error("Login API Error:", error);
-        return NextResponse.json(
-            { success: false, message: "Lỗi hệ thống, vui lòng thử lại" },
-            { status: 500 }
-        );
+        if (process.env.NODE_ENV === 'development') {
+            console.error("Login API Error:", error);
+        }
+        return ResponseApi.error(
+            API_MESSAGE.SYSTEM_TRY_AGAIN, HttpStatusCode.BadRequest
+        )
     }
 }

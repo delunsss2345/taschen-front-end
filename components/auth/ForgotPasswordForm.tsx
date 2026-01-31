@@ -1,9 +1,11 @@
-import * as React from "react";
-import type { TFunction } from "i18next";
+'use client'
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { TFunction } from "i18next";
+import * as React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { FormMessageI18n } from "@/components/common/FormMessageI18n";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -12,7 +14,6 @@ import {
   FormItem,
   FormLabel,
 } from "@/components/ui/form";
-import { FormMessageI18n } from "@/components/common/FormMessageI18n";
 import { Input } from "@/components/ui/input";
 import useTranslator from "@/hooks/use-translator";
 

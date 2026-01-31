@@ -26,8 +26,11 @@ export const login = createAsyncThunk<LoginResponse, LoginPayload>(
     try {
       const res = await authApi.login(payload);
       return res;
-    } catch (error) {
-      return rejectWithValue(error);
+    } catch (error: any) {
+      return rejectWithValue({
+        status: error.response?.status,
+        message: error.response?.data?.message || error.message || "Đăng nhập thất bại",
+      });
     }
   },
 );
