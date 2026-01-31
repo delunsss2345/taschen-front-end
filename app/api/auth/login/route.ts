@@ -1,4 +1,6 @@
 import { envConfig } from "@/config/envConfig";
+import { ResponseApi } from "@/lib/api/responseHandler";
+import { HttpStatusCode } from "axios";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -13,10 +15,7 @@ export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
         if (!body.email || !body.password) {
-            return NextResponse.json(
-                { success: false, message: "Email và mật khẩu là bắt buộc" },
-                { status: 400 }
-            );
+            return ResponseApi.error('Tài khoản hoặc mật khẩu không được trống', HttpStatusCode.UnprocessableEntity)
         }
         const backendResponse = await fetch(`${BACKEND_URL}/auth/login`, {
             method: "POST",
