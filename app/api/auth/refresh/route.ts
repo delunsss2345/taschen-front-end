@@ -1,8 +1,7 @@
 import { API_MESSAGE } from "@/constants/api/messageApi";
 import { api } from "@/lib/api/fetchHandler";
 import { ResponseApi } from "@/lib/api/responseHandler";
-import { LoginResponse } from "@/types/response/auth.response";
-import { LoginSchema } from "@/validation/auth/loginValidation";
+import { RefreshTokenResponse } from "@/types/response/auth.response";
 import { HttpStatusCode } from "axios";
 import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
@@ -15,27 +14,28 @@ const COOKIE_OPTIONS = {
 
 export async function POST(request: NextRequest) {
     try {
-        const payload = await request.json();
-        const parsed = LoginSchema.safeParse(payload);
-        if (!parsed.success) {
-            return ResponseApi.error(API_MESSAGE.AUTH_EMAIL_PASSWORD_EMPTY, HttpStatusCode.UnprocessableEntity)
-        }
-        const response = await api.post<LoginResponse>("auth/login", {
-            ...payload
-        })
-
         const cookieStore = await cookies();
+        const refreshToken = cookieStore.get("refreshToken")?.value;
+
+        if (!refreshToken) {
+            return ResponseApi.error(API_MESSAGE.REFRESH_TOKEN_MISSING, HttpStatusCode.Unauthorized)
+        }
+
+        const response = await api.post<RefreshTokenResponse>("auth/refresh", {
+            refreshToken
+        })
 
         cookieStore.set("refreshToken", response.data.refreshToken, {
             ...COOKIE_OPTIONS,
-            maxAge: 60 * 60 * 24 * 7,
+            maxAge: 60 * 60 * 24 * 7, // 7 days
         });
+
         return ResponseApi.success(response.data, HttpStatusCode.Ok);
 
     }
     catch (error) {
         if (process.env.NODE_ENV === 'development') {
-            console.error("Login API Error:", error);
+            console.error("Refresh Token API Error:", error);
         }
         return ResponseApi.error(
             API_MESSAGE.SYSTEM_TRY_AGAIN, HttpStatusCode.BadRequest
