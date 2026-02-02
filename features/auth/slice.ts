@@ -1,9 +1,11 @@
 import { authApi } from "@/services/authService";
 import type {
-  LoginPayload
+  LoginPayload,
+  RegisterPayload
 } from "@/types/request/auth.request";
 import type {
   LoginResponse,
+  RegisterResponse,
   UserLoginResponse
 } from "@/types/response/auth.response";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
@@ -35,17 +37,20 @@ export const login = createAsyncThunk<LoginResponse, LoginPayload>(
   },
 );
 
-// export const register = createAsyncThunk<RegisterResponse, RegisterPayload>(
-//   "auth/register",
-//   async (payload, { rejectWithValue }) => {
-//     try {
-//       const res = await authApi.register(payload);
-//       return res;
-//     } catch (error) {
-//       return rejectWithValue(error);
-//     }
-//   },
-// );
+export const register = createAsyncThunk<RegisterResponse, RegisterPayload>(
+  "auth/register",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const res = await authApi.register(payload);
+      return res;
+    } catch (error: any) {
+      return rejectWithValue({
+        status: error.response?.status,
+        message: error.response?.data?.message || error.message || "Đăng ký thất bại",
+      });
+    }
+  },
+);
 
 // export const logout = createAsyncThunk<LogoutResponse, LogoutPayload>(
 //   "auth/logout",
@@ -95,19 +100,17 @@ export const authSlice = createSlice({
     });
 
     // register
-    // builder.addCase(register.pending, (state) => {
-    //   state.authLoading = true;
-    // });
+    builder.addCase(register.pending, (state) => {
+      state.authLoading = true;
+    });
 
-    // builder.addCase(register.fulfilled, (state) => {
-    //   state.authLoading = false;
-    // });
+    builder.addCase(register.fulfilled, (state) => {
+      state.authLoading = false;
+    });
 
-    // builder.addCase(register.rejected, (state) => {
-    //   state.authLoading = false;
-    //   state.currentUser = null;
-    //   state.accessToken = null;
-    // });
+    builder.addCase(register.rejected, (state) => {
+      state.authLoading = false;
+    });
 
     // logout
     // builder.addCase(logout.pending, (state) => {

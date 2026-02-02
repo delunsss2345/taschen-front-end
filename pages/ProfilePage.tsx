@@ -4,10 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { selectCurrentUser } from "@/features/auth";
 import useTranslator from "@/hooks/use-translator";
+import { useAppSelector } from "@/store";
 
 const ProfilePage = () => {
   const { t } = useTranslator();
+  const currentUser = useAppSelector(selectCurrentUser);
 
   return (
     <main className="min-h-[calc(100vh-8rem)] bg-background">
@@ -34,11 +37,15 @@ const ProfilePage = () => {
                   </Button>
                 </div>
 
+                <div className="text-base font-medium">
+                  {currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : "N/A"}
+                </div>
+
                 <div className="grid gap-1">
                   <div className="text-sm text-muted-foreground">
                     {t("profile.page.emailLabel")}
                   </div>
-                  <div className="text-sm">huypham1459@gmail.com</div>
+                  <div className="text-sm">{currentUser?.email || "N/A"}</div>
                 </div>
               </div>
             </CardContent>
