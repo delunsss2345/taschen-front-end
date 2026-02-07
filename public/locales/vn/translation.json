@@ -201,5 +201,23 @@
       "requestFailed": "Có lỗi xảy ra. Vui lòng thử lại.",
       "missingVerifyId": "Thiếu mã định danh xác minh."
     }
+  },
+  "orders": {
+    "page": {
+      "title": "Lịch sử đơn hàng",
+      "subtitle": "Xem và quản lý các đơn hàng của bạn",
+      "noOrders": "Bạn chưa có đơn hàng nào",
+      "itemsCount": "Số lượng sản phẩm",
+      "total": "Tổng cộng",
+      "shippingAddress": "Địa chỉ giao hàng",
+      "viewDetails": "Xem chi tiết",
+      "buyAgain": "Mua lại"
+    },
+    "status": {
+      "delivered": "Đã giao",
+      "shipping": "Đang giao",
+      "processing": "Đang xử lý",
+      "cancelled": "Đã hủy"
+    }
   }
 }
