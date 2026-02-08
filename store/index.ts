@@ -1,5 +1,6 @@
 
 import { authSlice } from "@/features/auth/slice";
+import { bookSlice } from "@/features/book/slice";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -15,11 +16,12 @@ import persistReducer from "redux-persist/es/persistReducer";
 import storage from "redux-persist/lib/storage";
 
 const AUTH_SLICE_KEY = authSlice.name;
+const BOOK_SLICE_KEY = bookSlice.name;
 
 const persistConfig = {
   key: "root",
   storage,
-  blacklist: [AUTH_SLICE_KEY],
+  blacklist: [AUTH_SLICE_KEY, BOOK_SLICE_KEY],
 };
 
 const authPersistConfig = {
@@ -30,6 +32,7 @@ const authPersistConfig = {
 
 export const rootReducer = combineReducers({
   [AUTH_SLICE_KEY]: persistReducer(authPersistConfig, authSlice.reducer),
+  [BOOK_SLICE_KEY]: bookSlice.reducer,
 });
 
 const store = configureStore({

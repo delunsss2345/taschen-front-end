@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import useTranslator from "@/hooks/use-translator";
 
-// Mock data - thay bằng API call thật trong production
 const mockOrders = [
     {
         id: "ORD-2024-001",
