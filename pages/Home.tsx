@@ -2,9 +2,10 @@
 import Grid from "@/components/layouts/Grid";
 import { fetchBooks } from "@/features/book";
 import { selectBooks, selectIsLoadingBook } from "@/features/book/selector";
-import { useAppDispatch, useAppSelector } from "@/store";
 import Hero from "@/layouts/DefaultLayout/Hero";
 import QuoteRandom from "@/layouts/DefaultLayout/QuoteRandom";
+import { useAppDispatch, useAppSelector } from "@/store";
+import { Book } from "@/types/book";
 import { useEffect } from "react";
 
 type Item = {
@@ -19,14 +20,15 @@ type Item = {
 const Home = () => {
   const dispatch = useAppDispatch();
   const books = useAppSelector(selectBooks);
+  console.log(books);
+
   const isLoadingBook = useAppSelector(selectIsLoadingBook);
 
   useEffect(() => {
     dispatch(fetchBooks());
   }, [dispatch]);
 
-  // Transform books from API to Grid items format
-  const items: Item[] = books.map((book: import("@/types/book").Book) => ({
+  const items: Item[] = books.map((book: Book) => ({
     id: book.id.toString(),
     badge: book.isActive ? "Active" : undefined,
     title: book.title,

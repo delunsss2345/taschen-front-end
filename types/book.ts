@@ -20,3 +20,10 @@ export interface BooksApiResponse {
     statusCode: number;
     data: Book[];
 }
+
+export interface BookApiResponse {
+    error: null | string;
+    message: string;
+    statusCode: number;
+    data: Book;
+}
