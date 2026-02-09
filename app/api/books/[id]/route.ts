@@ -10,7 +10,7 @@ export async function GET(
 ) {
     try {
         const { id } = await params;
-        const response = await api.get<any>(`books/${id}`);
+        const response = await api.get<unknown>(`books/${id}`);
         return ResponseApi.success(response.data);
     } catch (error) {
         if (process.env.NODE_ENV === "development") {

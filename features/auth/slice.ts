@@ -9,6 +9,7 @@ import type {
   UserLoginResponse
 } from "@/types/response/auth.response";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 
 export type AuthState = {
   currentUser: UserLoginResponse | null;
@@ -28,10 +29,15 @@ export const login = createAsyncThunk<LoginResponse, LoginPayload>(
     try {
       const res = await authApi.login(payload);
       return res;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue({
+          status: error.response?.status,
+          message: error.response?.data?.message || error.message || "Đăng nhập thất bại",
+        });
+      }
       return rejectWithValue({
-        status: error.response?.status,
-        message: error.response?.data?.message || error.message || "Đăng nhập thất bại",
+        message: "Đăng nhập thất bại",
       });
     }
   },
@@ -43,10 +49,15 @@ export const register = createAsyncThunk<RegisterResponse, RegisterPayload>(
     try {
       const res = await authApi.register(payload);
       return res;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue({
+          status: error.response?.status,
+          message: error.response?.data?.message || error.message || "Đăng ký thất bại",
+        });
+      }
       return rejectWithValue({
-        status: error.response?.status,
-        message: error.response?.data?.message || error.message || "Đăng ký thất bại",
+        message: "Đăng ký thất bại",
       });
     }
   },

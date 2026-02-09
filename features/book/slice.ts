@@ -1,6 +1,7 @@
 import { bookApi } from "@/services/bookService";
 import type { Book, BookApiResponse, BooksApiResponse } from "@/types/book";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 
 export type BookState = {
     books: Book[];
@@ -24,9 +25,14 @@ export const fetchBooks = createAsyncThunk<BooksApiResponse, void>(
         try {
             const response = await bookApi.getBooks();
             return response;
-        } catch (error: any) {
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+                return rejectWithValue({
+                    message: error.response?.data?.message || error.message || "Failed to fetch books",
+                });
+            }
             return rejectWithValue({
-                message: error.response?.data?.message || error.message || "Failed to fetch books",
+                message: "Failed to fetch books",
             });
         }
     }
@@ -38,9 +44,14 @@ export const fetchBookById = createAsyncThunk<BookApiResponse, number>(
         try {
             const response = await bookApi.getBookById(id);
             return response;
-        } catch (error: any) {
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+                return rejectWithValue({
+                    message: error.response?.data?.message || error.message || "Failed to fetch book",
+                });
+            }
             return rejectWithValue({
-                message: error.response?.data?.message || error.message || "Failed to fetch book",
+                message: "Failed to fetch book",
             });
         }
     }

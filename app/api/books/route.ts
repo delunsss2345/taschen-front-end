@@ -5,7 +5,7 @@ import { HttpStatusCode } from "axios";
 
 export async function GET() {
     try {
-        const response = await api.get<any>("books")
+        const response = await api.get<unknown>("books")
         console.log(response.data);
         return ResponseApi.success(response.data);
     }
