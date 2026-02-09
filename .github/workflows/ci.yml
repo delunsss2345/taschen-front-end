@@ -1,4 +1,4 @@
-name: CI/CD Build & Conflict Check
+name: CI Build
 
 on:
   pull_request:
@@ -7,23 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  check-conflict:
-    name: Check Merge Conflict
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Check if PR has conflicts
-        uses: prince-chrismc/check-mergeable-action@v2
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
   build-and-lint:
     name: Build and Lint
-    needs: check-conflict
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
