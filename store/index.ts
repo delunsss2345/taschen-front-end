@@ -1,4 +1,3 @@
-
 import { authSlice } from "@/features/auth/slice";
 import { bookSlice } from "@/features/book/slice";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
@@ -11,8 +10,8 @@ import {
   PURGE,
   REHYDRATE,
 } from "redux-persist";
-import { REGISTER } from "redux-persist/es/constants";
-import persistReducer from "redux-persist/es/persistReducer";
+import { REGISTER } from "redux-persist/lib/constants";
+import persistReducer from "redux-persist/lib/persistReducer";
 import storage from "redux-persist/lib/storage";
 
 const AUTH_SLICE_KEY = authSlice.name;
