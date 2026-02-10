@@ -18,6 +18,7 @@ import {
 import { NavCollapsible, NavGroup as NavGroupProps, NavItem, NavLink } from '@/types/layouts/sidebar.type'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { type ReactNode } from 'react'
 import { Badge } from '../ui/badge'
 import {
@@ -30,6 +31,8 @@ import {
 } from '../ui/dropdown-menu'
 
 export function NavGroup({ title, items }: NavGroupProps) {
+  const pathname = usePathname() ?? ''
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>{title}</SidebarGroupLabel>
@@ -38,11 +41,10 @@ export function NavGroup({ title, items }: NavGroupProps) {
           const key = `${item.title}-${item.url}`
 
           if (!item.items) {
-              return <SidebarMenuLink key={key} item={item} href={item.url} />
+            return <SidebarMenuLink key={key} item={item} href={pathname} />
           }
-          
 
-          return <SidebarMenuCollapsible key={key} item={item} href={null} />
+          return <SidebarMenuCollapsible key={key} item={item} href={pathname} />
         })}
       </SidebarMenu>
     </SidebarGroup>
@@ -83,7 +85,7 @@ function SidebarMenuCollapsible({
   return (
     <Collapsible
       asChild
-      defaultOpen={checkIsActive(href, item, true)}
+      defaultOpen={checkIsActive(href, item)}
       className='group/collapsible'
     >
       <SidebarMenuItem>
@@ -164,9 +166,15 @@ function SidebarMenuCollapsedDropdown({
   )
 }
 
-function checkIsActive(href: string, item: NavItem, mainNav = false) {
+function resolvePath(url?: NavLink['url']) {
+  if (!url) return undefined
+  if (typeof url === 'string') return url
+  return url.pathname ?? undefined
+}
+
+function checkIsActive(href: string, item: NavItem) {
   return (
-    href === item.url || 
-    !!item?.items?.filter((i) => i.url === href).length 
+    href === resolvePath(item.url) ||
+    !!item?.items?.some((i) => resolvePath(i.url) === href)
   )
 }
