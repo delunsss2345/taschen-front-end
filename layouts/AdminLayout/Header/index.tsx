@@ -1,43 +1,41 @@
-import { Separator } from '@/components/ui/separator'
+'use client'
+
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
-import { useEffect, useState } from 'react'
+import { User } from 'lucide-react'
 
-type HeaderProps = React.HTMLAttributes<HTMLElement> & {
-  fixed?: boolean
-  ref?: React.Ref<HTMLElement>
+type AdminHeaderProps = React.HTMLAttributes<HTMLElement> & {
+  username?: string
 }
-export function Header({ className, fixed, children, ...props }: HeaderProps) {
-  const [offset, setOffset] = useState(0)
 
-  useEffect(() => {
-    const onScroll = () => {
-      setOffset(document.body.scrollTop || document.documentElement.scrollTop)
-    }
-
-    document.addEventListener('scroll', onScroll, { passive: true })
-
-    return () => document.removeEventListener('scroll', onScroll)
-  }, [])
-
+export function Header({ className, username = 'admin', ...props }: AdminHeaderProps) {
   return (
     <header
       className={cn(
-        'z-50 h-16',
-        fixed && 'header-fixed w-full h-full peer/header sticky top-0 w-[inherit]',
-        offset > 10 && fixed ? 'shadow' : 'shadow-none',
+        'h-16 w-full bg-white border-b border-gray-100 sticky top-0 z-10',
         className
       )}
       {...props}
     >
-      <div
-        className={cn(
-          'relative flex w-full h-full items-center gap-3 p-4 sm:gap-4',
-        )}
-      >
-        <SidebarTrigger variant='outline' className='max-md:scale-125' />
-        <Separator orientation='vertical' className='h-6' />
-        {children}
+      <div className="h-full flex items-center px-6">
+        <div className="flex items-center gap-4">
+          <SidebarTrigger className="text-gray-500 hover:bg-gray-50" />
+          <div className="text-lg font-semibold text-[#050505]">
+            TASCHEN
+          </div>
+        </div>
+
+        <div className="ms-auto flex items-center gap-3 text-sm">
+          <div className="text-gray-500">
+            Xin chào, <span className="text-gray-900 font-bold">{username}</span>
+          </div>
+          <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
+            <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+              <User className="h-5 w-5" />
+            </div>
+            <span className="text-gray-900 font-medium">{username}</span>
+          </div>
+        </div>
       </div>
     </header>
   )
