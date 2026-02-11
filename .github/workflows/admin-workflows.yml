@@ -1,4 +1,4 @@
-name: CI Build and Protection
+name: CI Build and Merge branch feature/admin
 
 on:
   push:
