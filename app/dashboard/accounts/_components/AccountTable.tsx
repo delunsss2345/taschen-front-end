@@ -53,33 +53,6 @@ export function AccountTable({ accounts }: AccountTableProps) {
     }
   }
 
-  const handleRoleChange = async (account: Account, newRole: string) => {
-    if (newRole === account.role) return
-
-    const result = await Swal.fire({
-      title: 'Xác nhận đổi vai trò?',
-      text: `Đổi vai trò tài khoản ${account.username} thành ${newRole}?`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Đồng ý',
-      cancelButtonText: 'Hủy',
-      confirmButtonColor: '#2563eb',
-      cancelButtonColor: '#6b7280',
-      customClass: { container: 'z-[9999]' },
-    })
-
-    if (!result.isConfirmed) return
-
-    await Swal.fire({
-      icon: 'success',
-      title: 'Thành công!',
-      text: 'Vai trò đã được cập nhật.',
-      timer: 1500,
-      showConfirmButton: false,
-      customClass: { container: 'z-[9999]' },
-    })
-  }
-
   const handleStatusChange = async (account: Account, checked: boolean) => {
     const action = checked ? 'Kích hoạt' : 'Khóa'
     const result = await Swal.fire({
@@ -134,20 +107,6 @@ export function AccountTable({ accounts }: AccountTableProps) {
               <td className="px-6 py-5">
                 <div className="flex flex-col gap-2 items-start">
                   {getRoleBadge(acc.role)}
-                  <Select
-                    defaultValue={acc.role}
-                    onValueChange={(value) => handleRoleChange(acc, value)}
-                  >
-                    <SelectTrigger className="h-7 w-[155px] text-[11px] cursor-pointer">
-                      <SelectValue placeholder="Đổi vai trò" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ADMIN">ADMIN</SelectItem>
-                      <SelectItem value="SELLER_STAFF">SELLER_STAFF</SelectItem>
-                      <SelectItem value="WAREHOUSE_STAFF">WAREHOUSE_STAFF</SelectItem>
-                      <SelectItem value="CUSTOMER">CUSTOMER</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
               </td>
               <td className="px-6 py-5 text-center">
@@ -186,9 +145,24 @@ function UpdateAccountModal({ trigger, account }: { trigger: React.ReactNode; ac
   const [form, setForm] = useState({
     fullName: account.fullName === '-' ? '' : account.fullName,
     phone: account.phone === '-' ? '' : account.phone,
+    role: account.role,
   })
 
   const onSubmit = async () => {
+    const result = await Swal.fire({
+      title: 'Xác nhận cập nhật?',
+      text: 'Thông tin tài khoản sẽ được lưu thay đổi.',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Lưu',
+      cancelButtonText: 'Hủy',
+      confirmButtonColor: '#2563eb',
+      cancelButtonColor: '#6b7280',
+      customClass: { container: 'z-[9999]' },
+    })
+
+    if (!result.isConfirmed) return
+
     Swal.fire({
       title: 'Đang lưu...',
       didOpen: () => Swal.showLoading(),
@@ -212,29 +186,46 @@ function UpdateAccountModal({ trigger, account }: { trigger: React.ReactNode; ac
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Cập nhật tài khoản: {account.username}</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4 text-left">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Họ tên</label>
-            <Input
-              placeholder="Nguyễn Văn A"
-              value={form.fullName}
-              onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Họ tên</label>
+              <Input
+                value={form.fullName}
+                onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Số điện thoại</label>
+              <Input
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              />
+            </div>
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Số điện thoại</label>
-            <Input
-              placeholder="09xxxxxxxx"
-              value={form.phone}
-              onChange={(e) => setForm({ ...form, phone: e.target.value })}
-            />
+            <label className="text-sm font-medium text-gray-700">Vai trò</label>
+            <Select
+              value={form.role}
+              onValueChange={(value) => setForm({ ...form, role: value })}
+            >
+              <SelectTrigger className="w-full cursor-pointer">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ADMIN">ADMIN</SelectItem>
+                <SelectItem value="SELLER_STAFF">SELLER_STAFF</SelectItem>
+                <SelectItem value="WAREHOUSE_STAFF">WAREHOUSE_STAFF</SelectItem>
+                <SelectItem value="CUSTOMER">CUSTOMER</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
-        <DialogFooter className="gap-2 border-t pt-4">
+        <DialogFooter className="gap-2 border-t pt-4 mt-4">
           <Button variant="outline" className="cursor-pointer" onClick={() => setOpen(false)}>
             Hủy
           </Button>

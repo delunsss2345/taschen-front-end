@@ -52,7 +52,7 @@ const mockPromotions = [
   },
   {
     id: 5,
-    name: 'Anh Quynh',
+    name: 'hihihihi',
     code: 'AL',
     discount: '20%',
     quantity: 100,
