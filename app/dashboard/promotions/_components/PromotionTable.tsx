@@ -81,15 +81,15 @@ export function PromotionTable({ promotions }: PromotionTableProps) {
                 </Badge>
               </td>
               <td className="px-6 py-5 text-center text-gray-600">{promo.quantity}</td>
-              <td className="px-6 py-5 text-gray-600 italic text-xs">{promo.minOrder}</td>
+              <td className="px-6 py-5 text-gray-600 text-xs">{promo.minOrder}</td>
               <td className="px-6 py-5 text-gray-500 text-xs">{promo.startDate}</td>
               <td className="px-6 py-5 text-gray-500 text-xs">{promo.endDate}</td>
               <td className="px-6 py-5 text-center">{getStatusBadge(promo.status)}</td>
               <td className="px-6 py-5 text-center">
                 <Button
-                  variant="link"
+                  variant="default"
                   size="sm"
-                  className="text-blue-600 hover:text-blue-800 cursor-pointer text-xs p-0 h-auto"
+                  className="bg-blue-600 hover:bg-blue-700 h-8 px-4 cursor-pointer text-[13px]"
                 >
                   Xem chi tiết
                 </Button>
