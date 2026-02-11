@@ -53,7 +53,7 @@ export function OrderTable({ orders }: OrderTableProps) {
       <table className="w-full text-sm">
         <thead className="bg-[#fcfcfc] border-b border-gray-50">
           <tr className="text-gray-500 font-medium">
-            <th className="px-6 py-4 font-semibold w-24">Mã đơn</th>
+            <th className="px-6 py-4 font-semibold w-25">Mã đơn</th>
             <th className="px-6 py-4 font-semibold">Khách hàng</th>
             <th className="px-6 py-4 font-semibold">Ngày đặt</th>
             <th className="px-6 py-4 font-semibold">Tổng tiền</th>
