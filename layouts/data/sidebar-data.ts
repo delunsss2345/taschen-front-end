@@ -51,7 +51,7 @@ export const sidebarData: SidebarData = {
           url: '/dashboard/orders',
           icon: ShoppingCart,
         },
-        {
+    {
           title: 'Quản lý Khuyến mãi',
           url: '/dashboard/promotions',
           icon: Percent,
@@ -66,27 +66,27 @@ export const sidebarData: SidebarData = {
           url: '/dashboard/import-notes',
           icon: FileDown,
         },
-        {
+            {
           title: 'Quản lý Khách hàng',
           url: '/dashboard/customers',
           icon: Users,
-        },
-        {
+            },
+            {
           title: 'Yêu cầu Hoàn/Đổi',
           url: '/dashboard/returns',
           icon: Undo2,
-        },
-        {
+            },
+            {
           title: 'Báo cáo',
           url: '/dashboard/reports',
           icon: BarChart3,
-        },
-        {
+            },
+            {
           title: 'Phân tích Khuyến mãi',
           url: '/dashboard/promotion-analysis',
           icon: TicketPercent,
-        },
-        {
+            },
+            {
           title: 'Yêu cầu Nhập kho',
           url: '/dashboard/import-requests',
           icon: PackageSearch,
