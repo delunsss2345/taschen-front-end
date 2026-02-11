@@ -30,7 +30,7 @@ export function AppSidebar() {
             const Icon = item.icon
             const isActive = pathname === item.url
 
-            return (
+  return (
               <Link
                 key={item.title}
                 href={item.url}

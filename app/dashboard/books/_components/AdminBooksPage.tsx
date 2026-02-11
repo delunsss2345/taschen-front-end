@@ -14,8 +14,7 @@ const mockBooks = [
   },
   {
     id: 2,
-    image:
-      'https://sachhoc.com/wp-content/uploads/2019/06/do-re-mon.jpg',
+    image: 'https://sachhoc.com/wp-content/uploads/2019/06/do-re-mon.jpg',
     title: 'Đô rê mon',
     author: 'Tao',
     price: 700000,
