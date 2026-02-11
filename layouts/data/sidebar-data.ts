@@ -1,99 +1,102 @@
 import { SidebarData } from '@/types/layouts/sidebar.type'
 import {
-  Bell,
-  HelpCircle,
   LayoutDashboard,
-  ListTodo,
-  MessagesSquare,
-  Monitor,
-  Package,
-  Palette,
-  Settings,
-  UserCog,
+  BookOpen,
+  Tags,
+  UserCircle,
+  ShoppingCart,
+  Percent,
+  Truck,
+  FileDown,
   Users,
-  Wrench
+  Undo2,
+  BarChart3,
+  TicketPercent,
+  PackageSearch,
+  Warehouse
 } from 'lucide-react'
-
 
 export const sidebarData: SidebarData = {
   user: {
-    name: 'phamthanhhuy',
-    email: 'huydev@gmail.com',
+    name: 'admin',
+    email: 'admin@sebook.com',
     avatar : ""
   },
   navGroups: [
     {
-      title: 'General',
+      title: 'ADMIN',
       items: [
         {
           title: 'Dashboard',
-          url: '/',
+          url: '/dashboard',
           icon: LayoutDashboard,
         },
         {
-          title: 'Tasks',
-          url: '/tasks',
-          icon: ListTodo,
+          title: 'Quản lý Sách',
+          url: '/dashboard/books',
+          icon: BookOpen,
         },
         {
-          title: 'Apps',
-          url: '/apps',
-          icon: Package,
+          title: 'Quản lý Thể loại',
+          url: '/dashboard/categories',
+          icon: Tags,
         },
         {
-          title: 'Chats',
-          url: '/chats',
-          badge: '3',
-          icon: MessagesSquare,
+          title: 'Quản lý Tài khoản',
+          url: '/dashboard/accounts',
+          icon: UserCircle,
         },
         {
-          title: 'Users',
-          url: '/users',
-          icon: Users,
-        }
-      ],
-    },
-   
+          title: 'Quản lý Đơn hàng',
+          url: '/dashboard/orders',
+          icon: ShoppingCart,
+        },
     {
-      title: 'Other',
-      items: [
-        {
-          title: 'Settings',
-          icon: Settings,
-          items: [
-            {
-              title: 'Profile',
-              url: '/settings',
-              icon: UserCog,
-            },
-            {
-              title: 'Account',
-              url: '/settings/account',
-              icon: Wrench,
-            },
-            {
-              title: 'Appearance',
-              url: '/settings/appearance',
-              icon: Palette,
-            },
-            {
-              title: 'Notifications',
-              url: '/settings/notifications',
-              icon: Bell,
-            },
-            {
-              title: 'Display',
-              url: '/settings/display',
-              icon: Monitor,
-            },
-          ],
+          title: 'Quản lý Khuyến mãi',
+          url: '/dashboard/promotions',
+          icon: Percent,
         },
         {
-          title: 'Help Center',
-          url: '/help-center',
-          icon: HelpCircle,
+          title: 'Quản lý Nhà cung cấp',
+          url: '/dashboard/suppliers',
+          icon: Truck,
+        },
+        {
+          title: 'Quản lý Phiếu nhập kho',
+          url: '/dashboard/import-notes',
+          icon: FileDown,
+        },
+            {
+          title: 'Quản lý Khách hàng',
+          url: '/dashboard/customers',
+          icon: Users,
+            },
+            {
+          title: 'Yêu cầu Hoàn/Đổi',
+          url: '/dashboard/returns',
+          icon: Undo2,
+            },
+            {
+          title: 'Báo cáo',
+          url: '/dashboard/reports',
+          icon: BarChart3,
+            },
+            {
+          title: 'Phân tích Khuyến mãi',
+          url: '/dashboard/promotion-analysis',
+          icon: TicketPercent,
+            },
+            {
+          title: 'Yêu cầu Nhập kho',
+          url: '/dashboard/import-requests',
+          icon: PackageSearch,
+        },
+        {
+          title: 'Kiểm kê Tồn kho',
+          url: '/dashboard/inventory',
+          icon: Warehouse,
         },
       ],
-    },
+    }
   ],
 }
