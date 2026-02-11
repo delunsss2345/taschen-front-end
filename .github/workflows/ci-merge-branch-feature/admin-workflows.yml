@@ -1,6 +1,10 @@
 name: CI Build and merge branch feature/adminadmin
 
 on:
+  push:
+    branches:
+      - main
+      - feature/admin
   pull_request:
     branches:
       - main
