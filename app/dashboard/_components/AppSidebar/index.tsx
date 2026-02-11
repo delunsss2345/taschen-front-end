@@ -9,7 +9,7 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
-import { adminSidebarData } from '@/layouts/data/admin-sidebar-data'
+import { adminSidebarData } from '@/app/dashboard/_components/admin-sidebar-data'
 
 export function AppSidebar() {
   const pathname = usePathname()
@@ -30,7 +30,7 @@ export function AppSidebar() {
             const Icon = item.icon
             const isActive = pathname === item.url
 
-  return (
+            return (
               <Link
                 key={item.title}
                 href={item.url}

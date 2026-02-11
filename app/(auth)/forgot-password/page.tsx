@@ -1,9 +1,25 @@
 "use client";
 
-import ForgotPassword from "@/pages/ForgotPassword";
+import ForgotPasswordForm from "@/components/auth/ForgotPasswordForm";
+import useTranslator from "@/hooks/use-translator";
 
-const Page = () => {
-  return <ForgotPassword />;
+const ForgotPassword = () => {
+  const { t } = useTranslator();
+
+  const onSubmit = async () => {};
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-1 text-center">
+        <h1 className="text-2xl font-semibold">{t("auth.forgotTitle")}</h1>
+        <p className="text-sm text-muted-foreground">
+          {t("auth.forgotSubtitle")}
+        </p>
+      </div>
+
+      <ForgotPasswordForm onSubmit={onSubmit} />
+    </div>
+  );
 };
 
-export default Page;
+export default ForgotPassword;
