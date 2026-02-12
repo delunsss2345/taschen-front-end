@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useState } from 'react'
-import Swal from 'sweetalert2'
+import { toast } from 'sonner'
 
 interface Account {
   id: number
@@ -130,39 +130,18 @@ function UpdateAccountModal({ trigger, account }: { trigger: React.ReactNode; ac
   })
 
   const onSubmit = async () => {
-    const result = await Swal.fire({
-      title: 'Xác nhận cập nhật?',
-      text: 'Thông tin tài khoản sẽ được lưu thay đổi.',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Lưu',
-      cancelButtonText: 'Hủy',
-      confirmButtonColor: '#2563eb',
-      cancelButtonColor: '#6b7280',
-      customClass: { container: 'z-[9999]' },
+    const promise = new Promise((resolve) => setTimeout(resolve, 800))
+
+    toast.promise(promise, {
+      loading: 'Đang lưu...',
+      success: () => {
+        setOpen(false)
+        return 'Thông tin tài khoản đã được cập nhật.'
+      },
+      error: () => 'Có lỗi xảy ra.',
     })
 
-    if (!result.isConfirmed) return
-
-    Swal.fire({
-      title: 'Đang lưu...',
-      didOpen: () => Swal.showLoading(),
-      customClass: { container: 'z-[9999]' },
-    })
-
-    await new Promise((r) => setTimeout(r, 800))
-
-    Swal.close()
-    await Swal.fire({
-      icon: 'success',
-      title: 'Thành công!',
-      text: 'Thông tin tài khoản đã được cập nhật.',
-      timer: 1500,
-      showConfirmButton: false,
-      customClass: { container: 'z-[9999]' },
-    })
-
-    setOpen(false)
+    await promise
   }
 
   return (

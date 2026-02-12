@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useState } from 'react'
-import Swal from 'sweetalert2'
+import { toast } from 'sonner'
 
 export function SupplierHeader() {
   return (
@@ -72,38 +72,23 @@ function AddSupplierModal({ trigger }: { trigger: React.ReactNode }) {
   const onSubmit = async () => {
     if (!form.name.trim()) return
 
-    const result = await Swal.fire({
-      title: 'Xác nhận thêm nhà cung cấp?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Thêm',
-      cancelButtonText: 'Hủy',
-      confirmButtonColor: '#2563eb',
-      cancelButtonColor: '#6b7280',
-      customClass: { container: 'z-[9999]' },
+    const promise = new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(true)
+      }, 1000)
     })
 
-    if (!result.isConfirmed) return
-
-    Swal.fire({
-      title: 'Đang lưu...',
-      didOpen: () => Swal.showLoading(),
-      customClass: { container: 'z-[9999]' },
+    toast.promise(promise, {
+      loading: 'Đang lưu...',
+      success: () => {
+        setOpen(false)
+        setForm({ name: '', email: '', phone: '', address: '', status: 'ACTIVE' })
+        return 'Nhà cung cấp mới đã được thêm.'
+      },
+      error: () => 'Có lỗi xảy ra.',
     })
 
-    await new Promise((r) => setTimeout(r, 1000))
-
-    Swal.close()
-    await Swal.fire({
-      icon: 'success',
-      title: 'Thành công!',
-      text: 'Nhà cung cấp mới đã được thêm.',
-      confirmButtonColor: '#2563eb',
-      customClass: { container: 'z-[9999]' },
-    })
-
-    setOpen(false)
-    setForm({ name: '', email: '', phone: '', address: '', status: 'ACTIVE' })
+    await promise
   }
 
   return (

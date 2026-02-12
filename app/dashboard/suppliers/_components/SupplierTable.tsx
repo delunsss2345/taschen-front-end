@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useState } from 'react'
-import Swal from 'sweetalert2'
+import { toast } from 'sonner'
 
 interface Supplier {
   id: number
@@ -103,24 +103,18 @@ function UpdateSupplierModal({ trigger, supplier }: { trigger: React.ReactNode; 
   })
 
   const onSubmit = async () => {
-    Swal.fire({
-      title: 'Đang lưu...',
-      didOpen: () => Swal.showLoading(),
-      customClass: { container: 'z-[9999]' },
+    const promise = new Promise((resolve) => setTimeout(resolve, 800))
+
+    toast.promise(promise, {
+      loading: 'Đang lưu...',
+      success: () => {
+        setOpen(false)
+        return 'Thông tin nhà cung cấp đã được cập nhật.'
+      },
+      error: () => 'Có lỗi xảy ra.',
     })
 
-    await new Promise((r) => setTimeout(r, 800))
-
-    Swal.close()
-    await Swal.fire({
-      icon: 'success',
-      title: 'Thành công!',
-      text: 'Thông tin nhà cung cấp đã được cập nhật.',
-      confirmButtonColor: '#2563eb',
-      customClass: { container: 'z-[9999]' },
-    })
-
-    setOpen(false)
+    await promise
   }
 
   return (

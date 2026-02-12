@@ -22,7 +22,6 @@ export function Header({ className, username = 'admin', ...props }: AdminHeaderP
           <SidebarTrigger className="text-gray-500 hover:bg-gray-50" />
           <div className="text-lg font-semibold text-[#030303]">TASCHEN</div>
         </div>
-
         <div className="ms-auto flex items-center gap-3 text-sm">
           <div className="text-gray-500">
             Xin chào, <span className="text-gray-900 font-bold">{username}</span>

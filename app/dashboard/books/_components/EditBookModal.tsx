@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/select'
 import { MultiSelectCombobox } from './MultiSelectCombobox'
 import { ImagePlus } from 'lucide-react'
-import Swal from 'sweetalert2'
+import { toast } from 'sonner'
 
 const mockFormats = [
   { value: 'Bìa cứng', label: 'Bìa cứng' },
@@ -131,37 +131,18 @@ export function EditBookModal({ trigger, book }: EditBookModalProps) {
   const onSubmit = async () => {
     if (!canSubmit) return
 
-    const result = await Swal.fire({
-      title: 'Xác nhận cập nhật?',
-      text: `Bạn đang thay đổi thông tin sách: ${book.title}`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Cập nhật',
-      cancelButtonText: 'Hủy',
-      confirmButtonColor: '#2563eb',
-      cancelButtonColor: '#6b7280',
-    })
+    const promise = new Promise((resolve) => setTimeout(resolve, 1000))
 
-    if (!result.isConfirmed) return
-
-    Swal.fire({
-      title: 'Đang lưu...',
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading()
+    toast.promise(promise, {
+      loading: 'Đang lưu...',
+      success: () => {
+        setOpen(false)
+        return 'Thông tin sách đã được cập nhật.'
       },
+      error: () => 'Có lỗi xảy ra.',
     })
 
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    await Swal.fire({
-      icon: 'success',
-      title: 'Thành công!',
-      text: 'Thông tin sách đã được cập nhật.',
-      confirmButtonColor: '#2563eb',
-    })
-
-    setOpen(false)
+    await promise
   }
 
   return (

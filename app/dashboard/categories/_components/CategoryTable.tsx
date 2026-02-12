@@ -12,7 +12,17 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import Swal from 'sweetalert2'
+import { toast } from 'sonner'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 
 interface Category {
   id: number
@@ -25,27 +35,15 @@ interface CategoryTableProps {
 
 export function CategoryTable({ categories }: CategoryTableProps) {
   const handleDelete = async (cat: Category) => {
-    const result = await Swal.fire({
-      title: 'Bạn chắc chắn muốn xóa?',
-      text: `Thể loại "${cat.name}" sẽ bị xóa khỏi hệ thống.`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#dc2626',
-      cancelButtonColor: '#6b7280',
-      confirmButtonText: 'Xóa',
-      cancelButtonText: 'Hủy',
-      customClass: { container: 'z-[9999]' },
+    const promise = new Promise((resolve) => setTimeout(resolve, 500))
+    
+    toast.promise(promise, {
+      loading: 'Đang xóa...',
+      success: () => `Thể loại "${cat.name}" đã được xóa.`,
+      error: () => 'Có lỗi xảy ra.',
     })
 
-    if (result.isConfirmed) {
-      await Swal.fire({
-        title: 'Đã xóa!',
-        text: 'Thể loại đã được xóa thành công.',
-        icon: 'success',
-        confirmButtonColor: '#2563eb',
-        customClass: { container: 'z-[9999]' },
-      })
-    }
+    await promise
   }
 
   return (
@@ -78,15 +76,36 @@ export function CategoryTable({ categories }: CategoryTableProps) {
                       </Button>
                     }
                   />
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    className="h-8 gap-1 px-3 cursor-pointer"
-                    onClick={() => handleDelete(cat)}
-                  >
-                    <Trash2 className="h-3 w-3" />
-                    Xóa
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="h-8 gap-1 px-3 cursor-pointer"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                        Xóa
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Xác nhận xóa</AlertDialogTitle>
+                      </AlertDialogHeader>
+                      <p className="text-sm text-gray-600">
+                        Bạn có chắc chắn muốn xóa thể loại <span className="font-medium">{cat.name}</span>? 
+                        Hành động này không thể hoàn tác.
+                      </p>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel className="cursor-pointer">Hủy</AlertDialogCancel>
+                        <AlertDialogAction
+                          className="bg-red-600 hover:bg-red-700 cursor-pointer"
+                          onClick={() => handleDelete(cat)}
+                        >
+                          Xóa
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </td>
             </tr>
@@ -104,38 +123,18 @@ function EditCategoryModal({ trigger, category }: { trigger: React.ReactNode; ca
   const onSubmit = async () => {
     if (!name.trim()) return
 
-    const result = await Swal.fire({
-      title: 'Xác nhận cập nhật?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Cập nhật',
-      cancelButtonText: 'Hủy',
-      confirmButtonColor: '#2563eb',
-      cancelButtonColor: '#6b7280',
-      customClass: { container: 'z-[9999]' },
+    const promise = new Promise((resolve) => setTimeout(resolve, 800))
+
+    toast.promise(promise, {
+      loading: 'Đang xử lý...',
+      success: () => {
+        setOpen(false)
+        return 'Thông tin thể loại đã được cập nhật.'
+      },
+      error: () => 'Có lỗi xảy ra.',
     })
 
-    if (!result.isConfirmed) return
-
-    Swal.fire({
-      title: 'Đang xử lý...',
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading(),
-      customClass: { container: 'z-[9999]' },
-    })
-
-    await new Promise((resolve) => setTimeout(resolve, 800))
-
-    Swal.close()
-    await Swal.fire({
-      icon: 'success',
-      title: 'Thành công!',
-      text: 'Thông tin thể loại đã được cập nhật.',
-      confirmButtonColor: '#2563eb',
-      customClass: { container: 'z-[9999]' },
-    })
-
-    setOpen(false)
+    await promise
   }
 
   return (

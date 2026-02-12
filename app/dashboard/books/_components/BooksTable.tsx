@@ -4,7 +4,17 @@ import { Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { EditBookModal } from './EditBookModal'
-import Swal from 'sweetalert2'
+import { toast } from 'sonner'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 
 interface Book {
   id: number
@@ -22,28 +32,15 @@ interface BooksTableProps {
 
 export function BooksTable({ books }: BooksTableProps) {
   const handleDelete = async (bookId: number) => {
-    const result = await Swal.fire({
-      title: 'Bạn chắc chắn muốn xóa?',
-      text: 'Hành động này không thể hoàn tác!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#dc2626',
-      cancelButtonColor: '#6b7280',
-      confirmButtonText: 'Xóa',
-      cancelButtonText: 'Hủy',
+    const promise = new Promise((resolve) => setTimeout(resolve, 500))
+
+    toast.promise(promise, {
+      loading: 'Đang xóa...',
+      success: () => 'Sách đã được xóa thành công.',
+      error: () => 'Có lỗi xảy ra.',
     })
 
-    if (result.isConfirmed) {
-      // TODO: gọi API xóa tại đây nếu có
-      // await deleteBook(bookId)
-
-      await Swal.fire({
-        title: 'Đã xóa!',
-        text: 'Sách đã được xóa thành công.',
-        icon: 'success',
-        confirmButtonColor: '#2563eb',
-      })
-    }
+    await promise
   }
 
   return (
@@ -123,15 +120,36 @@ export function BooksTable({ books }: BooksTableProps) {
                     }
                   />
 
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    className="h-8 gap-1 px-3 cursor-pointer"
-                    onClick={() => handleDelete(book.id)}
-                  >
-                    <Trash2 className="h-3 w-3" />
-                    Xóa
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="h-8 gap-1 px-3 cursor-pointer"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                        Xóa
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Xác nhận xóa</AlertDialogTitle>
+                      </AlertDialogHeader>
+                      <p className="text-sm text-gray-600">
+                        Bạn có chắc chắn muốn xóa sách <span className="font-medium">{book.title}</span>? 
+                        Hành động này không thể hoàn tác.
+                      </p>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel className="cursor-pointer">Hủy</AlertDialogCancel>
+                        <AlertDialogAction
+                          className="bg-red-600 hover:bg-red-700 cursor-pointer"
+                          onClick={() => handleDelete(book.id)}
+                        >
+                          Xóa
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </td>
             </tr>

@@ -12,7 +12,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import Swal from 'sweetalert2'
+import { toast } from 'sonner'
 
 export function CategoryHeader() {
   return (
@@ -47,41 +47,19 @@ function AddCategoryModal({ trigger }: { trigger: React.ReactNode }) {
   const onSubmit = async () => {
     if (!name.trim()) return
 
-    const result = await Swal.fire({
-      title: 'Xác nhận thêm thể loại?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Thêm',
-      cancelButtonText: 'Hủy',
-      confirmButtonColor: '#2563eb',
-      cancelButtonColor: '#6b7280',
-      customClass: {
-        container: 'z-[9999]',
+    const promise = new Promise((resolve) => setTimeout(resolve, 1000))
+
+    toast.promise(promise, {
+      loading: 'Đang lưu...',
+      success: () => {
+        setOpen(false)
+        setName('')
+        return 'Thể loại mới đã được thêm.'
       },
+      error: () => 'Có lỗi xảy ra.',
     })
 
-    if (!result.isConfirmed) return
-
-    Swal.fire({
-      title: 'Đang lưu...',
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading(),
-      customClass: { container: 'z-[9999]' },
-    })
-
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    Swal.close()
-    await Swal.fire({
-      icon: 'success',
-      title: 'Thành công!',
-      text: 'Thể loại mới đã được thêm.',
-      confirmButtonColor: '#2563eb',
-      customClass: { container: 'z-[9999]' },
-    })
-
-    setOpen(false)
-    setName('')
+    await promise
   }
 
   return (

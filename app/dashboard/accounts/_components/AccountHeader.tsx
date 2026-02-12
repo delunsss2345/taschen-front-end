@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useState } from 'react'
-import Swal from 'sweetalert2'
+import { toast } from 'sonner'
 
 export function AccountHeader() {
   return (
@@ -60,39 +60,19 @@ function CreateAccountModal({ trigger }: { trigger: React.ReactNode }) {
   })
 
   const onSubmit = async () => {
-    const result = await Swal.fire({
-      title: 'Xác nhận tạo tài khoản?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Tạo',
-      cancelButtonText: 'Hủy',
-      confirmButtonColor: '#2563eb',
-      cancelButtonColor: '#6b7280',
-      customClass: { container: 'z-[9999]' },
+    const promise = new Promise((resolve) => setTimeout(resolve, 1000))
+
+    toast.promise(promise, {
+      loading: 'Đang xử lý...',
+      success: () => {
+        setOpen(false)
+        setForm({ username: '', email: '', password: '', fullName: '', phone: '', role: 'CUSTOMER', status: 'ACTIVE' })
+        return 'Tài khoản nhân viên đã được tạo.'
+      },
+      error: () => 'Có lỗi xảy ra.',
     })
 
-    if (!result.isConfirmed) return
-
-    Swal.fire({
-      title: 'Đang xử lý...',
-      didOpen: () => Swal.showLoading(),
-      customClass: { container: 'z-[9999]' },
-    })
-
-    await new Promise((r) => setTimeout(r, 1000))
-
-    Swal.close()
-    await Swal.fire({
-      icon: 'success',
-      title: 'Thành công!',
-      text: 'Tài khoản nhân viên đã được tạo.',
-      timer: 1500,
-      showConfirmButton: false,
-      customClass: { container: 'z-[9999]' },
-    })
-
-    setOpen(false)
-    setForm({ username: '', email: '', password: '', fullName: '', phone: '', role: 'CUSTOMER', status: 'ACTIVE' })
+    await promise
   }
 
   return (
