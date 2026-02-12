@@ -1,7 +1,6 @@
 'use client'
 
-import { TableCell, TableRow } from '@/components/table'
-import { Eye } from 'lucide-react'
+import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
 import { Button } from '@/components/ui/button'
 
 interface ImportReceipt {
@@ -31,14 +30,14 @@ export function ImportReceiptsTable({ importReceipts }: ImportReceiptsTableProps
       <table className="w-full text-sm">
         <thead className="bg-[#fcfcfc] border-b border-gray-50">
           <tr className="text-gray-500 font-medium">
-            <th className="px-6 py-4 font-semibold w-28">Mã phiếu</th>
-            <th className="px-6 py-4 font-semibold">Nhà cung cấp</th>
-            <th className="px-6 py-4 font-semibold">Người tạo</th>
-            <th className="px-6 py-4 font-semibold">Ngày nhập</th>
-            <th className="px-6 py-4 font-semibold text-center">Số loại sách</th>
-            <th className="px-6 py-4 font-semibold text-center">Tổng số lượng</th>
-            <th className="px-6 py-4 font-semibold text-right">Tổng tiền</th>
-            <th className="px-6 py-4 font-semibold text-center w-28">Thao tác</th>
+            <TableHeaderCell className="w-20">Mã phiếu</TableHeaderCell>
+            <TableHeaderCell>Nhà cung cấp</TableHeaderCell>
+            <TableHeaderCell>Người tạo</TableHeaderCell>
+            <TableHeaderCell>Ngày nhập</TableHeaderCell>
+            <TableHeaderCell className="text-center">Số loại sách</TableHeaderCell>
+            <TableHeaderCell className="text-center">Tổng số lượng</TableHeaderCell>
+            <TableHeaderCell className="text-right">Tổng tiền</TableHeaderCell>
+            <TableHeaderCell className="text-center w-28">Thao tác</TableHeaderCell>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-50 bg-white">
@@ -55,8 +54,7 @@ export function ImportReceiptsTable({ importReceipts }: ImportReceiptsTableProps
                 <Button
                   className="h-8 gap-1 px-3 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white"
                 >
-                  <Eye className="h-3 w-3" />
-                  Chi tiết
+                  Xem chi tiết
                 </Button>
               </TableCell>
             </TableRow>

@@ -3,7 +3,7 @@
 import { Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { TableCell, TableRow } from '@/components/table'
+import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
 import { EditBookModal } from './EditBookModal'
 import { toast } from 'sonner'
 import {
@@ -49,14 +49,14 @@ export function BooksTable({ books }: BooksTableProps) {
       <table className="w-full text-sm">
         <thead className="bg-[#fcfcfc] border-b border-gray-50">
           <tr className="text-gray-500 font-medium">
-            <th className="px-6 py-4 text-left font-semibold">ID</th>
-            <th className="px-6 py-4 text-left font-semibold">Ảnh</th>
-            <th className="px-6 py-4 text-left font-semibold">Tên sách</th>
-            <th className="px-6 py-4 text-left font-semibold">Tác giả</th>
-            <th className="px-6 py-4 text-left font-semibold">Giá</th>
-            <th className="px-6 py-4 text-left font-semibold">Số lượng</th>
-            <th className="px-6 py-4 text-left font-semibold">Thể loại</th>
-            <th className="px-6 py-4 text-center font-semibold">Thao tác</th>
+            <TableHeaderCell>ID</TableHeaderCell>
+            <TableHeaderCell>Ảnh</TableHeaderCell>
+            <TableHeaderCell>Tên sách</TableHeaderCell>
+            <TableHeaderCell>Tác giả</TableHeaderCell>
+            <TableHeaderCell>Giá</TableHeaderCell>
+            <TableHeaderCell>Số lượng</TableHeaderCell>
+            <TableHeaderCell>Thể loại</TableHeaderCell>
+            <TableHeaderCell className="text-center">Thao tác</TableHeaderCell>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-50">

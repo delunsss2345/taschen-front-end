@@ -3,7 +3,7 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { TableCell, TableRow } from '@/components/table'
+import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
 
 interface Order {
   id: string
@@ -54,12 +54,12 @@ export function OrderTable({ orders }: OrderTableProps) {
       <table className="w-full text-sm">
         <thead className="bg-[#fcfcfc] border-b border-gray-50">
           <tr className="text-gray-500 font-medium">
-            <th className="px-6 py-4 font-semibold w-25">Mã đơn</th>
-            <th className="px-6 py-4 font-semibold">Khách hàng</th>
-            <th className="px-6 py-4 font-semibold">Ngày đặt</th>
-            <th className="px-6 py-4 font-semibold">Tổng tiền</th>
-            <th className="px-6 py-4 font-semibold text-center">Trạng thái</th>
-            <th className="px-6 py-4 font-semibold text-center w-32">Thao tác</th>
+            <TableHeaderCell className="w-24">Mã đơn</TableHeaderCell>
+            <TableHeaderCell>Khách hàng</TableHeaderCell>
+            <TableHeaderCell>Ngày đặt</TableHeaderCell>
+            <TableHeaderCell>Tổng tiền</TableHeaderCell>
+            <TableHeaderCell className="text-center">Trạng thái</TableHeaderCell>
+            <TableHeaderCell className="text-center w-32">Thao tác</TableHeaderCell>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-50 bg-white">
