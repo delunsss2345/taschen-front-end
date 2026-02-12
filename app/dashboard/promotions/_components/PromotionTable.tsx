@@ -3,7 +3,7 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { TableCell, TableRow } from '@/components/table'
+import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
 
 interface Promotion {
   id: number
@@ -52,16 +52,16 @@ export function PromotionTable({ promotions }: PromotionTableProps) {
       <table className="w-full text-sm">
         <thead className="bg-[#fcfcfc] border-b border-gray-50">
           <tr className="text-gray-500 font-medium">
-            <th className="px-6 py-4 font-semibold w-16">ID</th>
-            <th className="px-6 py-4 font-semibold">Tên khuyến mãi</th>
-            <th className="px-6 py-4 font-semibold">Mã khuyến mãi</th>
-            <th className="px-6 py-4 font-semibold text-center">Giảm giá</th>
-            <th className="px-6 py-4 font-semibold text-center">Số lượng</th>
-            <th className="px-6 py-4 font-semibold">Đơn tối thiểu</th>
-            <th className="px-6 py-4 font-semibold">Ngày bắt đầu</th>
-            <th className="px-6 py-4 font-semibold">Ngày kết thúc</th>
-            <th className="px-6 py-4 font-semibold text-center">Trạng thái</th>
-            <th className="px-6 py-4 font-semibold text-center w-32">Thao tác</th>
+            <TableHeaderCell className="w-16">ID</TableHeaderCell>
+            <TableHeaderCell>Tên khuyến mãi</TableHeaderCell>
+            <TableHeaderCell>Mã khuyến mãi</TableHeaderCell>
+            <TableHeaderCell className="text-center">Giảm giá</TableHeaderCell>
+            <TableHeaderCell className="text-center">Số lượng</TableHeaderCell>
+            <TableHeaderCell>Đơn tối thiểu</TableHeaderCell>
+            <TableHeaderCell>Ngày bắt đầu</TableHeaderCell>
+            <TableHeaderCell>Ngày kết thúc</TableHeaderCell>
+            <TableHeaderCell className="text-center">Trạng thái</TableHeaderCell>
+            <TableHeaderCell className="text-center w-32">Thao tác</TableHeaderCell>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-50 bg-white">
