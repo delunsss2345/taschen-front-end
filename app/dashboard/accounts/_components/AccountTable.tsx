@@ -3,6 +3,7 @@
 import { Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { TableCell, TableRow } from '@/components/table'
 import {
   Dialog,
   DialogContent,
@@ -79,23 +80,23 @@ export function AccountTable({ accounts }: AccountTableProps) {
             <th className="px-6 py-4 font-semibold text-center">Thao tác</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-50">
+        <tbody className="divide-y divide-gray-50 bg-white">
           {accounts.map((acc) => (
-            <tr key={acc.id} className="hover:bg-gray-50 transition-colors">
-              <td className="px-6 py-5 text-gray-600">{acc.id}</td>
-              <td className="px-6 py-5 font-medium text-gray-900">{acc.username}</td>
-              <td className="px-6 py-5 text-gray-600">{acc.email}</td>
-              <td className="px-6 py-5 text-gray-600">{acc.fullName}</td>
-              <td className="px-6 py-5 text-gray-600">{acc.phone}</td>
-              <td className="px-6 py-5">
+            <TableRow key={acc.id}>
+              <TableCell>{acc.id}</TableCell>
+              <TableCell>{acc.username}</TableCell>
+              <TableCell>{acc.email}</TableCell>
+              <TableCell>{acc.fullName}</TableCell>
+              <TableCell>{acc.phone}</TableCell>
+              <TableCell>
                 <div className="flex flex-col gap-2 items-start">
                   {getRoleBadge(acc.role)}
                 </div>
-              </td>
-              <td className="px-6 py-5 text-center">
+              </TableCell>
+              <TableCell className="text-center">
                 {getStatusBadge(acc.status)}
-              </td>
-              <td className="px-6 py-5">
+              </TableCell>
+              <TableCell>
                 <div className="flex items-center justify-center gap-2">
                   <UpdateAccountModal
                     account={acc}
@@ -111,8 +112,8 @@ export function AccountTable({ accounts }: AccountTableProps) {
                     }
                   />
                 </div>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
         </tbody>
       </table>

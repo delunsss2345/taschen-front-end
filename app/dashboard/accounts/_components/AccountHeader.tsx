@@ -65,8 +65,8 @@ function CreateAccountModal({ trigger }: { trigger: React.ReactNode }) {
     toast.promise(promise, {
       loading: 'Đang xử lý...',
       success: () => {
-        setOpen(false)
-        setForm({ username: '', email: '', password: '', fullName: '', phone: '', role: 'CUSTOMER', status: 'ACTIVE' })
+    setOpen(false)
+    setForm({ username: '', email: '', password: '', fullName: '', phone: '', role: 'CUSTOMER', status: 'ACTIVE' })
         return 'Tài khoản nhân viên đã được tạo.'
       },
       error: () => 'Có lỗi xảy ra.',

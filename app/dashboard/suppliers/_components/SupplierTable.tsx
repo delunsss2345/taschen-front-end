@@ -3,6 +3,7 @@
 import { Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { TableCell, TableRow } from '@/components/table'
 import {
   Dialog,
   DialogContent,
@@ -52,13 +53,13 @@ export function SupplierTable({ suppliers }: SupplierTableProps) {
         </thead>
         <tbody className="divide-y divide-gray-50 bg-white">
           {suppliers.map((s) => (
-            <tr key={s.id} className="hover:bg-gray-50 transition-colors">
-              <td className="px-6 py-5 text-gray-600">{s.id}</td>
-              <td className="px-6 py-5 font-medium text-gray-900">{s.name}</td>
-              <td className="px-6 py-5 text-gray-600 truncate max-w-[200px]">{s.email}</td>
-              <td className="px-6 py-5 text-gray-600">{s.phone}</td>
-              <td className="px-6 py-5 text-gray-600 truncate max-w-[200px]">{s.address}</td>
-              <td className="px-6 py-5 text-center">
+            <TableRow key={s.id}>
+              <TableCell variant="secondary">{s.id}</TableCell>
+              <TableCell>{s.name}</TableCell>
+              <TableCell className="truncate max-w-[200px]">{s.email}</TableCell>
+              <TableCell>{s.phone}</TableCell>
+              <TableCell className="truncate max-w-[200px]">{s.address}</TableCell>
+              <TableCell className="text-center">
                 <Badge
                   className={
                     s.status === 'ACTIVE'
@@ -68,23 +69,23 @@ export function SupplierTable({ suppliers }: SupplierTableProps) {
                 >
                   {s.status === 'ACTIVE' ? 'Hoạt động' : 'Vô hiệu hóa'}
                 </Badge>
-              </td>
-              <td className="px-6 py-5 text-center">
+              </TableCell>
+              <TableCell className="text-center">
                 <UpdateSupplierModal
                   supplier={s}
                   trigger={
                     <Button
                       variant="default"
                       size="sm"
-                      className="h-8 gap-1 px-3 bg-blue-600 hover:bg-blue-700 cursor-pointer w-32"
+                      className="h-8 gap-1 px-3 bg-blue-600 hover:bg-blue-700 cursor-pointer"
                     >
                       <Pencil className="h-3 w-3" />
                       Cập nhật
                     </Button>
                   }
                 />
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
         </tbody>
       </table>

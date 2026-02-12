@@ -3,6 +3,7 @@
 import { Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { TableCell, TableRow } from '@/components/table'
 import { EditBookModal } from './EditBookModal'
 import { toast } from 'sonner'
 import {
@@ -60,10 +61,10 @@ export function BooksTable({ books }: BooksTableProps) {
         </thead>
         <tbody className="divide-y divide-gray-50">
           {books.map((book) => (
-            <tr key={book.id} className="hover:bg-gray-50 transition-colors">
-              <td className="px-6 py-5 text-gray-600">{book.id}</td>
+            <TableRow key={book.id}>
+              <TableCell>{book.id}</TableCell>
 
-              <td className="px-6 py-5">
+              <TableCell>
                 <div className="h-[72px] w-[54px] bg-gray-100 rounded overflow-hidden flex items-center justify-center border border-gray-50 shadow-sm">
                   {book.image ? (
                     <img
@@ -75,36 +76,35 @@ export function BooksTable({ books }: BooksTableProps) {
                     <div className="text-[10px] text-gray-400">No img</div>
                   )}
                 </div>
-              </td>
+              </TableCell>
 
-              <td className="px-6 py-5 font-medium text-gray-900 max-w-[200px] truncate">
+              <TableCell className="max-w-[200px] truncate">
                 {book.title}
-              </td>
+              </TableCell>
 
-              <td className="px-6 py-5 text-gray-600 truncate">
+              <TableCell className="max-w-[150px] truncate">
                 {book.author}
-              </td>
+              </TableCell>
 
-              <td className="px-6 py-5 text-gray-600 font-medium">
+              <TableCell>
                 {book.price.toLocaleString('vi-VN')} đ
-              </td>
+              </TableCell>
 
-              <td className="px-6 py-5">
+              <TableCell>
                 <span
                   className={cn(
-                    'font-medium',
-                    book.quantity === 0 ? 'text-red-500' : 'text-gray-600'
+                    book.quantity === 0 ? 'text-red-500' : ''
                   )}
                 >
                   {book.quantity}
                 </span>
-              </td>
+              </TableCell>
 
-              <td className="px-6 py-5 text-gray-500 italic text-xs max-w-[150px]">
+              <TableCell className="max-w-[150px]">
                 {book.category}
-              </td>
+              </TableCell>
 
-              <td className="px-6 py-5">
+              <TableCell className="text-right">
                 <div className="flex items-center justify-end gap-2">
                   <EditBookModal
                     book={book}
@@ -151,8 +151,8 @@ export function BooksTable({ books }: BooksTableProps) {
                     </AlertDialogContent>
                   </AlertDialog>
                 </div>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
         </tbody>
       </table>
