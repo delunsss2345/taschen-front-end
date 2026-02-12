@@ -3,6 +3,13 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Search } from 'lucide-react'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 interface CustomersHeaderProps {
   searchQuery: string
@@ -15,16 +22,26 @@ export function CustomersHeader({ searchQuery, onSearchChange }: CustomersHeader
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Quản lý Khách hàng</h1>
       </div>
-      <div className="flex items-center gap-3">
-        <div className="relative w-full md:w-80">
+      <div className="flex items-center gap-4">
+        <div className="relative w-80">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             placeholder="Tìm kiếm theo tên, email, số điện thoại..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-10 bg-white border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+            className="pl-10 h-10 bg-white border-gray-200"
           />
         </div>
+        <Select>
+          <SelectTrigger className="w-40 h-10 bg-white border-gray-200 cursor-pointer">
+            <SelectValue placeholder="Trạng thái" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tất cả</SelectItem>
+            <SelectItem value="active">Hoạt động</SelectItem>
+            <SelectItem value="inactive">Đã khóa</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
     </div>
   )
