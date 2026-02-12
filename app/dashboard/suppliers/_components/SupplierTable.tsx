@@ -71,19 +71,19 @@ export function SupplierTable({ suppliers }: SupplierTableProps) {
                 </Badge>
               </TableCell>
               <TableCell className="text-center">
-                <UpdateSupplierModal
-                  supplier={s}
-                  trigger={
-                    <Button
-                      variant="default"
-                      size="sm"
+                  <UpdateSupplierModal
+                    supplier={s}
+                    trigger={
+                      <Button
+                        variant="default"
+                        size="sm"
                       className="h-8 gap-1 px-3 bg-blue-600 hover:bg-blue-700 cursor-pointer"
-                    >
-                      <Pencil className="h-3 w-3" />
-                      Cập nhật
-                    </Button>
-                  }
-                />
+                      >
+                        <Pencil className="h-3 w-3" />
+                        Cập nhật
+                      </Button>
+                    }
+                  />
               </TableCell>
             </TableRow>
           ))}
@@ -148,12 +148,12 @@ function UpdateSupplierModal({ trigger, supplier }: { trigger: React.ReactNode; 
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Địa chỉ</label>
-              <Input
-                value={form.address}
-                onChange={(e) => setForm({ ...form, address: e.target.value })}
-              />
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">Địa chỉ</label>
+            <Input
+              value={form.address}
+              onChange={(e) => setForm({ ...form, address: e.target.value })}
+            />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">Trạng thái</label>
