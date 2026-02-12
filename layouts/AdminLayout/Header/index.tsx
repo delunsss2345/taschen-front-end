@@ -20,9 +20,8 @@ export function Header({ className, username = 'admin', ...props }: AdminHeaderP
       <div className="h-full flex items-center px-6">
         <div className="flex items-center gap-4">
           <SidebarTrigger className="text-gray-500 hover:bg-gray-50" />
-          <div className="text-lg font-semibold text-[#F0592A]">SEBook Admin</div>
+          <div className="text-lg font-semibold text-[#030303]">TASCHEN</div>
         </div>
-
         <div className="ms-auto flex items-center gap-3 text-sm">
           <div className="text-gray-500">
             Xin chào, <span className="text-gray-900 font-bold">{username}</span>

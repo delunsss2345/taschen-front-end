@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/select'
 import { MultiSelectCombobox } from './MultiSelectCombobox'
 import { ImagePlus } from 'lucide-react'
-import Swal from 'sweetalert2'
+import { toast } from 'sonner'
 
 const mockFormats = [
   { value: 'Bìa cứng', label: 'Bìa cứng' },
@@ -128,55 +128,20 @@ export function AddBookModal({ trigger }: { trigger: React.ReactNode }) {
 
   const onSubmit = async () => {
     if (!canSubmit) return
-  
-    const result = await Swal.fire({
-      title: 'Xác nhận thêm sách?',
-      text: 'Thông tin sách sẽ được lưu vào hệ thống.',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Thêm',
-      cancelButtonText: 'Hủy',
-      confirmButtonColor: '#2563eb',
-      cancelButtonColor: '#6b7280',
-      customClass: {
-        container: 'z-[9999]',
+
+    const promise = new Promise((resolve) => setTimeout(resolve, 1200))
+
+    toast.promise(promise, {
+      loading: 'Đang lưu...',
+      success: () => {
+        setOpen(false)
+        resetForm()
+        return 'Sách đã được thêm thành công.'
       },
+      error: () => 'Có lỗi xảy ra.',
     })
 
-    if (!result.isConfirmed) return
-
-    // Đóng popup confirm trước
-    Swal.close()
-
-    // Hiện loading
-    Swal.fire({
-      title: 'Đang lưu...',
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      customClass: {
-        container: 'z-[9999]',
-      },
-      didOpen: () => {
-        Swal.showLoading()
-      },
-    })
-
-    // Giả lập API
-    await new Promise((resolve) => setTimeout(resolve, 1200))
-
-    Swal.close()
-
-    await Swal.fire({
-      icon: 'success',
-      title: 'Thêm sách thành công!',
-      confirmButtonColor: '#2563eb',
-      customClass: {
-        container: 'z-[9999]',
-      },
-    })
-  
-    setOpen(false)
-    resetForm()
+    await promise
   }
   
   return (
