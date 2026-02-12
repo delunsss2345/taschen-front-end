@@ -20,7 +20,7 @@ export function BooksHeader() {
         />
       </div>
 
-      <div className="relative max-w-2xl">
+      <div className="relative w-80">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
         <Input
           placeholder="Tìm theo tên hoặc mã sách"

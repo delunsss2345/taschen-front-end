@@ -37,7 +37,7 @@ export function SupplierHeader() {
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="relative max-w-md flex-1">
+        <div className="relative w-80">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             placeholder="Tìm kiếm theo tên, email, số điện thoại..."
@@ -45,7 +45,7 @@ export function SupplierHeader() {
           />
         </div>
         <Select defaultValue="all">
-          <SelectTrigger className="w-[200px] h-10 bg-white border-gray-200 cursor-pointer">
+          <SelectTrigger className="w-40 h-10 bg-white border-gray-200 cursor-pointer">
             <SelectValue placeholder="Tất cả trạng thái" />
           </SelectTrigger>
           <SelectContent>
