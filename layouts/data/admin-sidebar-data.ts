@@ -10,10 +10,11 @@ import {
   UserRound,
   RotateCcw,
   BarChart3,
-  Percent,
   PackagePlus,
   Warehouse,
-  History
+  History,
+  RotateCw,
+  LayoutGrid
 } from 'lucide-react'
 
 export const adminSidebarData = {
@@ -75,9 +76,14 @@ export const adminSidebarData = {
       icon: RotateCcw,
     },
     {
-      title: 'Phân tích Khuyến mãi',
-      url: '/dashboard/promotion-analysis',
-      icon: Percent,
+      title: 'Trả về Kho',
+      url: '/dashboard/return-to-warehouse',
+      icon: RotateCw,
+    },
+    {
+      title: 'Đơn Đặt hàng',
+      url: '/dashboard/purchase-orders',
+      icon: LayoutGrid,
     },
     {
       title: 'Yêu cầu Nhập kho',
