@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useMemo } from 'react'
 import { CustomersHeader } from './CustomersHeader'
 import { CustomersTable } from './CustomersTable'
 
@@ -62,10 +63,27 @@ const mockCustomers = [
 ]
 
 export function CustomersPage() {
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const filteredCustomers = useMemo(() => {
+    if (!searchQuery.trim()) return mockCustomers
+
+    const query = searchQuery.toLowerCase().trim()
+
+    return mockCustomers.filter((item) => {
+      return (
+        item.username.toLowerCase().includes(query) ||
+        item.email.toLowerCase().includes(query) ||
+        item.fullName.toLowerCase().includes(query) ||
+        item.phone.includes(query)
+      )
+    })
+  }, [searchQuery])
+
   return (
     <div className="space-y-4">
-      <CustomersHeader />
-      <CustomersTable customers={mockCustomers} />
+      <CustomersHeader searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+      <CustomersTable customers={filteredCustomers} />
     </div>
   )
 }

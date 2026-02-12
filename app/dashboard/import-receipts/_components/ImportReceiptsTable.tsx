@@ -30,7 +30,7 @@ export function ImportReceiptsTable({ importReceipts }: ImportReceiptsTableProps
       <table className="w-full text-sm">
         <thead className="bg-[#fcfcfc] border-b border-gray-50">
           <tr className="text-gray-500 font-medium">
-            <TableHeaderCell className="w-20">Mã phiếu</TableHeaderCell>
+            <TableHeaderCell className="w-28">Mã phiếu</TableHeaderCell>
             <TableHeaderCell>Nhà cung cấp</TableHeaderCell>
             <TableHeaderCell>Người tạo</TableHeaderCell>
             <TableHeaderCell>Ngày nhập</TableHeaderCell>
