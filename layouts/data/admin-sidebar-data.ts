@@ -25,6 +25,11 @@ export const adminSidebarData = {
       icon: LayoutDashboard,
     },
     {
+      title: 'Báo cáo',
+      url: '/dashboard/reports',
+      icon: BarChart3,
+    },
+    {
       title: 'Quản lý Sách',
       url: '/dashboard/books',
       icon: BookOpen,
@@ -68,11 +73,6 @@ export const adminSidebarData = {
       title: 'Yêu cầu Hoàn/Đổi',
       url: '/dashboard/returns',
       icon: RotateCcw,
-    },
-    {
-      title: 'Báo cáo',
-      url: '/dashboard/reports',
-      icon: BarChart3,
     },
     {
       title: 'Phân tích Khuyến mãi',
