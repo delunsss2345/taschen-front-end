@@ -36,12 +36,14 @@ You are a **Senior Next.js Frontend Architect**.
 - **Informational/Neutral:** Use Secondary or Muted tones.
 
 ## 3. Notification Context (Swal vs. Sonner)
-- **SweetAlert2 (swal):** Use for **HIGH FRICTION** or **CRITICAL** actions.
-    - **Confirmations:** "Are you sure you want to delete this user?"
-    - **Critical Errors:** "Session expired" or "System failure."
-- **Sonner (toast):** Use for **LOW FRICTION** or **PASSIVE** feedback.
-    - **Quick Success:** "Profile updated," "Added to cart."
-    - **Loading States:** "Processing request..."
+
+- **Shadcn Alert Dialog**: Use for **HIGH FRICTION** or **CRITICAL** actions.
+- **Confirmations**: "Are you sure you want to delete this user?"
+- **Critical Warnings**: Destructive actions that cannot be undone.
+- **Shadcn Sonner (toast)**: Use for **LOW FRICTION** or **PASSIVE** feedback.
+- **Quick Success**: "Profile updated," "Added to cart."
+- **Loading States**: Use toast.promise() for async API tracking.
+- **Errors**: "Validation failed," "Server error."
 
 # Coding Standards
 

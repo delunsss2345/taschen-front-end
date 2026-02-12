@@ -3,7 +3,6 @@
 import { Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Switch } from '@/components/ui/switch'
 import {
   Dialog,
   DialogContent,
@@ -53,32 +52,16 @@ export function AccountTable({ accounts }: AccountTableProps) {
     }
   }
 
-  const handleStatusChange = async (account: Account, checked: boolean) => {
-    const action = checked ? 'Kích hoạt' : 'Khóa'
-    const result = await Swal.fire({
-      title: `${action} tài khoản?`,
-      text: `Bạn có chắc muốn ${action.toLowerCase()} tài khoản ${account.username}?`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Đồng ý',
-      cancelButtonText: 'Hủy',
-      confirmButtonColor: '#2563eb',
-      cancelButtonColor: '#6b7280',
-      customClass: { container: 'z-[9999]' },
-    })
-
-    if (!result.isConfirmed) {
-      return
-    }
-
-    await Swal.fire({
-      icon: 'success',
-      title: 'Thành công!',
-      text: `Tài khoản đã được ${action.toLowerCase()}.`,
-      timer: 1500,
-      showConfirmButton: false,
-      customClass: { container: 'z-[9999]' },
-    })
+  const getStatusBadge = (status: boolean) => {
+    return status ? (
+      <Badge className="bg-green-50 text-green-600 border-green-100 hover:bg-green-50 shadow-none font-normal">
+        Hoạt động
+      </Badge>
+    ) : (
+      <Badge className="bg-red-50 text-red-600 border-red-100 hover:bg-red-50 shadow-none font-normal">
+        Khóa
+      </Badge>
+    )
   }
 
   return (
@@ -110,10 +93,7 @@ export function AccountTable({ accounts }: AccountTableProps) {
                 </div>
               </td>
               <td className="px-6 py-5 text-center">
-                <Switch
-                  defaultChecked={acc.status}
-                  onCheckedChange={(checked) => handleStatusChange(acc, checked)}
-                />
+                {getStatusBadge(acc.status)}
               </td>
               <td className="px-6 py-5">
                 <div className="flex items-center justify-center gap-2">
@@ -146,6 +126,7 @@ function UpdateAccountModal({ trigger, account }: { trigger: React.ReactNode; ac
     fullName: account.fullName === '-' ? '' : account.fullName,
     phone: account.phone === '-' ? '' : account.phone,
     role: account.role,
+    status: account.status ? 'ACTIVE' : 'INACTIVE',
   })
 
   const onSubmit = async () => {
@@ -176,7 +157,8 @@ function UpdateAccountModal({ trigger, account }: { trigger: React.ReactNode; ac
       icon: 'success',
       title: 'Thành công!',
       text: 'Thông tin tài khoản đã được cập nhật.',
-      confirmButtonColor: '#2563eb',
+      timer: 1500,
+      showConfirmButton: false,
       customClass: { container: 'z-[9999]' },
     })
 
@@ -207,22 +189,39 @@ function UpdateAccountModal({ trigger, account }: { trigger: React.ReactNode; ac
               />
             </div>
           </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Vai trò</label>
-            <Select
-              value={form.role}
-              onValueChange={(value) => setForm({ ...form, role: value })}
-            >
-              <SelectTrigger className="w-full cursor-pointer">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ADMIN">ADMIN</SelectItem>
-                <SelectItem value="SELLER_STAFF">SELLER_STAFF</SelectItem>
-                <SelectItem value="WAREHOUSE_STAFF">WAREHOUSE_STAFF</SelectItem>
-                <SelectItem value="CUSTOMER">CUSTOMER</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Vai trò</label>
+              <Select
+                value={form.role}
+                onValueChange={(value) => setForm({ ...form, role: value })}
+              >
+                <SelectTrigger className="w-full cursor-pointer">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ADMIN">ADMIN</SelectItem>
+                  <SelectItem value="SELLER_STAFF">SELLER_STAFF</SelectItem>
+                  <SelectItem value="WAREHOUSE_STAFF">WAREHOUSE_STAFF</SelectItem>
+                  <SelectItem value="CUSTOMER">CUSTOMER</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Trạng thái</label>
+              <Select
+                value={form.status}
+                onValueChange={(value) => setForm({ ...form, status: value })}
+              >
+                <SelectTrigger className="w-full cursor-pointer">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ACTIVE">Hoạt động</SelectItem>
+                  <SelectItem value="INACTIVE">Khóa</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
         <DialogFooter className="gap-2 border-t pt-4 mt-4">

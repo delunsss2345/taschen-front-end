@@ -56,6 +56,7 @@ function CreateAccountModal({ trigger }: { trigger: React.ReactNode }) {
     fullName: '',
     phone: '',
     role: 'CUSTOMER',
+    status: 'ACTIVE',
   })
 
   const onSubmit = async () => {
@@ -85,12 +86,13 @@ function CreateAccountModal({ trigger }: { trigger: React.ReactNode }) {
       icon: 'success',
       title: 'Thành công!',
       text: 'Tài khoản nhân viên đã được tạo.',
-      confirmButtonColor: '#2563eb',
+      timer: 1500,
+      showConfirmButton: false,
       customClass: { container: 'z-[9999]' },
     })
 
     setOpen(false)
-    setForm({ username: '', email: '', password: '', fullName: '', phone: '', role: 'CUSTOMER' })
+    setForm({ username: '', email: '', password: '', fullName: '', phone: '', role: 'CUSTOMER', status: 'ACTIVE' })
   }
 
   return (
@@ -101,6 +103,13 @@ function CreateAccountModal({ trigger }: { trigger: React.ReactNode }) {
           <DialogTitle>Tạo tài khoản nhân viên</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4 text-left">
+        <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">Họ tên</label>
+            <Input
+              value={form.fullName}
+              onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+            />
+          </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">Tên đăng nhập</label>
@@ -128,6 +137,15 @@ function CreateAccountModal({ trigger }: { trigger: React.ReactNode }) {
               />
             </div>
             <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Số điện thoại</label>
+              <Input
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">Vai trò</label>
               <Select
                 value={form.role}
@@ -144,23 +162,23 @@ function CreateAccountModal({ trigger }: { trigger: React.ReactNode }) {
                 </SelectContent>
               </Select>
             </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Họ tên</label>
-              <Input
-                value={form.fullName}
-                onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Số điện thoại</label>
-              <Input
-                value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              />
+              <label className="text-sm font-medium text-gray-700">Trạng thái</label>
+              <Select
+                value={form.status}
+                onValueChange={(value) => setForm({ ...form, status: value })}
+              >
+                <SelectTrigger className="w-full cursor-pointer">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ACTIVE">Hoạt động</SelectItem>
+                  <SelectItem value="INACTIVE">Đã khóa</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
+          
         </div>
         <DialogFooter className="gap-2 border-t pt-4 mt-4">
           <Button variant="outline" className="cursor-pointer" onClick={() => setOpen(false)}>
