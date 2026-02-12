@@ -139,7 +139,6 @@ export function ReturnToWarehouseDetailModal({
           </div>
         </div>
 
-        {/* Nút hành động - Chỉ hiện khi trạng thái là "Chờ duyệt" */}
         {request.status === 'pending' && (
           <div className="flex justify-end gap-3 pt-4 border-t">
             <Button
