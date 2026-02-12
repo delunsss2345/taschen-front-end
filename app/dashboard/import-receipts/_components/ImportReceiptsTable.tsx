@@ -1,9 +1,10 @@
 'use client'
 
+import { TableCell, TableRow } from '@/components/table'
 import { Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-interface ImportNote {
+interface ImportReceipt {
   id: string
   supplier: string
   creator: string
@@ -13,11 +14,11 @@ interface ImportNote {
   totalAmount: number
 }
 
-interface ImportNotesTableProps {
-  importNotes: ImportNote[]
+interface ImportReceiptsTableProps {
+  importReceipts: ImportReceipt[]
 }
 
-export function ImportNotesTable({ importNotes }: ImportNotesTableProps) {
+export function ImportReceiptsTable({ importReceipts }: ImportReceiptsTableProps) {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
@@ -30,7 +31,7 @@ export function ImportNotesTable({ importNotes }: ImportNotesTableProps) {
       <table className="w-full text-sm">
         <thead className="bg-[#fcfcfc] border-b border-gray-50">
           <tr className="text-gray-500 font-medium">
-            <th className="px-6 py-4 font-semibold w-24">Mã phiếu</th>
+            <th className="px-6 py-4 font-semibold w-28">Mã phiếu</th>
             <th className="px-6 py-4 font-semibold">Nhà cung cấp</th>
             <th className="px-6 py-4 font-semibold">Người tạo</th>
             <th className="px-6 py-4 font-semibold">Ngày nhập</th>
@@ -41,28 +42,24 @@ export function ImportNotesTable({ importNotes }: ImportNotesTableProps) {
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-50 bg-white">
-          {importNotes.map((note) => (
-            <tr key={note.id} className="hover:bg-gray-50 transition-colors">
-              <td className="px-6 py-5 font-medium text-blue-600">{note.id}</td>
-              <td className="px-6 py-5 text-gray-900">{note.supplier}</td>
-              <td className="px-6 py-5 text-gray-600">{note.creator}</td>
-              <td className="px-6 py-5 text-gray-600">{note.date}</td>
-              <td className="px-6 py-5 text-center text-gray-600">{note.bookTypes}</td>
-              <td className="px-6 py-5 text-center text-gray-600">{note.totalQuantity}</td>
-              <td className="px-6 py-5 text-right font-medium text-gray-900">
-                {formatCurrency(note.totalAmount)}
-              </td>
-              <td className="px-6 py-5 text-center">
+          {importReceipts.map((receipt) => (
+            <TableRow key={receipt.id}>
+              <TableCell variant="primary">{receipt.id}</TableCell>
+              <TableCell>{receipt.supplier}</TableCell>
+              <TableCell>{receipt.creator}</TableCell>
+              <TableCell>{receipt.date}</TableCell>
+              <TableCell className="text-center">{receipt.bookTypes}</TableCell>
+              <TableCell className="text-center">{receipt.totalQuantity}</TableCell>
+              <TableCell className="text-right">{formatCurrency(receipt.totalAmount)}</TableCell>
+              <TableCell className="text-center">
                 <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-8 gap-1 px-3 cursor-pointer"
+                  className="h-8 gap-1 px-3 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   <Eye className="h-3 w-3" />
                   Chi tiết
                 </Button>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
         </tbody>
       </table>

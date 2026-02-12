@@ -3,6 +3,7 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { TableCell, TableRow } from '@/components/table'
 
 interface Order {
   id: string
@@ -63,17 +64,17 @@ export function OrderTable({ orders }: OrderTableProps) {
         </thead>
         <tbody className="divide-y divide-gray-50 bg-white">
           {orders.map((order) => (
-            <tr key={order.id} className="hover:bg-gray-50 transition-colors">
-              <td className="px-6 py-5 font-bold text-gray-900">{order.id}</td>
-              <td className="px-6 py-5 text-gray-400 text-xs truncate max-w-[200px]">
+            <TableRow key={order.id}>
+              <TableCell>{order.id}</TableCell>
+              <TableCell className="truncate max-w-[200px]">
                 {order.customer}
-              </td>
-              <td className="px-6 py-5 text-gray-600">{order.date}</td>
-              <td className="px-6 py-5 font-bold text-red-500">
+              </TableCell>
+              <TableCell>{order.date}</TableCell>
+              <TableCell className="text-red-500">
                 {order.total.toLocaleString('vi-VN')} đ
-              </td>
-              <td className="px-6 py-5 text-center">{getStatusBadge(order.status)}</td>
-              <td className="px-6 py-5 text-center">
+              </TableCell>
+              <TableCell className="text-center">{getStatusBadge(order.status)}</TableCell>
+              <TableCell className="text-center">
                 <Button
                   variant="default"
                   size="sm"
@@ -81,8 +82,8 @@ export function OrderTable({ orders }: OrderTableProps) {
                 >
                   Xem chi tiết
                 </Button>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
         </tbody>
       </table>

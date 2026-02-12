@@ -1,10 +1,10 @@
 'use client'
 
-import { ImportNotesHeader } from './_components/ImportNotesHeader'
-import { ImportNotesTable } from './_components/ImportNotesTable'
+import { ImportReceiptsHeader } from './ImportReceiptsHeader'
+import { ImportReceiptsTable } from './ImportReceiptsTable'
 
 // Mock data tạm thời
-const mockImportNotes = [
+const mockImportReceipts = [
   {
     id: 'PN001',
     supplier: 'Nhà xuất bản Kim Đồng',
@@ -52,11 +52,11 @@ const mockImportNotes = [
   },
 ]
 
-export function ImportNotesPage() {
+export function ImportReceiptsPage() {
   return (
     <div className="space-y-6">
-      <ImportNotesHeader />
-      <ImportNotesTable importNotes={mockImportNotes} />
+      <ImportReceiptsHeader />
+      <ImportReceiptsTable importReceipts={mockImportReceipts} />
     </div>
   )
 }

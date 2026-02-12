@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { TableCell, TableRow } from '@/components/table'
 import {
   Dialog,
   DialogContent,
@@ -47,7 +48,7 @@ export function CategoryTable({ categories }: CategoryTableProps) {
   }
 
   return (
-    <div className="rounded-md bg-white border border-gray-100 overflow-hidden shadow-sm text-left">
+    <div className="rounded-md bg-white border border-gray-100 overflow-hidden shadow-sm text-left font-sans">
       <table className="w-full text-sm">
         <thead className="bg-[#fcfcfc] border-b border-gray-50">
           <tr className="text-gray-500 font-medium">
@@ -56,12 +57,12 @@ export function CategoryTable({ categories }: CategoryTableProps) {
             <th className="px-6 py-4 font-semibold text-center w-48">Thao tác</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-50">
+        <tbody className="divide-y divide-gray-50 bg-white">
           {categories.map((cat) => (
-            <tr key={cat.id} className="hover:bg-gray-50 transition-colors">
-              <td className="px-6 py-5 text-gray-600">{cat.id}</td>
-              <td className="px-6 py-5 font-medium text-gray-900">{cat.name}</td>
-              <td className="px-6 py-5">
+            <TableRow key={cat.id}>
+              <TableCell>{cat.id}</TableCell>
+              <TableCell>{cat.name}</TableCell>
+              <TableCell className="text-right">
                 <div className="flex items-center justify-end gap-2">
                   <EditCategoryModal
                     category={cat}
@@ -107,8 +108,8 @@ export function CategoryTable({ categories }: CategoryTableProps) {
                     </AlertDialogContent>
                   </AlertDialog>
                 </div>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
         </tbody>
       </table>

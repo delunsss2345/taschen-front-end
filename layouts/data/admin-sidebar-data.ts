@@ -56,7 +56,7 @@ export const adminSidebarData = {
     },
     {
       title: 'Quản lý Phiếu nhập kho',
-      url: '/dashboard/import-vouchers',
+      url: '/dashboard/import-receipts',
       icon: PackageCheck,
     },
     {

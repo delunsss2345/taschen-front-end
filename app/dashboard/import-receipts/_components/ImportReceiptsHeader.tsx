@@ -3,7 +3,7 @@
 import { Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 
-export function ImportNotesHeader() {
+export function ImportReceiptsHeader() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">

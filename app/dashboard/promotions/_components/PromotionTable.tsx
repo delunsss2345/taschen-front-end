@@ -3,6 +3,7 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { TableCell, TableRow } from '@/components/table'
 
 interface Promotion {
   id: number
@@ -65,27 +66,27 @@ export function PromotionTable({ promotions }: PromotionTableProps) {
         </thead>
         <tbody className="divide-y divide-gray-50 bg-white">
           {promotions.map((promo) => (
-            <tr key={promo.id} className="hover:bg-gray-50 transition-colors">
-              <td className="px-6 py-5 text-gray-600">{promo.id}</td>
-              <td className="px-6 py-5 font-medium text-gray-900 max-w-[200px] truncate">
+            <TableRow key={promo.id}>
+              <TableCell>{promo.id}</TableCell>
+              <TableCell className="max-w-[200px] truncate">
                 {promo.name}
-              </td>
-              <td className="px-6 py-5">
+              </TableCell>
+              <TableCell>
                 <Badge variant="outline" className="text-blue-600 border-blue-100 bg-blue-50 font-mono">
                   {promo.code}
                 </Badge>
-              </td>
-              <td className="px-6 py-5 text-center">
+              </TableCell>
+              <TableCell className="text-center">
                 <Badge className="bg-green-50 text-green-600 border-green-100 shadow-none">
                   {promo.discount}
                 </Badge>
-              </td>
-              <td className="px-6 py-5 text-center text-gray-600">{promo.quantity}</td>
-              <td className="px-6 py-5 text-gray-600 text-xs">{promo.minOrder}</td>
-              <td className="px-6 py-5 text-gray-500 text-xs">{promo.startDate}</td>
-              <td className="px-6 py-5 text-gray-500 text-xs">{promo.endDate}</td>
-              <td className="px-6 py-5 text-center">{getStatusBadge(promo.status)}</td>
-              <td className="px-6 py-5 text-center">
+              </TableCell>
+              <TableCell className="text-center">{promo.quantity}</TableCell>
+              <TableCell>{promo.minOrder}</TableCell>
+              <TableCell>{promo.startDate}</TableCell>
+              <TableCell>{promo.endDate}</TableCell>
+              <TableCell className="text-center">{getStatusBadge(promo.status)}</TableCell>
+              <TableCell className="text-center">
                 <Button
                   variant="default"
                   size="sm"
@@ -93,8 +94,8 @@ export function PromotionTable({ promotions }: PromotionTableProps) {
                 >
                   Xem chi tiết
                 </Button>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
         </tbody>
       </table>
