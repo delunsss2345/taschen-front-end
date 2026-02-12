@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useMemo } from 'react'
 import { ReturnsHeader } from './ReturnsHeader'
 import { ReturnsTable } from './ReturnsTable'
 
@@ -62,10 +63,27 @@ const mockReturns = [
 ]
 
 export function ReturnsPage() {
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const filteredReturns = useMemo(() => {
+    if (!searchQuery.trim()) return mockReturns
+
+    const query = searchQuery.toLowerCase().trim()
+
+    return mockReturns.filter((item) => {
+      return (
+        item.orderCode.toLowerCase().includes(query) ||
+        item.reason.toLowerCase().includes(query) ||
+        item.createdBy.toLowerCase().includes(query) ||
+        item.createdAt.includes(query)
+      )
+    })
+  }, [searchQuery])
+
   return (
     <div className="space-y-4">
-      <ReturnsHeader />
-      <ReturnsTable returns={mockReturns} />
+      <ReturnsHeader searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+      <ReturnsTable returns={filteredReturns} />
     </div>
   )
 }
