@@ -76,7 +76,7 @@ export function SupplierTable({ suppliers }: SupplierTableProps) {
                     <Button
                       variant="default"
                       size="sm"
-                      className="h-8 gap-1 px-3 bg-blue-600 hover:bg-blue-700 cursor-pointer w-32"
+                      className="h-8 gap-1 px-3 bg-blue-600 hover:bg-blue-700 cursor-pointer"
                     >
                       <Pencil className="h-3 w-3" />
                       Cập nhật
