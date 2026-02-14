@@ -20,7 +20,7 @@ export function CustomersHeader({ searchQuery, onSearchChange }: CustomersHeader
   return (
     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Quản lý Khách hàng</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900">Quản lý Khách hàng</h1>
       </div>
       <div className="flex items-center gap-4">
         <div className="relative w-80">
