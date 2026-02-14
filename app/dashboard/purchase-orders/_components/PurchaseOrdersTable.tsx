@@ -66,7 +66,6 @@ export function PurchaseOrdersTable({ data }: PurchaseOrdersTableProps) {
                   size="sm"
                   className="h-8 gap-1 px-3 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white"
                 >
-                  <Eye className="h-4 w-4" />
                   Xem chi tiết
                 </Button>
               </TableCell>
