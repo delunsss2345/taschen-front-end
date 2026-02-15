@@ -277,30 +277,9 @@ export default function CheckoutPage() {
                                             {item.variant}
                                         </p>
                                     )}
-                                    {item.discount && (
-                                        <p className="mt-0.5 text-xs text-teal-600">
-                                            ⊘ {item.discount}
-                                        </p>
-                                    )}
+
                                 </div>
 
-                                {/* Price */}
-                                <div className="shrink-0 text-right">
-                                    {item.isFree ? (
-                                        <span className="text-sm font-medium text-zinc-800">
-                                            MIỄN PHÍ
-                                        </span>
-                                    ) : (
-                                        <>
-                                            {item.originalPrice && (
-                                                <p className="text-xs text-zinc-400 line-through">
-                                                    {fmt(item.originalPrice)}
-                                                </p>
-                                            )}
-                                            <p className="text-sm font-medium">{fmt(item.price)}</p>
-                                        </>
-                                    )}
-                                </div>
                             </div>
                         ))}
                     </div>
