@@ -7,8 +7,7 @@ import {
   RotateCcw,
   BarChart3,
   PackagePlus,
-  Warehouse,
-  History
+  Warehouse
 } from 'lucide-react'
 
 export const sellerSidebarData = {
@@ -53,11 +52,6 @@ export const sellerSidebarData = {
       title: 'Yêu cầu Nhập kho',
       url: '/seller/dashboard/import-requests',
       icon: PackagePlus,
-    },
-    {
-      title: 'Lịch sử Hoạt động',
-      url: '/seller/dashboard/activities',
-      icon: History,
     },
     {
       title: 'Trả về kho',
