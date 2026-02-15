@@ -1,18 +1,15 @@
 import {
   LayoutDashboard,
   BookOpen,
+  Tags,
   ShoppingCart,
   TicketPercent,
-  PackageCheck,
   UserRound,
   RotateCcw,
   BarChart3,
   PackagePlus,
   Warehouse,
-  History,
-  DollarSign,
-  Settings,
-  Store
+  History
 } from 'lucide-react'
 
 export const sellerSidebarData = {
@@ -34,6 +31,11 @@ export const sellerSidebarData = {
       icon: BookOpen,
     },
     {
+      title: 'Quản lý Thể loại',
+      url: '/seller/dashboard/categories',
+      icon: Tags,
+    },
+    {
       title: 'Quản lý Đơn hàng',
       url: '/seller/dashboard/orders',
       icon: ShoppingCart,
@@ -47,11 +49,6 @@ export const sellerSidebarData = {
       title: 'Quản lý Khách hàng',
       url: '/seller/dashboard/customers',
       icon: UserRound,
-    },
-    {
-      title: 'Quản lý Phiếu nhập kho',
-      url: '/seller/dashboard/import-receipts',
-      icon: PackageCheck,
     },
     {
       title: 'Yêu cầu Hoàn/Đổi',
@@ -69,19 +66,9 @@ export const sellerSidebarData = {
       icon: History,
     },
     {
-      title: 'Doanh thu',
-      url: '/seller/dashboard/revenue',
-      icon: DollarSign,
-    },
-    {
-      title: 'Cửa hàng',
-      url: '/seller/dashboard/store',
-      icon: Store,
-    },
-    {
-      title: 'Cài đặt',
-      url: '/seller/dashboard/settings',
-      icon: Settings,
+      title: 'Trả về kho',
+      url: '/seller/dashboard/warehouse-returns',
+      icon: Warehouse,
     },
   ],
 }
