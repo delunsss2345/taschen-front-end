@@ -4,10 +4,13 @@ on:
   push:
     branches:
       - main
-      - feature/seller
   pull_request:
     branches:
       - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-and-check:
@@ -30,7 +33,6 @@ jobs:
 
       - name: Check for restricted files in .cursor/rules
         run: |
-          # Fetch origin/main để đảm bảo có dữ liệu so sánh
           git fetch origin main --quiet
           CHANGED_FILES=$(git diff --name-only origin/main...HEAD)
           if echo "$CHANGED_FILES" | grep -q "^.cursor/rules/"; then
