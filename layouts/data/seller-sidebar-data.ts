@@ -4,7 +4,6 @@ import {
   Tags,
   ShoppingCart,
   TicketPercent,
-  UserRound,
   RotateCcw,
   BarChart3,
   PackagePlus,
@@ -44,11 +43,6 @@ export const sellerSidebarData = {
       title: 'Quản lý Khuyến mãi',
       url: '/seller/dashboard/promotions',
       icon: TicketPercent,
-    },
-    {
-      title: 'Quản lý Khách hàng',
-      url: '/seller/dashboard/customers',
-      icon: UserRound,
     },
     {
       title: 'Yêu cầu Hoàn/Đổi',
