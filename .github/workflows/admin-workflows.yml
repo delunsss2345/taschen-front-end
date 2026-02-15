@@ -8,6 +8,8 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - 'app/admin/**'
 
 jobs:
   build-and-check:

@@ -7,6 +7,8 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - 'app/seller/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
