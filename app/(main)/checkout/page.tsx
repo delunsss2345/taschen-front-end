@@ -177,7 +177,6 @@ export default function CheckoutPage() {
                         </div>
                     </section>
 
-                    {/* ---- Thanh toán (Payment) ---- */}
                     <section>
                         <h2 className="text-xl font-semibold">Thanh toán</h2>
                         <p className="mt-1 text-sm text-zinc-500">
