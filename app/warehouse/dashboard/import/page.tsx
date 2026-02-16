@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import { ImportReceiptsHeader } from './_components/ImportReceiptsHeader'
 import { ImportReceiptsTable } from './_components/ImportReceiptsTable'
 

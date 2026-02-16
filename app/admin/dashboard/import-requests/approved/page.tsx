@@ -1,21 +1,8 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { ImportRequestsHeader } from './ImportRequestsHeader'
-import { ImportRequestsTable } from './ImportRequestsTable'
-
-interface ImportRequest {
-  id: number
-  bookName: string
-  quantity: number
-  status: string
-  createdBy: string
-  processedBy: string | null
-  note: string
-  feedback: string
-  createdAt: string
-  processedAt: string | null
-}
+import { ImportRequestsHeader } from '../_components/ImportRequestsHeader'
+import { ImportRequestsTable, type ImportRequest } from '../_components/ImportRequestsTable'
 
 const mockImportRequests: ImportRequest[] = [
   {
@@ -92,28 +79,35 @@ const mockImportRequests: ImportRequest[] = [
   },
 ]
 
-export function ImportRequestsPage() {
+export default function ApprovedPage() {
   const [searchQuery, setSearchQuery] = useState('')
 
   const filteredRequests = useMemo(() => {
-    if (!searchQuery.trim()) return mockImportRequests
+    let filtered = mockImportRequests.filter((item) => item.status === 'APPROVED')
 
-    const query = searchQuery.toLowerCase().trim()
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim()
+      filtered = filtered.filter((item) => {
+        return (
+          item.bookName.toLowerCase().includes(query) ||
+          item.note.toLowerCase().includes(query) ||
+          item.createdBy.toLowerCase().includes(query) ||
+          item.id.toString().includes(query)
+        )
+      })
+    }
 
-    return mockImportRequests.filter((item) => {
-      return (
-        item.bookName.toLowerCase().includes(query) ||
-        item.note.toLowerCase().includes(query) ||
-        item.createdBy.toLowerCase().includes(query) ||
-        item.id.toString().includes(query)
-      )
-    })
+    return filtered
   }, [searchQuery])
 
   return (
     <div className="space-y-4">
-      <ImportRequestsHeader searchQuery={searchQuery} onSearchChange={setSearchQuery} />
-      <ImportRequestsTable requests={filteredRequests} />
+      <ImportRequestsHeader 
+        searchQuery={searchQuery} 
+        onSearchChange={setSearchQuery} 
+        title="Yêu cầu Nhập kho - Đã duyệt"
+      />
+      <ImportRequestsTable requests={filteredRequests} mode="approved" />
     </div>
   )
 }
