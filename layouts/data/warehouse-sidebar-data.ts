@@ -8,6 +8,7 @@ import {
   Trash2,
   BarChart3,
   ChevronDown,
+  PackagePlus,
 } from 'lucide-react'
 
 export const warehouseSidebarData = {
@@ -19,20 +20,20 @@ export const warehouseSidebarData = {
       icon: LayoutDashboard,
     },
     {
-      title: 'Quản lý Nhập hàng',
+      title: 'Yêu cầu nhập kho',
       icon: ArrowDownToLine,
       items: [
         {
           title: 'Đang chờ',
-          url: '/warehouse/dashboard/imports/pending',
+          url: '/warehouse/dashboard/import-requests/pending',
         },
         {
-          title: 'Đã xác nhận',
-          url: '/warehouse/dashboard/imports/approved',
+          title: 'Đã duyệt',
+          url: '/warehouse/dashboard/import-requests/approved',
         },
         {
           title: 'Từ chối',
-          url: '/warehouse/dashboard/imports/rejected',
+          url: '/warehouse/dashboard/import-requests/rejected',
         },
       ],
     },
@@ -43,8 +44,8 @@ export const warehouseSidebarData = {
     },
     {
       title: 'Quản lý Phiếu Nhập kho',
-      url: '/warehouse/dashboard/import-receipts',
-      icon: PackageCheck,
+      url: '/warehouse/dashboard/import',
+      icon: PackagePlus,
     },
     {
       title: 'Quản lý Lô hàng',

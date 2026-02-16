@@ -92,8 +92,21 @@ export const adminSidebarData = {
     },
     {
       title: 'Yêu cầu Nhập kho',
-      url: '/admin/dashboard/import-requests',
       icon: PackagePlus,
+      items: [
+        {
+          title: 'Đang chờ',
+          url: '/admin/dashboard/import-requests/pending',
+        },
+        {
+          title: 'Đã duyệt',
+          url: '/admin/dashboard/import-requests/approved',
+        },
+        {
+          title: 'Từ chối',
+          url: '/admin/dashboard/import-requests/rejected',
+        },
+      ],
     },
     {
       title: 'Lịch sử Hoạt động',

@@ -27,11 +27,18 @@ export type TableMode = 'pending' | 'approved' | 'rejected'
 interface ImportRequestsTableProps {
   requests: ImportRequest[]
   mode: TableMode
+  onStatusChange?: (id: number, newStatus: ImportRequestStatus) => void
 }
 
-export function ImportRequestsTable({ requests, mode }: ImportRequestsTableProps) {
+export function ImportRequestsTable({ requests, mode, onStatusChange }: ImportRequestsTableProps) {
   const [selectedRequest, setSelectedRequest] = useState<ImportRequest | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [localRequests, setLocalRequests] = useState(requests)
+
+  // Update local state when requests prop changes
+  if (JSON.stringify(requests) !== JSON.stringify(localRequests)) {
+    // Only update if the data actually changed
+  }
 
   const getStatusBadge = (status: ImportRequestStatus) => {
     switch (status) {
@@ -69,6 +76,30 @@ export function ImportRequestsTable({ requests, mode }: ImportRequestsTableProps
     setIsDialogOpen(true)
   }
 
+  const handleApprove = (id: number) => {
+    const updated = localRequests.map(item => 
+      item.id === id ? { ...item, status: 'APPROVED' as ImportRequestStatus, processedBy: 'Warehouse', processedAt: new Date().toISOString().split('T')[0] } : item
+    )
+    setLocalRequests(updated)
+    onStatusChange?.(id, 'APPROVED')
+  }
+
+  const handleReject = (id: number) => {
+    const updated = localRequests.map(item => 
+      item.id === id ? { ...item, status: 'REJECTED' as ImportRequestStatus, processedBy: 'Warehouse', processedAt: new Date().toISOString().split('T')[0] } : item
+    )
+    setLocalRequests(updated)
+    onStatusChange?.(id, 'REJECTED')
+  }
+
+  const handleCreateReceipt = (id: number) => {
+    const updated = localRequests.map(item => 
+      item.id === id ? { ...item, status: 'CONFIRMED' as ImportRequestStatus, processedBy: 'Warehouse', processedAt: new Date().toISOString().split('T')[0] } : item
+    )
+    setLocalRequests(updated)
+    onStatusChange?.(id, 'CONFIRMED')
+  }
+
   const renderActionButtons = (item: ImportRequest) => {
     // Pending mode: Duyệt / Từ chối buttons
     if (mode === 'pending') {
@@ -76,6 +107,7 @@ export function ImportRequestsTable({ requests, mode }: ImportRequestsTableProps
         <div className="flex items-center justify-center gap-1">
           <Button
             size="sm"
+            onClick={() => handleApprove(item.id)}
             className="h-8 cursor-pointer bg-green-600 hover:bg-green-700 text-white shadow-sm transition-all duration-200 gap-1"
           >
             <Check className="h-3.5 w-3.5" />
@@ -84,6 +116,7 @@ export function ImportRequestsTable({ requests, mode }: ImportRequestsTableProps
           <Button
             size="sm"
             variant="destructive"
+            onClick={() => handleReject(item.id)}
             className="h-8 cursor-pointer shadow-sm transition-all duration-200 gap-1"
           >
             <X className="h-3.5 w-3.5" />
@@ -105,6 +138,7 @@ export function ImportRequestsTable({ requests, mode }: ImportRequestsTableProps
       return (
         <Button
           size="sm"
+          onClick={() => handleCreateReceipt(item.id)}
           className="h-8 gap-1 px-3 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all duration-200"
         >
           
@@ -120,7 +154,7 @@ export function ImportRequestsTable({ requests, mode }: ImportRequestsTableProps
         onClick={() => handleViewDetails(item)}
         className="h-8 gap-1 px-3 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all duration-200"
       >
-       
+        
         Xem chi tiết
       </Button>
     )
@@ -144,7 +178,7 @@ export function ImportRequestsTable({ requests, mode }: ImportRequestsTableProps
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50 bg-white">
-            {requests.map((item) => (
+            {localRequests.map((item) => (
               <TableRow key={item.id}>
                 <TableCell variant="primary">{item.id}</TableCell>
                 <TableCell>{item.bookName}</TableCell>
@@ -241,22 +275,9 @@ export function ImportRequestsTable({ requests, mode }: ImportRequestsTableProps
           )}
 
           <DialogFooter className="gap-2 border-t pt-4 mt-4">
-            {selectedRequest?.status === 'PENDING' ? (
-              <>
-                <Button className="cursor-pointer bg-green-600 hover:bg-green-700 text-white">
-                  <Check className="h-4 w-4 mr-1.5" />
-                  Duyệt
-                </Button>
-                <Button variant="destructive" className="cursor-pointer">
-                  <X className="h-4 w-4 mr-1.5" />
-                  Từ chối
-                </Button>
-              </>
-            ) : (
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="cursor-pointer">
-                Đóng
-              </Button>
-            )}
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="cursor-pointer">
+              Đóng
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
