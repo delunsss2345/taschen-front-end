@@ -6,7 +6,8 @@ import {
   Boxes,
   RotateCw,
   Trash2,
-  BarChart3
+  BarChart3,
+  ChevronDown,
 } from 'lucide-react'
 
 export const warehouseSidebarData = {
@@ -19,8 +20,21 @@ export const warehouseSidebarData = {
     },
     {
       title: 'Quản lý Nhập hàng',
-      url: '/warehouse/dashboard/imports',
       icon: ArrowDownToLine,
+      items: [
+        {
+          title: 'Đang chờ',
+          url: '/warehouse/dashboard/imports/pending',
+        },
+        {
+          title: 'Đã xác nhận',
+          url: '/warehouse/dashboard/imports/approved',
+        },
+        {
+          title: 'Từ chối',
+          url: '/warehouse/dashboard/imports/rejected',
+        },
+      ],
     },
     {
       title: 'Quản lý Đơn đặt hàng',
