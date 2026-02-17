@@ -39,7 +39,7 @@ export const warehouseSidebarData = {
     },
     {
       title: 'Phiếu Nhập kho',
-      url: '/warehouse/dashboard/orders',
+      url: '/warehouse/dashboard/import',
       icon: PackageCheck,
     },
     {

@@ -3,7 +3,7 @@
 import { ImportReceiptsHeader } from './ImportReceiptsHeader'
 import { ImportReceiptsTable } from './ImportReceiptsTable'
 
-// Mock data tạm thời
+// Mock data tạm thời - chỉ hiển thị Đã duyệt
 const mockImportReceipts = [
   {
     id: 'PN001',
@@ -13,7 +13,7 @@ const mockImportReceipts = [
     bookTypes: 5,
     totalQuantity: 150,
     totalAmount: 4500000,
-    status: 'DRAFT' as const,
+    status: 'APPROVED' as const,
   },
   {
     id: 'PN002',
@@ -26,16 +26,6 @@ const mockImportReceipts = [
     status: 'APPROVED' as const,
   },
   {
-    id: 'PN003',
-    supplier: 'NXB Giáo Dục Việt Nam',
-    creator: 'Lê Văn Cường',
-    date: '13/01/2025',
-    bookTypes: 8,
-    totalQuantity: 200,
-    totalAmount: 6200000,
-    status: 'REJECTED' as const,
-  },
-  {
     id: 'PN004',
     supplier: 'Nhà xuất bản Trẻ',
     creator: 'Phạm Thị Dung',
@@ -43,17 +33,7 @@ const mockImportReceipts = [
     bookTypes: 4,
     totalQuantity: 120,
     totalAmount: 3600000,
-    status: 'ORDERED' as const,
-  },
-  {
-    id: 'PN005',
-    supplier: 'Công ty Sách Hồng Ân',
-    creator: 'Hoàng Văn Em',
-    date: '11/01/2025',
-    bookTypes: 6,
-    totalQuantity: 180,
-    totalAmount: 5400000,
-    status: 'CANCELLED' as const,
+    status: 'APPROVED' as const,
   },
   {
     id: 'PN006',
@@ -63,7 +43,7 @@ const mockImportReceipts = [
     bookTypes: 2,
     totalQuantity: 50,
     totalAmount: 1500000,
-    status: 'DRAFT' as const,
+    status: 'APPROVED' as const,
   },
   {
     id: 'PN007',
