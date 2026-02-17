@@ -1,8 +1,7 @@
 'use client'
 
-import React from 'react'
-import { ImportReceiptsHeader } from './_components/ImportReceiptsHeader'
-import { ImportReceiptsTable } from './_components/ImportReceiptsTable'
+import { ImportReceiptsHeader } from './ImportReceiptsHeader'
+import { ImportReceiptsTable } from './ImportReceiptsTable'
 
 // Mock data tạm thời
 const mockImportReceipts = [
@@ -14,7 +13,7 @@ const mockImportReceipts = [
     bookTypes: 5,
     totalQuantity: 150,
     totalAmount: 4500000,
-    status: 'pending' as const,
+    status: 'DRAFT' as const,
   },
   {
     id: 'PN002',
@@ -24,7 +23,7 @@ const mockImportReceipts = [
     bookTypes: 3,
     totalQuantity: 80,
     totalAmount: 2800000,
-    status: 'approved' as const,
+    status: 'APPROVED' as const,
   },
   {
     id: 'PN003',
@@ -34,7 +33,7 @@ const mockImportReceipts = [
     bookTypes: 8,
     totalQuantity: 200,
     totalAmount: 6200000,
-    status: 'rejected' as const,
+    status: 'REJECTED' as const,
   },
   {
     id: 'PN004',
@@ -44,7 +43,7 @@ const mockImportReceipts = [
     bookTypes: 4,
     totalQuantity: 120,
     totalAmount: 3600000,
-    status: 'pending' as const,
+    status: 'ORDERED' as const,
   },
   {
     id: 'PN005',
@@ -54,11 +53,31 @@ const mockImportReceipts = [
     bookTypes: 6,
     totalQuantity: 180,
     totalAmount: 5400000,
-    status: 'approved' as const,
+    status: 'CANCELLED' as const,
+  },
+  {
+    id: 'PN006',
+    supplier: 'Công ty Sách Minh Khai',
+    creator: 'Vũ Thị Hoa',
+    date: '10/01/2025',
+    bookTypes: 2,
+    totalQuantity: 50,
+    totalAmount: 1500000,
+    status: 'DRAFT' as const,
+  },
+  {
+    id: 'PN007',
+    supplier: 'NXB Tổng hợp TP.HCM',
+    creator: 'Đặng Văn Hùng',
+    date: '09/01/2025',
+    bookTypes: 7,
+    totalQuantity: 250,
+    totalAmount: 7500000,
+    status: 'APPROVED' as const,
   },
 ]
 
-export default function ImportReceiptsPage() {
+export function ImportReceiptsPage() {
   return (
     <div className="space-y-6">
       <ImportReceiptsHeader />

@@ -38,14 +38,14 @@ export const warehouseSidebarData = {
       ],
     },
     {
-      title: 'Quản lý Đơn đặt hàng',
+      title: 'Phiếu Nhập kho',
       url: '/warehouse/dashboard/orders',
-      icon: ShoppingCart,
+      icon: PackageCheck,
     },
     {
-      title: 'Quản lý Phiếu Nhập kho',
-      url: '/warehouse/dashboard/import',
-      icon: PackagePlus,
+      title: 'Quản lý Đơn Đặt hàng',
+      url: '/warehouse/dashboard/purchase-order',
+      icon: ShoppingCart,
     },
     {
       title: 'Quản lý Lô hàng',

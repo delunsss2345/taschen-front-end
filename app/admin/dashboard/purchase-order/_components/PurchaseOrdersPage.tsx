@@ -3,27 +3,12 @@
 import { PurchaseOrdersHeader } from './PurchaseOrdersHeader'
 import { PurchaseOrdersTable } from './PurchaseOrdersTable'
 
-// Interface cho dữ liệu PO
-interface PurchaseOrder {
-  id: string
-  supplier: string
-  status: 'APPROVED' | 'PENDING' | 'REJECTED'
-  createdBy: string
-  approvedBy: string | null
-  createdAt: string
-  books: {
-    name: string
-    quantity: number
-    price: number
-  }[]
-}
-
 // Mock data tạm thời
-const mockData: PurchaseOrder[] = [
+const mockData = [
   {
     id: 'PO001',
     supplier: 'Nhà xuất bản Kim Đồng',
-    status: 'APPROVED',
+    status: 'APPROVED' as const,
     createdBy: 'nguyenvana',
     approvedBy: 'admin01',
     createdAt: '2024-01-15 10:30',
@@ -35,7 +20,7 @@ const mockData: PurchaseOrder[] = [
   {
     id: 'PO002',
     supplier: 'Công ty Sách Trí Tuệ',
-    status: 'PENDING',
+    status: 'PENDING' as const,
     createdBy: 'tranb',
     approvedBy: null,
     createdAt: '2024-01-14 09:15',
@@ -48,7 +33,7 @@ const mockData: PurchaseOrder[] = [
   {
     id: 'PO003',
     supplier: 'NXB Giáo Dục',
-    status: 'REJECTED',
+    status: 'REJECTED' as const,
     createdBy: 'lehong',
     approvedBy: 'admin02',
     createdAt: '2024-01-13 16:45',
@@ -59,7 +44,7 @@ const mockData: PurchaseOrder[] = [
   {
     id: 'PO004',
     supplier: 'Nhà xuất bản Kim Đồng',
-    status: 'PENDING',
+    status: 'PENDING' as const,
     createdBy: 'phamt',
     approvedBy: null,
     createdAt: '2024-01-12 11:20',
@@ -71,7 +56,7 @@ const mockData: PurchaseOrder[] = [
   {
     id: 'PO005',
     supplier: 'Công ty Sách Alpha',
-    status: 'APPROVED',
+    status: 'APPROVED' as const,
     createdBy: 'dangm',
     approvedBy: 'admin01',
     createdAt: '2024-01-11 08:00',
@@ -82,7 +67,7 @@ const mockData: PurchaseOrder[] = [
   },
 ]
 
-export default function PurchaseOrdersPage() {
+export function PurchaseOrdersPage() {
   return (
     <div className="space-y-6">
       <PurchaseOrdersHeader />

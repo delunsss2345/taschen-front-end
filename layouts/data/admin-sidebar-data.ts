@@ -61,8 +61,8 @@ export const adminSidebarData = {
       icon: Truck,
     },
     {
-      title: 'Quản lý Phiếu nhập kho',
-      url: '/admin/dashboard/import-receipts',
+      title: 'Quản lý Đơn Đặt hàng',
+      url: '/admin/dashboard/purchase-order',
       icon: PackageCheck,
     },
     {
@@ -86,8 +86,8 @@ export const adminSidebarData = {
       icon: RotateCw,
     },
     {
-      title: 'Đơn Đặt hàng',
-      url: '/admin/dashboard/purchase-orders',
+      title: 'Phiếu Nhập kho',
+      url: '/admin/dashboard/import',
       icon: LayoutGrid,
     },
     {

@@ -1,6 +1,5 @@
 'use client'
 
-import React from 'react'
 import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -13,17 +12,19 @@ interface ImportReceipt {
   bookTypes: number
   totalQuantity: number
   totalAmount: number
-  status: 'pending' | 'approved' | 'rejected'
+  status: 'DRAFT' | 'APPROVED' | 'REJECTED' | 'ORDERED' | 'CANCELLED'
 }
 
 interface ImportReceiptsTableProps {
   importReceipts: ImportReceipt[]
 }
 
-const statusConfig = {
-  pending: { label: 'Đang chờ', className: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100' },
-  approved: { label: 'Đã duyệt', className: 'bg-green-100 text-green-800 hover:bg-green-100' },
-  rejected: { label: 'Từ chối', className: 'bg-red-100 text-red-800 hover:bg-red-100' },
+const statusConfig: Record<ImportReceipt['status'], { label: string; className: string }> = {
+  DRAFT: { label: 'Chờ phê duyệt', className: 'bg-gray-100 text-gray-800 hover:bg-gray-100' },
+  APPROVED: { label: 'Đã duyệt', className: 'bg-green-100 text-green-800 hover:bg-green-100' },
+  REJECTED: { label: 'Từ chối', className: 'bg-red-100 text-red-800 hover:bg-red-100' },
+  ORDERED: { label: 'Đã đặt hàng', className: 'bg-purple-100 text-purple-800 hover:bg-purple-100' },
+  CANCELLED: { label: 'Đã hủy', className: 'bg-orange-100 text-orange-800 hover:bg-orange-100' },
 }
 
 export function ImportReceiptsTable({ importReceipts }: ImportReceiptsTableProps) {

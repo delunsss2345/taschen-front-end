@@ -11,13 +11,14 @@ interface ImportReceipt {
   bookTypes: number
   totalQuantity: number
   totalAmount: number
+  status: 'DRAFT' | 'APPROVED' | 'REJECTED' | 'ORDERED' | 'CANCELLED'
 }
 
 interface ImportReceiptsTableProps {
   importReceipts: ImportReceipt[]
 }
 
-export function ImportReceiptsTable({ importReceipts }: ImportReceiptsTableProps) {
+export function WarehouseImportReceiptsTable({ importReceipts }: ImportReceiptsTableProps) {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN').format(amount) + ' đ'
   }
@@ -34,7 +35,7 @@ export function ImportReceiptsTable({ importReceipts }: ImportReceiptsTableProps
             <TableHeaderCell className="text-center">Số loại sách</TableHeaderCell>
             <TableHeaderCell className="text-center">Tổng số lượng</TableHeaderCell>
             <TableHeaderCell className="text-right">Tổng tiền</TableHeaderCell>
-            <TableHeaderCell className="text-center w-28">Thao tác</TableHeaderCell>
+            <TableHeaderCell className="text-center w-32">Thao tác</TableHeaderCell>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-50 bg-white">
@@ -49,9 +50,9 @@ export function ImportReceiptsTable({ importReceipts }: ImportReceiptsTableProps
               <TableCell className="text-right">{formatCurrency(receipt.totalAmount)}</TableCell>
               <TableCell className="text-center">
                 <Button
-                  className="h-8 gap-1 px-3 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white"
+                  className="h-8 gap-1 px-3 cursor-pointer bg-green-600 hover:bg-green-700 text-white"
                 >
-                  Xem chi tiết
+                  Nhập kho
                 </Button>
               </TableCell>
             </TableRow>
