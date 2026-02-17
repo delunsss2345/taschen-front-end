@@ -11,14 +11,14 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-export function ImportReceiptsHeader() {
+export function PurchaseOrdersHeader() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">Quản lý Phiếu nhập kho</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900">Quản Lý Đơn Đặt hàng</h1>
         <Button className="bg-blue-600 hover:bg-blue-700 cursor-pointer">
           <Plus className="h-4 w-4" />
-          Tạo phiếu nhập
+          Tạo đơn đặt hàng
         </Button>
       </div>
 
@@ -26,7 +26,7 @@ export function ImportReceiptsHeader() {
         <div className="relative w-80">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
-            placeholder="Tìm kiếm theo mã phiếu, nhà cung cấp..."
+            placeholder="Tìm kiếm theo tên nhà cung cấp"
             className="pl-10 h-10 bg-white border-gray-200"
           />
         </div>
@@ -36,8 +36,9 @@ export function ImportReceiptsHeader() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Tất cả</SelectItem>
-            <SelectItem value="pending">Chờ nhập</SelectItem>
-            <SelectItem value="completed">Đã nhập</SelectItem>
+            <SelectItem value="pending">Chờ duyệt</SelectItem>
+            <SelectItem value="approved">Đã duyệt</SelectItem>
+            <SelectItem value="completed">Hoàn thành</SelectItem>
             <SelectItem value="cancelled">Đã hủy</SelectItem>
           </SelectContent>
         </Select>

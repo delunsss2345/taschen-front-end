@@ -2,6 +2,6 @@
 
 import { ImportReceiptsPage } from './_components/ImportReceiptsPage'
 
-export default function ImportReceiptsPageWrapper() {
+export default function Page() {
   return <ImportReceiptsPage />
 }

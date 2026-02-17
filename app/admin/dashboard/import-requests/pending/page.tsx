@@ -105,7 +105,7 @@ export default function PendingPage() {
       <ImportRequestsHeader 
         searchQuery={searchQuery} 
         onSearchChange={setSearchQuery} 
-        title="Yêu cầu Nhập kho - Đang chờ"
+      
       />
       <ImportRequestsTable requests={filteredRequests} mode="pending" />
     </div>

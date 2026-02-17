@@ -1,6 +1,5 @@
 'use client'
 
-import React from 'react'
 import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -13,17 +12,15 @@ interface ImportReceipt {
   bookTypes: number
   totalQuantity: number
   totalAmount: number
-  status: 'pending' | 'approved' | 'rejected'
+  status: 'APPROVED'
 }
 
 interface ImportReceiptsTableProps {
   importReceipts: ImportReceipt[]
 }
 
-const statusConfig = {
-  pending: { label: 'Đang chờ', className: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100' },
-  approved: { label: 'Đã duyệt', className: 'bg-green-100 text-green-800 hover:bg-green-100' },
-  rejected: { label: 'Từ chối', className: 'bg-red-100 text-red-800 hover:bg-red-100' },
+const statusConfig: Record<ImportReceipt['status'], { label: string; className: string }> = {
+  APPROVED: { label: 'Đã duyệt', className: 'bg-green-100 text-green-800 hover:bg-green-100' },
 }
 
 export function ImportReceiptsTable({ importReceipts }: ImportReceiptsTableProps) {
@@ -44,7 +41,7 @@ export function ImportReceiptsTable({ importReceipts }: ImportReceiptsTableProps
             <TableHeaderCell className="text-center">Tổng số lượng</TableHeaderCell>
             <TableHeaderCell className="text-right">Tổng tiền</TableHeaderCell>
             <TableHeaderCell className="text-center w-28">Trạng thái</TableHeaderCell>
-            <TableHeaderCell className="text-center w-28">Thao tác</TableHeaderCell>
+            <TableHeaderCell className="text-center w-40">Thao tác</TableHeaderCell>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-50 bg-white">
@@ -63,11 +60,14 @@ export function ImportReceiptsTable({ importReceipts }: ImportReceiptsTableProps
                 </Badge>
               </TableCell>
               <TableCell className="text-center">
-                <Button
-                  className="h-8 gap-1 px-3 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  Xem chi tiết
-                </Button>
+                <div className="flex items-center justify-center gap-1">
+                  <Button className="h-8 px-2 cursor-pointer bg-green-600 hover:bg-green-700 text-white text-xs">
+                    Nhập kho
+                  </Button>
+                  <Button className="h-8 px-2 cursor-pointer bg-red-600 hover:bg-red-700 text-white text-xs">
+                    Hủy nhập
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}

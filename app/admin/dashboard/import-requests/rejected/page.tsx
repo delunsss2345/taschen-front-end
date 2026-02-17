@@ -105,7 +105,7 @@ export default function RejectedPage() {
       <ImportRequestsHeader 
         searchQuery={searchQuery} 
         onSearchChange={setSearchQuery} 
-        title="Yêu cầu Nhập kho - Từ chối"
+     
       />
       <ImportRequestsTable requests={filteredRequests} mode="rejected" />
     </div>
