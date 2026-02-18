@@ -1,7 +1,12 @@
-export type ApiResponse<T> = {
+export type BackendApiResponse<T> = {
   error: string | null;
   message: string;
   statusCode: number;
+  data: T;
+};
+
+export type RouteSuccessResponse<T> = {
+  success: true;
   data: T;
 };
 
@@ -39,14 +44,12 @@ export type LoginResponseData = AuthTokenData & {
   user: UserLoginResponse;
 };
 
+export type RegisterResponseData = UserResponse;
 export type RefreshTokenResponseData = AuthTokenData;
 
-export type RegisterResponseData = UserResponse;
-
-export type LoginResponse = ApiResponse<LoginResponseData>;
-export type RefreshTokenResponse = ApiResponse<RefreshTokenResponseData>;
-export type RegisterResponse = ApiResponse<RegisterResponseData>;
-
-export type LogoutResponse = void;
-export type ChangePasswordResponse = void;
-export type VerifyAccountResponse = void;
+export type LoginApiResponse = BackendApiResponse<LoginResponseData>;
+export type RegisterApiResponse = BackendApiResponse<RegisterResponseData>;
+export type RefreshTokenApiResponse = BackendApiResponse<RefreshTokenResponseData>;
+export type LogoutApiResponse = BackendApiResponse<null>;
+export type ChangePasswordApiResponse = BackendApiResponse<null>;
+export type VerifyAccountApiResponse = BackendApiResponse<null>;

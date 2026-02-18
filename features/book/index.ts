@@ -1,1 +1,3 @@
-export * from "./slice";
+export { useBookStore } from "./store/book.store";
+export * from "./selectors";
+export * from "./hooks";

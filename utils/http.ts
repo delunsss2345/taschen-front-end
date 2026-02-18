@@ -49,12 +49,15 @@ const processQueue = (error: unknown) => {
 // Gọi refreshToken
 const refreshToken = async () => {
   try {
-    const result = await refreshAxiosInstance.post(`${baseURL}/auth/refresh`, {
-      refresh_token: localStorage.getItem("refreshToken"),
+    const result = await refreshAxiosInstance.post("/auth/refresh", {
+      refreshToken: localStorage.getItem("refreshToken"),
     });
 
     localStorage.setItem("accessToken", result.data.data.accessToken);
-    // localStorage.setItem("refreshToken", result.data.data.refresh_token);
+
+    if (result.data.data.refreshToken) {
+      localStorage.setItem("refreshToken", result.data.data.refreshToken);
+    }
 
     // Gắn queue  null nếu thành công
     processQueue(null);
@@ -123,18 +126,14 @@ class AxiosHttp {
     data: object | undefined,
     config?: AxiosRequestConfig,
   ) => {
-    try {
-      const response = await axiosInstance.request<T>({
-        method,
-        url: path,
-        data,
-        ...config,
-      });
+    const response = await axiosInstance.request<T>({
+      method,
+      url: path,
+      data,
+      ...config,
+    });
 
-      return response.data;
-    } catch (error) {
-      throw new Error(String(error));
-    }
+    return response.data;
   };
 
   get = <T = unknown>(

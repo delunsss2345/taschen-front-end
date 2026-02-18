@@ -1,30 +1,28 @@
 "use client";
 
-import { selectCurrentUser } from "@/features/auth";
-import { useAppSelector } from "@/store";
+import { selectorCurrentUser, useAuthStore } from "@/features/auth";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 type AuthGuardProps = {
-    children: React.ReactNode;
+  children: React.ReactNode;
 };
 
-
 const AuthGuard = ({ children }: AuthGuardProps) => {
-    const currentUser = useAppSelector(selectCurrentUser);
-    const router = useRouter();
+  const currentUser = useAuthStore(selectorCurrentUser);
+  const router = useRouter();
 
-    useEffect(() => {
-        if (currentUser) {
-            router.push('/');
-        }
-    }, [currentUser, router]);
-
+  useEffect(() => {
     if (currentUser) {
-        return null;
+      router.push("/");
     }
+  }, [currentUser, router]);
 
-    return <>{children}</>;
+  if (currentUser) {
+    return null;
+  }
+
+  return <>{children}</>;
 };
 
 export default AuthGuard;

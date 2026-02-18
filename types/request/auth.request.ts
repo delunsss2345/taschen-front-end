@@ -1,4 +1,4 @@
-export type RegisterPayload = {
+export type RegisterRequest = {
   firstName: string;
   lastName: string;
   email: string;
@@ -6,24 +6,24 @@ export type RegisterPayload = {
   confirmPassword: string;
 };
 
-export type LoginPayload = {
+export type LoginRequest = {
   email: string;
   password: string;
 };
 
-export type LogoutPayload = {
+export type LogoutRequest = {
   refreshToken: string;
 };
 
-export type ChangePasswordPayload = {
+export type ChangePasswordRequest = {
   oldPassword: string;
   newPassword: string;
 };
 
-export type VerifyAccountPayload = {
+export type VerifyAccountRequest = {
   verifyToken: string;
 };
 
-export type RefreshTokenPayload = {
+export type RefreshTokenRequest = {
   refreshToken: string;
 };

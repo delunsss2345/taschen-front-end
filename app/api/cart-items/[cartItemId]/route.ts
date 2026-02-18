@@ -1,0 +1,54 @@
+import {
+  getAuthorizationHeader,
+  handleRouteError,
+} from "@/app/api/_utils/route-utils";
+import { API_MESSAGE } from "@/constants/api/messageApi";
+import type { CartItemApiResponse, EmptyApiResponse } from "@/types/response/cart.response";
+import { api } from "@/lib/api/fetchHandler";
+import { ResponseApi } from "@/lib/api/responseHandler";
+import { HttpStatusCode } from "axios";
+import { NextRequest } from "next/server";
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ cartItemId: string }> },
+) {
+  try {
+    const { cartItemId } = await params;
+    const headers = getAuthorizationHeader(request);
+
+    const response = await api.get<CartItemApiResponse>(`cart-items/${cartItemId}`, {
+      headers,
+    });
+
+    return ResponseApi.success(response.data, HttpStatusCode.Ok);
+  } catch (error) {
+    return handleRouteError(
+      error,
+      API_MESSAGE.SYSTEM_TRY_AGAIN,
+      "Get Cart Item API Error",
+    );
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ cartItemId: string }> },
+) {
+  try {
+    const { cartItemId } = await params;
+    const headers = getAuthorizationHeader(request);
+
+    const response = await api.delete<EmptyApiResponse>(`cart-items/${cartItemId}`, {
+      headers,
+    });
+
+    return ResponseApi.success(response.data, HttpStatusCode.Ok);
+  } catch (error) {
+    return handleRouteError(
+      error,
+      API_MESSAGE.SYSTEM_TRY_AGAIN,
+      "Delete Cart Item API Error",
+    );
+  }
+}

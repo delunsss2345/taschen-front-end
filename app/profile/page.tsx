@@ -6,13 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { selectCurrentUser } from "@/features/auth";
+import { selectorCurrentUser, useAuthStore } from "@/features/auth";
 import useTranslator from "@/hooks/use-translator";
-import { useAppSelector } from "@/store";
 
 const ProfilePage = () => {
   const { t } = useTranslator();
-  const currentUser = useAppSelector(selectCurrentUser);
+  const currentUser = useAuthStore(selectorCurrentUser);
 
   return (
     <main className="min-h-[calc(100vh-8rem)] bg-background">
