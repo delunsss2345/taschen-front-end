@@ -91,7 +91,6 @@ export const fetchApi = (defaults: Pick<ApiOptions, "baseURL" | "headers"> = {})
             return request<T>("GET", path, withDefaults(opt));
         },
         post<T>(path: string, body?: unknown, opt?: ApiOptions) {
-            console.log(path);
             return request<T>("POST", path, withDefaults({ ...opt, body }));
         },
         put<T>(path: string, body?: unknown, opt?: ApiOptions) {
@@ -100,8 +99,8 @@ export const fetchApi = (defaults: Pick<ApiOptions, "baseURL" | "headers"> = {})
         patch<T>(path: string, body?: unknown, opt?: ApiOptions) {
             return request<T>("PATCH", path, withDefaults({ ...opt, body }));
         },
-        delete<T>(path: string, opt?: ApiOptions) {
-            return request<T>("DELETE", path, withDefaults(opt));
+        delete<T>(path: string, body?: unknown, opt?: ApiOptions) {
+            return request<T>("DELETE", path, withDefaults({ ...opt, body }));
         },
     };
 };

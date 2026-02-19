@@ -1,3 +1,5 @@
+import type { Category } from "./category.response";
+
 export type BackendApiResponse<T> = {
   error: string | null;
   message: string;
@@ -24,6 +26,7 @@ export type Book = {
   isActive: boolean;
   variantFormats: string[];
   categoryIds: number[];
+  categories?: Category[];
 };
 
 export type BookListMeta = {
