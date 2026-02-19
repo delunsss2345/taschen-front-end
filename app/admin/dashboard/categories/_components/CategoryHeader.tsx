@@ -13,13 +13,19 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
+import { categoryService } from '@/services/category.service'
 
-export function CategoryHeader() {
+interface CategoryHeaderProps {
+  onSuccess?: () => void
+}
+
+export function CategoryHeader({ onSuccess }: CategoryHeaderProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight text-gray-900">Quản lý Thể loại</h1>
         <AddCategoryModal
+          onSuccess={onSuccess}
           trigger={
             <Button className="bg-blue-600 hover:bg-blue-700 cursor-pointer">
               <Plus className="h-4 w-4" />
@@ -40,26 +46,30 @@ export function CategoryHeader() {
   )
 }
 
-function AddCategoryModal({ trigger }: { trigger: React.ReactNode }) {
+function AddCategoryModal({ trigger, onSuccess }: { trigger: React.ReactNode; onSuccess?: () => void }) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
+  const [code, setCode] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const onSubmit = async () => {
     if (!name.trim()) return
 
-    const promise = new Promise((resolve) => setTimeout(resolve, 1000))
-
-    toast.promise(promise, {
-      loading: 'Đang lưu...',
-      success: () => {
-        setOpen(false)
-        setName('')
-        return 'Thể loại mới đã được thêm.'
-      },
-      error: () => 'Có lỗi xảy ra.',
-    })
-
-    await promise
+    try {
+      setIsSubmitting(true)
+      const categoryCode = code.trim() || name.trim().toUpperCase().replace(/[^A-Z0-9]/g, '_')
+      await categoryService.createCategory({ name, code: categoryCode })
+      toast.success('Thể loại mới đã được thêm.')
+      setOpen(false)
+      setName('')
+      setCode('')
+      onSuccess?.()
+    } catch (error) {
+      console.error('Error creating category:', error)
+      toast.error('Không thể thêm thể loại')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -70,6 +80,14 @@ function AddCategoryModal({ trigger }: { trigger: React.ReactNode }) {
           <DialogTitle>Thêm thể loại mới</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4 text-left">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Mã thể loại</label>
+            <Input
+              placeholder="Nhập mã (vd: SCIENCE)"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+            />
+          </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">Tên thể loại</label>
             <Input
@@ -86,9 +104,9 @@ function AddCategoryModal({ trigger }: { trigger: React.ReactNode }) {
           <Button
             className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
             onClick={onSubmit}
-            disabled={!name.trim()}
+            disabled={!name.trim() || isSubmitting}
           >
-            Lưu
+            {isSubmitting ? 'Đang lưu...' : 'Lưu'}
           </Button>
         </DialogFooter>
       </DialogContent>

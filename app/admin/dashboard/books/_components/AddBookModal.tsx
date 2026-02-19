@@ -23,21 +23,15 @@ import {
 import { MultiSelectCombobox } from './MultiSelectCombobox'
 import { ImagePlus } from 'lucide-react'
 import { toast } from 'sonner'
+import { bookService } from '@/services/book.service'
+import { categoryService } from '@/services/category.service'
+import { uploadService } from '@/services/upload.service'
+import { useEffect } from 'react'
 
 const mockFormats = [
   { value: 'Bìa cứng', label: 'Bìa cứng' },
   { value: 'Bìa mềm', label: 'Bìa mềm' },
   { value: 'E-book', label: 'E-book' },
-]
-
-const mockCategories = [
-  { value: 1, label: 'Kinh dị' },
-  { value: 2, label: 'Tiểu thuyết' },
-  { value: 3, label: 'Văn học' },
-  { value: 4, label: 'Trinh thám' },
-  { value: 5, label: 'Kỹ năng sống' },
-  { value: 6, label: 'Quân sự' },
-  { value: 7, label: 'Truyện tranh' },
 ]
 
 export type BookCreateModel = {
@@ -99,11 +93,27 @@ function Section({ title, children }: { title?: string; children: React.ReactNod
   )
 }
 
-export function AddBookModal({ trigger }: { trigger: React.ReactNode }) {
+export function AddBookModal({ 
+  trigger, 
+  onSuccess 
+}: { 
+  trigger: React.ReactNode
+  onSuccess?: () => void 
+}) {
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState<BookCreateModel>(defaultValues)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const [categories, setCategories] = useState<{ value: number; label: string }[]>([])
+
+  useEffect(() => {
+    if (open) {
+      categoryService.getAllCategories().then((cats) => {
+        setCategories(cats.map((c) => ({ value: c.id, label: c.name })))
+      })
+    }
+  }, [open])
 
   const canSubmit = useMemo(() => {
     return form.tenSach.trim().length > 0 && form.tacGia.trim().length > 0
@@ -129,19 +139,43 @@ export function AddBookModal({ trigger }: { trigger: React.ReactNode }) {
   const onSubmit = async () => {
     if (!canSubmit) return
 
-    const promise = new Promise((resolve) => setTimeout(resolve, 1200))
+    setIsSubmitting(true)
+    
+    try {
+      let imageUrl = ''
 
-    toast.promise(promise, {
-      loading: 'Đang lưu...',
-      success: () => {
-        setOpen(false)
-        resetForm()
-        return 'Sách đã được thêm thành công.'
-      },
-      error: () => 'Có lỗi xảy ra.',
-    })
+      // Upload image to Cloudinary first if exists
+      if (form.hinhAnh) {
+        imageUrl = await uploadService.uploadImage(form.hinhAnh, 'books')
+      }
 
-    await promise
+      const payload = {
+        title: form.tenSach,
+        author: form.tacGia,
+        description: form.moTa,
+        publicationYear: form.namXuatBan,
+        weightGrams: form.khoiLuongGram,
+        pageCount: form.soTrang,
+        price: form.gia,
+        stockQuantity: form.soLuongTon,
+        imageUrl: imageUrl,
+        isActive: form.kichHoat,
+        categoryIds: form.maTheLoai,
+        variantFormats: form.dinhDang ? [form.dinhDang] : [],
+      }
+
+      await bookService.createBook(payload)
+      
+      toast.success('Sách đã được thêm thành công.')
+      setOpen(false)
+      resetForm()
+      onSuccess?.()
+    } catch (error) {
+      console.error('Error creating book:', error)
+      toast.error('Có lỗi xảy ra khi thêm sách.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
   
   return (
@@ -310,7 +344,7 @@ export function AddBookModal({ trigger }: { trigger: React.ReactNode }) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Field label="Thể loại" helper="Có thể chọn nhiều">
                   <MultiSelectCombobox
-                    options={mockCategories}
+                    options={categories}
                     value={form.maTheLoai}
                     onChange={(value) => setForm((p) => ({ ...p, maTheLoai: value }))}
                     placeholder="Chọn thể loại"
@@ -363,10 +397,10 @@ export function AddBookModal({ trigger }: { trigger: React.ReactNode }) {
           <Button
             type="button"
             className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
-            disabled={!canSubmit}
+            disabled={!canSubmit || isSubmitting}
             onClick={onSubmit}
           >
-            Lưu
+            {isSubmitting ? 'Đang lưu...' : 'Lưu'}
           </Button>
         </DialogFooter>
       </DialogContent>

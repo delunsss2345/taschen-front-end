@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { AddBookModal } from './AddBookModal'
 import { Input } from '@/components/ui/input'
 
-export function BooksHeader() {
+export function BooksHeader({ onSuccess }: { onSuccess?: () => void }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -17,6 +17,7 @@ export function BooksHeader() {
               Thêm sách mới
             </Button>
           }
+          onSuccess={onSuccess}
         />
       </div>
 

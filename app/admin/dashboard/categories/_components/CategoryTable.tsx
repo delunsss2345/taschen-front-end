@@ -24,27 +24,68 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-
-interface Category {
-  id: number
-  name: string
-}
+import type { Category } from '@/types/response/category.response'
+import { categoryService } from '@/services/category.service'
 
 interface CategoryTableProps {
   categories: Category[]
+  isLoading?: boolean
+  onEditSuccess?: () => void
+  onDeleteSuccess?: () => void
 }
 
-export function CategoryTable({ categories }: CategoryTableProps) {
+export function CategoryTable({ categories, isLoading, onEditSuccess, onDeleteSuccess }: CategoryTableProps) {
+  
   const handleDelete = async (cat: Category) => {
-    const promise = new Promise((resolve) => setTimeout(resolve, 500))
-    
-    toast.promise(promise, {
-      loading: 'Đang xóa...',
-      success: () => `Thể loại "${cat.name}" đã được xóa.`,
-      error: () => 'Có lỗi xảy ra.',
-    })
+    try {
+      await categoryService.deleteCategory(cat.id)
+      toast.success(`Thể loại "${cat.name}" đã được xóa.`)
+      onDeleteSuccess?.()
+    } catch (error: unknown) {
+      // Handle AxiosError
+      let errorMessage = 'Đã xảy ra lỗi không xác định'
+      
+      if (typeof error === 'object' && error !== null && 'response' in error) {
+        // AxiosError - try to get backend message
+        const axiosError = error as { response?: { data?: { message?: string; error?: string } } }
+        const backendMsg = axiosError.response?.data?.message || axiosError.response?.data?.error
+        if (backendMsg) {
+          errorMessage = backendMsg
+        } else {
+          errorMessage = 'Lỗi HTTP 400 - Yêu cầu không hợp lệ'
+        }
+      } else if (error instanceof Error) {
+        errorMessage = error.message
+      }
+      
+      // Check for associated books error
+      const errMsg = String(error)
+      if (errMsg.includes('associated book') || errMsg.includes('Cannot delete category') || errorMessage.includes('associated book') || errorMessage.includes('Cannot delete category')) {
+        toast.error('Không thể xóa thể loại!\nThể loại này đang gắn với một sách.')
+      } else {
+        toast.error('Lỗi khi xóa thể loại: ' + errorMessage)
+      }
+    }
+  }
 
-    await promise
+  if (isLoading) {
+    return (
+      <div className="rounded-md bg-white border border-gray-100 overflow-hidden shadow-sm">
+        <div className="flex items-center justify-center h-32">
+          <span className="text-gray-500">Đang tải...</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (categories.length === 0) {
+    return (
+      <div className="rounded-md bg-white border border-gray-100 overflow-hidden shadow-sm">
+        <div className="flex items-center justify-center h-32">
+          <span className="text-gray-500">Chưa có thể loại nào</span>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -53,6 +94,7 @@ export function CategoryTable({ categories }: CategoryTableProps) {
         <thead className="bg-[#fcfcfc] border-b border-gray-50">
           <tr className="text-gray-500 font-medium">
             <TableHeaderCell className="w-24">ID</TableHeaderCell>
+            <TableHeaderCell>Mã thể loại</TableHeaderCell>
             <TableHeaderCell>Tên thể loại</TableHeaderCell>
             <TableHeaderCell className="text-center w-48">Thao tác</TableHeaderCell>
           </tr>
@@ -61,11 +103,13 @@ export function CategoryTable({ categories }: CategoryTableProps) {
           {categories.map((cat) => (
             <TableRow key={cat.id}>
               <TableCell>{cat.id}</TableCell>
+              <TableCell>{cat.code || '-'}</TableCell>
               <TableCell>{cat.name}</TableCell>
               <TableCell className="text-right">
                 <div className="flex items-center justify-end gap-2">
                   <EditCategoryModal
                     category={cat}
+                    onSuccess={onEditSuccess}
                     trigger={
                       <Button
                         variant="default"
@@ -117,25 +161,26 @@ export function CategoryTable({ categories }: CategoryTableProps) {
   )
 }
 
-function EditCategoryModal({ trigger, category }: { trigger: React.ReactNode; category: Category }) {
+function EditCategoryModal({ trigger, category, onSuccess }: { trigger: React.ReactNode; category: Category; onSuccess?: () => void }) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState(category.name)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const onSubmit = async () => {
     if (!name.trim()) return
 
-    const promise = new Promise((resolve) => setTimeout(resolve, 800))
-
-    toast.promise(promise, {
-      loading: 'Đang xử lý...',
-      success: () => {
-        setOpen(false)
-        return 'Thông tin thể loại đã được cập nhật.'
-      },
-      error: () => 'Có lỗi xảy ra.',
-    })
-
-    await promise
+    try {
+      setIsSubmitting(true)
+      await categoryService.updateCategory(category.id, { name })
+      toast.success('Thông tin thể loại đã được cập nhật.')
+      setOpen(false)
+      onSuccess?.()
+    } catch (error) {
+      console.error('Error updating category:', error)
+      toast.error('Không thể cập nhật thể loại')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -164,9 +209,9 @@ function EditCategoryModal({ trigger, category }: { trigger: React.ReactNode; ca
           <Button
             className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
             onClick={onSubmit}
-            disabled={!name.trim() || name === category.name}
+            disabled={!name.trim() || name === category.name || isSubmitting}
           >
-            Lưu
+            {isSubmitting ? 'Đang lưu...' : 'Lưu'}
           </Button>
         </DialogFooter>
       </DialogContent>

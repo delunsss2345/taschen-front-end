@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
 import { EditBookModal } from './EditBookModal'
 import { toast } from 'sonner'
+import { bookService } from '@/services/book.service'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,29 +20,57 @@ import {
 
 interface Book {
   id: number
-  image: string
+  imageUrl?: string
   title: string
   author: string
   price: number
-  quantity: number
-  category: string
+  stockQuantity: number
+  categoryIds: number[]
+  categories?: {
+    id: number
+    name: string
+  }[]
 }
 
 interface BooksTableProps {
   books: Book[]
+  isLoading?: boolean
+  onDeleteSuccess?: (bookId: number) => void
+  onEditSuccess?: () => void
 }
 
-export function BooksTable({ books }: BooksTableProps) {
+export function BooksTable({ books, isLoading, onDeleteSuccess, onEditSuccess }: BooksTableProps) {
   const handleDelete = async (bookId: number) => {
-    const promise = new Promise((resolve) => setTimeout(resolve, 500))
+    try {
+      await bookService.deleteBook(bookId)
+      toast.success('Sách đã được xóa thành công.')
+      onDeleteSuccess?.(bookId)
+    } catch (error: unknown) {
+      console.error('Error deleting book:', error)
+      const axiosError = error as { response?: { data?: { message?: string; error?: string } } };
+      const backendMessage = axiosError?.response?.data?.message
+      toast.error(backendMessage || 'Có lỗi xảy ra khi xóa sách.')
+    }
+  }
 
-    toast.promise(promise, {
-      loading: 'Đang xóa...',
-      success: () => 'Sách đã được xóa thành công.',
-      error: () => 'Có lỗi xảy ra.',
-    })
+  if (isLoading) {
+    return (
+      <div className="rounded-md bg-white border border-gray-100 overflow-hidden shadow-sm">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-gray-400">Đang tải...</div>
+        </div>
+      </div>
+    )
+  }
 
-    await promise
+  if (books.length === 0) {
+    return (
+      <div className="rounded-md bg-white border border-gray-100 overflow-hidden shadow-sm">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-gray-400">Chưa có sách nào</div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -66,9 +95,9 @@ export function BooksTable({ books }: BooksTableProps) {
 
               <TableCell>
                 <div className="h-[72px] w-[54px] bg-gray-100 rounded overflow-hidden flex items-center justify-center border border-gray-50 shadow-sm">
-                  {book.image ? (
+                  {book.imageUrl ? (
                     <img
-                      src={book.image}
+                      src={book.imageUrl}
                       alt={book.title}
                       className="h-full w-full object-cover"
                     />
@@ -93,21 +122,30 @@ export function BooksTable({ books }: BooksTableProps) {
               <TableCell>
                 <span
                   className={cn(
-                    book.quantity === 0 ? 'text-red-500' : ''
+                    book.stockQuantity === 0 ? 'text-red-500' : ''
                   )}
                 >
-                  {book.quantity}
+                  {book.stockQuantity}
                 </span>
               </TableCell>
 
               <TableCell className="max-w-[150px]">
-                {book.category}
+                {book.categories?.map((cat) => cat.name).join(", ") || "Chưa có thể loại"}
               </TableCell>
 
               <TableCell className="text-right">
                 <div className="flex items-center justify-end gap-2">
                   <EditBookModal
-                    book={book}
+                    book={{
+                      id: book.id,
+                      image: book.imageUrl || '',
+                      title: book.title,
+                      author: book.author,
+                      price: book.price,
+                      quantity: book.stockQuantity,
+                      category: book.categories?.map((cat) => cat.name).join(", ") || ""
+                    }}
+                    onSuccess={onEditSuccess}
                     trigger={
                       <Button
                         variant="default"

@@ -169,9 +169,10 @@ class AxiosHttp {
 
   del = <T = unknown>(
     path: string,
+    data?: object | undefined,
     config?: AxiosRequestConfig,
   ): Promise<T> => {
-    return this._send<T>("delete", path, undefined, config);
+    return this._send<T>("delete", path, data, config);
   };
 }
 export const http = new AxiosHttp();

@@ -39,7 +39,7 @@ export async function DELETE(
     const { userId } = await params;
     const headers = getAuthorizationHeader(request);
 
-    const response = await api.delete<EmptyApiResponse>(`carts/users/${userId}`, {
+    const response = await api.delete<EmptyApiResponse>(`/api/carts/users/${userId}`, undefined, {
       headers,
     });
 

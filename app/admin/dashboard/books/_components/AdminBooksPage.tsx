@@ -1,53 +1,73 @@
+'use client'
+
+import { useEffect, useState } from 'react'
 import { BooksHeader } from './BooksHeader'
 import { BooksTable } from './BooksTable'
-
-const mockBooks = [
-  {
-    id: 1,
-    image:
-      'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1327881099i/3735293.jpg',
-    title: 'Thư vào Nam',
-    author: 'Lê Duẩn',
-    price: 150000,
-    quantity: 44,
-    category: 'Quân sự',
-  },
-  {
-    id: 2,
-    image: 'https://sachhoc.com/wp-content/uploads/2019/06/do-re-mon.jpg',
-    title: 'Đô rê mon',
-    author: 'Tao',
-    price: 700000,
-    quantity: 0,
-    category: 'Truyện tranh, Tiểu thuyết',
-  },
-  {
-    id: 3,
-    image:
-      'https://salt.tikicdn.com/media/catalog/product/i/m/img320.u5472.d20170626.t162430.847967.jpg',
-    title: 'Kính nhu hoa',
-    author: 'Taoo',
-    price: 36000,
-    quantity: 12,
-    category: 'Tiểu thuyết, Văn học',
-  },
-  {
-    id: 4,
-    image:
-      'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1451442515i/3144900.jpg',
-    title: 'Nhà Giả Kim (Tái bản 2025)',
-    author: 'Paulo Coelho',
-    price: 85000,
-    quantity: 33,
-    category: 'Tiểu thuyết, Văn học',
-  },
-]
+import { Pagination } from '@/components/ui/pagination'
+import { bookService } from '@/services/book.service'
+import { toast } from 'sonner'
+import type { Book, BookListMeta } from '@/types/response/book.response'
 
 export function AdminBooksPage() {
+  const [books, setBooks] = useState<Book[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [meta, setMeta] = useState<BookListMeta | null>(null)
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(5)
+
+  const fetchBooks = async () => {
+    try {
+      setIsLoading(true)
+      const response = await bookService.getAllBooks({ page, pageSize })
+      setBooks(response.result)
+      setMeta(response.meta)
+    } catch (error) {
+      toast.error('Không thể tải danh sách sách')
+      console.error('Error fetching books:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchBooks()
+  }, [page, pageSize])
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage)
+  }
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize)
+    setPage(1)
+  }
+
+  const handleDeleteSuccess = (bookId: number) => {
+    setBooks((prev) => prev.filter((book) => book.id !== bookId))
+    if (meta) {
+      setMeta((prev) => prev ? { ...prev, total: prev.total - 1 } : null)
+    }
+  }
+
   return (
     <div className="space-y-4">
-      <BooksHeader />
-      <BooksTable books={mockBooks} />
+      <BooksHeader onSuccess={fetchBooks} />
+      <BooksTable 
+        books={books} 
+        isLoading={isLoading}
+        onDeleteSuccess={handleDeleteSuccess}
+        onEditSuccess={fetchBooks}
+      />
+      {meta && (
+        <Pagination
+          currentPage={meta.page}
+          totalPages={meta.pages}
+          totalItems={meta.total}
+          pageSize={meta.pageSize}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+        />
+      )}
     </div>
   )
 }
