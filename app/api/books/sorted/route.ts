@@ -12,7 +12,7 @@ import { NextRequest } from "next/server";
 export async function GET(request: NextRequest) {
   try {
     const headers = getAuthorizationHeader(request);
-    const response = await api.get<BooksApiResponse>("books/sorted", {
+    const response = await api.get<BooksApiResponse>("api/books/sorted", {
       headers,
     });
 
