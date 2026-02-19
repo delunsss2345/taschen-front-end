@@ -1,36 +1,25 @@
 "use client";
 
-import RegisterForm, { type RegisterValues } from "@/components/auth/RegisterForm";
-import { register, selectAuthLoading } from "@/features/auth";
-import { useAppDispatch, useAppSelector } from "@/store";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import RegisterForm from "@/components/auth/RegisterForm";
+import useTranslator from "@/hooks/use-translator";
 
-const Page = () => {
-  const { authLoading } = useAppSelector(selectAuthLoading);
-  const dispatch = useAppDispatch();
-  const router = useRouter();
+const Register = () => {
+  const { t } = useTranslator();
 
-  const onSubmit = async (values: RegisterValues) => {
-    const payload = {
-      firstName: values.firstName,
-      lastName: values.lastName,
-      email: values.email,
-      password: values.password,
-      confirmPassword: values.confirm_password,
-    };
+  const onSubmit = async () => {};
 
-    toast.promise(dispatch(register(payload)).unwrap(), {
-      loading: 'Đang đăng ký',
-      success: () => {
-        router.push('/');
-        return 'Đăng ký thành công! Vui lòng kiểm tra email để xác minh tài khoản.';
-      },
-      error: 'Đăng ký thất bại',
-    });
-  };
+  return (
+    <div className="space-y-4">
+      <div className="space-y-1 text-center">
+        <h1 className="text-2xl font-semibold">{t("auth.registerTitle")}</h1>
+        <p className="text-sm text-muted-foreground">
+          {t("auth.registerSubtitle")}
+        </p>
+      </div>
 
-  return <RegisterForm isLoading={authLoading} onSubmit={onSubmit} />;
+      <RegisterForm onSubmit={onSubmit} />
+    </div>
+  );
 };
 
-export default Page;
+export default Register;

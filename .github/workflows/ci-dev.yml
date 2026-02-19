@@ -1,0 +1,53 @@
+name: CI (dev)
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [develop]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      matrix:
+        node: [20, 22]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Cache Next.js
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: ${{ runner.os }}-nextjs-${{ matrix.node }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('next.config.*', 'package.json', 'src/**', 'app/**', 'pages/**', 'components/**') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ matrix.node }}-${{ hashFiles('package-lock.json') }}-
+            ${{ runner.os }}-nextjs-${{ matrix.node }}-
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload build file test
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-build-node-${{ matrix.node }}
+          path: |
+            .next
+            public
+            package.json
+            next.config.js
+          if-no-files-found: ignore
