@@ -1,15 +1,22 @@
-name: CI Build and Merge branch feature/warehouse
+name: CI Build All Modules
 
 on:
   push:
     branches:
       - main
+      - feature/admin
+      - feature/seller
+      - feature/warehouse
     paths:
+      - 'app/admin/**'
+      - 'app/seller/**'
       - 'app/warehouse/**'
   pull_request:
     branches:
       - main
     paths:
+      - 'app/admin/**'
+      - 'app/seller/**'
       - 'app/warehouse/**'
 
 concurrency:
