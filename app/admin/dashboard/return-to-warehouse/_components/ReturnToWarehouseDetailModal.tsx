@@ -52,14 +52,10 @@ export function ReturnToWarehouseDetailModal({
   if (!request) return null
 
   const handleApprove = () => {
-    // TODO: Gọi API duyệt yêu cầu
-    console.log('Duyệt:', request.id)
     onClose()
   }
 
   const handleReject = () => {
-    // TODO: Gọi API từ chối yêu cầu
-    console.log('Từ chối:', request.id)
     onClose()
   }
 

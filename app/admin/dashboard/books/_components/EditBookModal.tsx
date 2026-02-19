@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState, useEffect } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -23,21 +23,14 @@ import {
 import { MultiSelectCombobox } from './MultiSelectCombobox'
 import { ImagePlus } from 'lucide-react'
 import { toast } from 'sonner'
+import { bookService } from '@/services/book.service'
+import { categoryService } from '@/services/category.service'
+import { uploadService } from '@/services/upload.service'
 
 const mockFormats = [
   { value: 'Bìa cứng', label: 'Bìa cứng' },
   { value: 'Bìa mềm', label: 'Bìa mềm' },
   { value: 'E-book', label: 'E-book' },
-]
-
-const mockCategories = [
-  { value: 1, label: 'Kinh dị' },
-  { value: 2, label: 'Tiểu thuyết' },
-  { value: 3, label: 'Văn học' },
-  { value: 4, label: 'Trinh thám' },
-  { value: 5, label: 'Kỹ năng sống' },
-  { value: 6, label: 'Quân sự' },
-  { value: 7, label: 'Truyện tranh' },
 ]
 
 export type BookEditModel = {
@@ -69,6 +62,7 @@ type BooksTableRow = {
 interface EditBookModalProps {
   trigger: React.ReactNode
   book: BooksTableRow
+  onSuccess?: () => void
 }
 
 function Field({ label, children, helper }: { label: string; children: React.ReactNode; helper?: string }) {
@@ -90,9 +84,11 @@ function Section({ title, children }: { title?: string; children: React.ReactNod
   )
 }
 
-export function EditBookModal({ trigger, book }: EditBookModalProps) {
+export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) {
   const [open, setOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [categories, setCategories] = useState<{ value: number; label: string }[]>([])
 
   const [form, setForm] = useState<BookEditModel>({
     id: book.id,
@@ -111,6 +107,14 @@ export function EditBookModal({ trigger, book }: EditBookModalProps) {
   })
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(book.image || null)
+
+  useEffect(() => {
+    if (open) {
+      categoryService.getAllCategories().then((cats) => {
+        setCategories(cats.map((c) => ({ value: c.id, label: c.name })))
+      })
+    }
+  }, [open])
 
   const canSubmit = useMemo(() => {
     return form.tenSach.trim() && form.tacGia.trim()
@@ -131,18 +135,42 @@ export function EditBookModal({ trigger, book }: EditBookModalProps) {
   const onSubmit = async () => {
     if (!canSubmit) return
 
-    const promise = new Promise((resolve) => setTimeout(resolve, 1000))
+    setIsSubmitting(true)
 
-    toast.promise(promise, {
-      loading: 'Đang lưu...',
-      success: () => {
-        setOpen(false)
-        return 'Thông tin sách đã được cập nhật.'
-      },
-      error: () => 'Có lỗi xảy ra.',
-    })
+    try {
+      let imageUrl = book.image || ''
 
-    await promise
+      // Upload new image to Cloudinary if a new file is selected
+      if (form.hinhAnh) {
+        imageUrl = await uploadService.uploadImage(form.hinhAnh, 'books')
+      }
+
+      const payload = {
+        title: form.tenSach,
+        author: form.tacGia,
+        description: form.moTa,
+        publicationYear: form.namXuatBan,
+        weightGrams: form.khoiLuongGram,
+        pageCount: form.soTrang,
+        price: form.gia,
+        stockQuantity: form.soLuongTon,
+        imageUrl: imageUrl,
+        isActive: form.kinhDoanh,
+        categoryIds: form.maTheLoai,
+        variantFormats: form.dinhDang ? [form.dinhDang] : [],
+      }
+
+      await bookService.updateBook(book.id, payload)
+      
+      toast.success('Thông tin sách đã được cập nhật.')
+      setOpen(false)
+      onSuccess?.()
+    } catch (error) {
+      console.error('Error updating book:', error)
+      toast.error('Có lỗi xảy ra khi cập nhật sách.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -294,7 +322,7 @@ export function EditBookModal({ trigger, book }: EditBookModalProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Field label="Thể loại">
                   <MultiSelectCombobox
-                    options={mockCategories}
+                    options={categories}
                     value={form.maTheLoai}
                     onChange={(value) => setForm((p) => ({ ...p, maTheLoai: value }))}
                     placeholder="Chọn thể loại"
@@ -338,10 +366,10 @@ export function EditBookModal({ trigger, book }: EditBookModalProps) {
           <Button
             type="button"
             className="bg-blue-600 hover:bg-blue-700 cursor-pointer disabled:cursor-not-allowed"
-            disabled={!canSubmit}
+            disabled={!canSubmit || isSubmitting}
             onClick={onSubmit}
           >
-            Lưu
+            {isSubmitting ? 'Đang lưu...' : 'Lưu'}
           </Button>
         </DialogFooter>
       </DialogContent>
