@@ -7,6 +7,7 @@ import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
 import { EditBookModal } from './EditBookModal'
 import { toast } from 'sonner'
 import { bookService } from '@/services/book.service'
+import { LoadingSpinner } from '@/components/ui/loading'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,7 +47,6 @@ export function BooksTable({ books, isLoading, onDeleteSuccess, onEditSuccess }:
       toast.success('Sách đã được xóa thành công.')
       onDeleteSuccess?.(bookId)
     } catch (error: unknown) {
-      console.error('Error deleting book:', error)
       const axiosError = error as { response?: { data?: { message?: string; error?: string } } };
       const backendMessage = axiosError?.response?.data?.message
       toast.error(backendMessage || 'Có lỗi xảy ra khi xóa sách.')
@@ -56,9 +56,7 @@ export function BooksTable({ books, isLoading, onDeleteSuccess, onEditSuccess }:
   if (isLoading) {
     return (
       <div className="rounded-md bg-white border border-gray-100 overflow-hidden shadow-sm">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-gray-400">Đang tải...</div>
-        </div>
+        <LoadingSpinner />
       </div>
     )
   }

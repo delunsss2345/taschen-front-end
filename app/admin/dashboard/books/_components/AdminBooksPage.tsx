@@ -23,7 +23,6 @@ export function AdminBooksPage() {
       setMeta(response.meta)
     } catch (error) {
       toast.error('Không thể tải danh sách sách')
-      console.error('Error fetching books:', error)
     } finally {
       setIsLoading(false)
     }
