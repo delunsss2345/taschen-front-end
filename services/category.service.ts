@@ -9,7 +9,6 @@ export const categoryService = {
       const categoriesData = response.data;
       return Array.isArray(categoriesData) ? categoriesData : [];
     } catch (error) {
-      console.error('Error fetching categories:', error);
       return [];
     }
   },

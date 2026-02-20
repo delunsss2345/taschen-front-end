@@ -36,7 +36,7 @@ export const bookService = {
     try {
       categories = await categoryService.getAllCategories();
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      // Error fetching categories is non-critical
     }
     
     const categoryList = Array.isArray(categories) ? categories : [];
@@ -72,7 +72,6 @@ export const bookService = {
           : [];
         return { ...book, categories: bookCategories };
       } catch (error) {
-        console.error('Error fetching categories for book:', error);
         return book;
       }
     }
@@ -91,7 +90,7 @@ export const bookService = {
         : [];
       return { ...book, categories: bookCategories };
     } catch (error) {
-      console.error('Error fetching categories for book:', error);
+      // Error fetching categories is non-critical
       return book;
     }
   },
