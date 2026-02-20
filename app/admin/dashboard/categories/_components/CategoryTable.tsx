@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
+import { LoadingSpinner } from '@/components/ui/loading'
 import {
   Dialog,
   DialogContent,
@@ -71,9 +72,7 @@ export function CategoryTable({ categories, isLoading, onEditSuccess, onDeleteSu
   if (isLoading) {
     return (
       <div className="rounded-md bg-white border border-gray-100 overflow-hidden shadow-sm">
-        <div className="flex items-center justify-center h-32">
-          <span className="text-gray-500">Đang tải...</span>
-        </div>
+        <LoadingSpinner />
       </div>
     )
   }
@@ -176,7 +175,6 @@ function EditCategoryModal({ trigger, category, onSuccess }: { trigger: React.Re
       setOpen(false)
       onSuccess?.()
     } catch (error) {
-      console.error('Error updating category:', error)
       toast.error('Không thể cập nhật thể loại')
     } finally {
       setIsSubmitting(false)

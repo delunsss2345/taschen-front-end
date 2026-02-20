@@ -166,7 +166,6 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
       setOpen(false)
       onSuccess?.()
     } catch (error) {
-      console.error('Error updating book:', error)
       toast.error('Có lỗi xảy ra khi cập nhật sách.')
     } finally {
       setIsSubmitting(false)

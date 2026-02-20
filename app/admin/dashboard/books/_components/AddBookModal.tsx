@@ -171,7 +171,6 @@ export function AddBookModal({
       resetForm()
       onSuccess?.()
     } catch (error) {
-      console.error('Error creating book:', error)
       toast.error('Có lỗi xảy ra khi thêm sách.')
     } finally {
       setIsSubmitting(false)

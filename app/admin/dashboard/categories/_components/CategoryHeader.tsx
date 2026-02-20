@@ -65,7 +65,6 @@ function AddCategoryModal({ trigger, onSuccess }: { trigger: React.ReactNode; on
       setCode('')
       onSuccess?.()
     } catch (error) {
-      console.error('Error creating category:', error)
       toast.error('Không thể thêm thể loại')
     } finally {
       setIsSubmitting(false)

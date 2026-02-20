@@ -1,6 +1,6 @@
 'use client'
 
-import { Pencil } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/select'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { userService } from '@/services/user.service'
 
 interface Account {
   id: number
@@ -35,19 +36,22 @@ interface Account {
 
 interface AccountTableProps {
   accounts: Account[]
+  loading?: boolean
+  onUpdate?: (updatedAccount: Account) => void
+  onRefresh?: () => void
 }
 
-export function AccountTable({ accounts }: AccountTableProps) {
+export function AccountTable({ accounts, loading = false, onUpdate, onRefresh }: AccountTableProps) {
   const getRoleBadge = (role: string) => {
     switch (role) {
       case 'ADMIN':
         return <Badge className="bg-red-100 text-red-600 hover:bg-red-100 border-none shadow-none">ADMIN</Badge>
-      case 'SELLER_STAFF':
-        return <Badge className="bg-blue-100 text-blue-600 hover:bg-blue-100 border-none shadow-none">SELLER_STAFF</Badge>
+      case 'SELLER':
+        return <Badge className="bg-blue-100 text-blue-600 hover:bg-blue-100 border-none shadow-none">SELLER</Badge>
       case 'WAREHOUSE_STAFF':
         return <Badge className="bg-orange-100 text-orange-600 hover:bg-orange-100 border-none shadow-none">WAREHOUSE_STAFF</Badge>
-      case 'CUSTOMER':
-        return <Badge className="bg-green-100 text-green-600 hover:bg-green-100 border-none shadow-none">CUSTOMER</Badge>
+      case 'USER':
+        return <Badge className="bg-green-100 text-green-600 hover:bg-green-100 border-none shadow-none">USER</Badge>
       default:
         return <Badge variant="outline">{role}</Badge>
     }
@@ -65,6 +69,26 @@ export function AccountTable({ accounts }: AccountTableProps) {
     )
   }
 
+  if (loading) {
+    return (
+      <div className="rounded-md bg-white border border-gray-100 overflow-hidden shadow-sm">
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        </div>
+      </div>
+    )
+  }
+
+  if (accounts.length === 0) {
+    return (
+      <div className="rounded-md bg-white border border-gray-100 overflow-hidden shadow-sm">
+        <div className="flex items-center justify-center h-64 text-gray-500">
+          Không có tài khoản nào
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="rounded-md bg-white border border-gray-100 overflow-hidden shadow-sm text-left font-sans">
       <table className="w-full text-sm">
@@ -74,7 +98,7 @@ export function AccountTable({ accounts }: AccountTableProps) {
             <TableHeaderCell>Tên đăng nhập</TableHeaderCell>
             <TableHeaderCell>Email</TableHeaderCell>
             <TableHeaderCell>Họ tên</TableHeaderCell>
-            <TableHeaderCell>Số điện thoại</TableHeaderCell>
+            <TableHeaderCell className="w-36">Số điện thoại</TableHeaderCell>
             <TableHeaderCell>Vai trò</TableHeaderCell>
             <TableHeaderCell className="text-center">Trạng thái</TableHeaderCell>
             <TableHeaderCell className="text-center">Thao tác</TableHeaderCell>
@@ -100,13 +124,14 @@ export function AccountTable({ accounts }: AccountTableProps) {
                 <div className="flex items-center justify-center gap-2">
                   <UpdateAccountModal
                     account={acc}
+                    onUpdate={onUpdate}
+                    onRefresh={onRefresh}
                     trigger={
                       <Button
                         variant="default"
                         size="sm"
                         className="h-8 gap-1 px-3 bg-blue-600 hover:bg-blue-700 cursor-pointer"
                       >
-                        <Pencil className="h-3 w-3" />
                         Cập nhật
                       </Button>
                     }
@@ -121,8 +146,19 @@ export function AccountTable({ accounts }: AccountTableProps) {
   )
 }
 
-function UpdateAccountModal({ trigger, account }: { trigger: React.ReactNode; account: Account }) {
+function UpdateAccountModal({ 
+  trigger, 
+  account, 
+  onUpdate, 
+  onRefresh 
+}: { 
+  trigger: React.ReactNode; 
+  account: Account
+  onUpdate?: (updatedAccount: Account) => void
+  onRefresh?: () => void
+}) {
   const [open, setOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({
     fullName: account.fullName === '-' ? '' : account.fullName,
     phone: account.phone === '-' ? '' : account.phone,
@@ -131,18 +167,48 @@ function UpdateAccountModal({ trigger, account }: { trigger: React.ReactNode; ac
   })
 
   const onSubmit = async () => {
-    const promise = new Promise((resolve) => setTimeout(resolve, 800))
+    setSaving(true)
+    
+    const nameParts = form.fullName.trim().split(' ')
+    const firstName = nameParts[0] || ''
+    const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : undefined
 
-    toast.promise(promise, {
-      loading: 'Đang lưu...',
-      success: () => {
-        setOpen(false)
-        return 'Thông tin tài khoản đã được cập nhật.'
-      },
-      error: () => 'Có lỗi xảy ra.',
-    })
+    const updatePayload: Record<string, unknown> = {}
+    
+    if (firstName) updatePayload.firstName = firstName
+    if (lastName) updatePayload.lastName = lastName
+    if (form.phone) updatePayload.phoneNumber = form.phone
+    if (form.role) updatePayload.roles = [form.role]
+    if (form.status) updatePayload.active = form.status === 'ACTIVE'
 
-    await promise
+    try {
+      const result = await userService.updateUser(account.id, updatePayload)
+
+      if (!result) {
+        toast.error('Không thể cập nhật tài khoản. Vui lòng thử lại.')
+        setSaving(false)
+        return
+      }
+
+      const updatedAccount: Account = {
+        ...account,
+        fullName: form.fullName,
+        phone: form.phone,
+        role: form.role,
+        status: form.status === 'ACTIVE',
+      }
+
+      onUpdate?.(updatedAccount)
+      onRefresh?.()
+      toast.success('Thông tin tài khoản đã được cập nhật.')
+      setOpen(false)
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: { message?: string } } }
+      const errorMessage = axiosError?.response?.data?.message || 'Có lỗi xảy ra khi cập nhật tài khoản.'
+      toast.error(errorMessage)
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -181,9 +247,9 @@ function UpdateAccountModal({ trigger, account }: { trigger: React.ReactNode; ac
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ADMIN">ADMIN</SelectItem>
-                  <SelectItem value="SELLER_STAFF">SELLER_STAFF</SelectItem>
+                  <SelectItem value="SELLER">SELLER</SelectItem>
                   <SelectItem value="WAREHOUSE_STAFF">WAREHOUSE_STAFF</SelectItem>
-                  <SelectItem value="CUSTOMER">CUSTOMER</SelectItem>
+                  <SelectItem value="USER">USER</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -208,8 +274,19 @@ function UpdateAccountModal({ trigger, account }: { trigger: React.ReactNode; ac
           <Button variant="outline" className="cursor-pointer" onClick={() => setOpen(false)}>
             Hủy
           </Button>
-          <Button className="bg-blue-600 hover:bg-blue-700 cursor-pointer" onClick={onSubmit}>
-            Lưu thay đổi
+          <Button 
+            className="bg-blue-600 hover:bg-blue-700 cursor-pointer" 
+            onClick={onSubmit}
+            disabled={saving}
+          >
+            {saving ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Đang lưu...
+              </>
+            ) : (
+              'Lưu thay đổi'
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
