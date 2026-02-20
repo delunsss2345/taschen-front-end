@@ -17,7 +17,6 @@ export function AdminCategoriesPage() {
       const data = await categoryService.getAllCategories()
       setCategories(data)
     } catch (error) {
-      console.error('Error fetching categories:', error)
       toast.error('Không thể tải danh sách thể loại')
     } finally {
       setIsLoading(false)
