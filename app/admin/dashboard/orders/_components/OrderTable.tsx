@@ -2,22 +2,35 @@
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
-
-interface Order {
-  id: string
-  customer: string
-  date: string
-  total: number
-  status: string
-}
+import type { Order } from '@/services/order.service'
+import { useState } from 'react'
+import { orderService } from '@/services/order.service'
+import { toast } from 'sonner'
+import { OrderDetailModal } from './OrderDetailModal'
 
 interface OrderTableProps {
   orders: Order[]
+  onStatusChange?: () => void
 }
 
-export function OrderTable({ orders }: OrderTableProps) {
+export function OrderTable({ orders, onStatusChange }: OrderTableProps) {
+  const [approvingId, setApprovingId] = useState<number | null>(null)
+  const [shippingId, setShippingId] = useState<number | null>(null)
+  const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'CANCELLED':
@@ -38,6 +51,18 @@ export function OrderTable({ orders }: OrderTableProps) {
             Chờ xác nhận
           </Badge>
         )
+      case 'PROCESSING':
+        return (
+          <Badge className="bg-blue-50 text-blue-500 hover:bg-blue-50 border-blue-100 shadow-none font-normal">
+            Đang xử lý
+          </Badge>
+        )
+      case 'DELIVERING':
+        return (
+          <Badge className="bg-purple-50 text-purple-500 hover:bg-purple-50 border-purple-100 shadow-none font-normal">
+            Đang giao hàng
+          </Badge>
+        )
       case 'COMPLETED':
         return (
           <Badge className="bg-green-50 text-green-600 hover:bg-green-50 border-green-100 shadow-none font-normal">
@@ -47,6 +72,37 @@ export function OrderTable({ orders }: OrderTableProps) {
       default:
         return <Badge variant="outline">{status}</Badge>
     }
+  }
+
+  const handleApprove = async (orderId: number) => {
+    try {
+      setApprovingId(orderId)
+      await orderService.updateOrderStatus(orderId, 'PROCESSING')
+      toast.success('Đơn hàng đã được duyệt')
+      onStatusChange?.()
+    } catch {
+      toast.error('Không thể duyệt đơn hàng')
+    } finally {
+      setApprovingId(null)
+    }
+  }
+
+  const handleShip = async (orderId: number) => {
+    try {
+      setShippingId(orderId)
+      await orderService.updateOrderStatus(orderId, 'DELIVERING')
+      toast.success('Đơn hàng đã chuyển sang giao hàng')
+      onStatusChange?.()
+    } catch {
+      toast.error('Không thể chuyển sang giao hàng')
+    } finally {
+      setShippingId(null)
+    }
+  }
+
+  const handleView = (orderId: number) => {
+    setSelectedOrderId(orderId)
+    setIsModalOpen(true)
   }
 
   return (
@@ -63,30 +119,69 @@ export function OrderTable({ orders }: OrderTableProps) {
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-50 bg-white">
-          {orders.map((order) => (
-            <TableRow key={order.id}>
-              <TableCell>{order.id}</TableCell>
-              <TableCell className="truncate max-w-[200px]">
-                {order.customer}
-              </TableCell>
-              <TableCell>{order.date}</TableCell>
-              <TableCell className="text-red-500">
-                {order.total.toLocaleString('vi-VN')} đ
-              </TableCell>
-              <TableCell className="text-center">{getStatusBadge(order.status)}</TableCell>
-              <TableCell className="text-center">
-                <Button
-                  variant="default"
-                  size="sm"
-                  className="bg-blue-600 hover:bg-blue-700 h-8 px-4 cursor-pointer text-[13px]"
-                >
-                  Xem chi tiết
-                </Button>
+          {orders.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={6} className="text-center py-8 text-gray-400">
+                Chưa có đơn hàng nào
               </TableCell>
             </TableRow>
-          ))}
+          ) : (
+            orders.map((order) => (
+              <TableRow key={order.id}>
+                <TableCell>#{order.id}</TableCell>
+                <TableCell className="truncate max-w-[200px]">
+                  {order.userName}
+                </TableCell>
+                <TableCell>{formatDate(order.orderDate)}</TableCell>
+                <TableCell className="text-red-500">
+                  {order.totalAmount.toLocaleString('vi-VN')} đ
+                </TableCell>
+                <TableCell className="text-center">{getStatusBadge(order.status)}</TableCell>
+                <TableCell className="text-center">
+                  <div className="flex items-center justify-center gap-2">
+                    {order.status === 'PENDING' && (
+                      <Button
+                        variant="default"
+                        size="sm"
+                        className="bg-green-600 hover:bg-green-700 h-8 px-3 cursor-pointer text-[13px]"
+                        onClick={() => handleApprove(order.id)}
+                        disabled={approvingId === order.id}
+                      >
+                        {approvingId === order.id ? 'Đang duyệt...' : 'Duyệt'}
+                      </Button>
+                    )}
+                    {order.status === 'PROCESSING' && (
+                      <Button
+                        variant="default"
+                        size="sm"
+                        className="bg-orange-500 hover:bg-orange-600 h-8 px-3 cursor-pointer text-[13px]"
+                        onClick={() => handleShip(order.id)}
+                        disabled={shippingId === order.id}
+                      >
+                        {shippingId === order.id ? 'Đang giao...' : 'Giao hàng'}
+                      </Button>
+                    )}
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="bg-blue-600 hover:bg-blue-700 h-8 px-4 cursor-pointer text-[13px]"
+                      onClick={() => handleView(order.id)}
+                    >
+                      Xem
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </tbody>
       </table>
+
+      <OrderDetailModal
+        orderId={selectedOrderId}
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+      />
     </div>
   )
 }
