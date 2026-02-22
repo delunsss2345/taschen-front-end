@@ -19,9 +19,13 @@ interface Promotion {
 
 interface PromotionTableProps {
   promotions: Promotion[]
+  onView?: (id: number) => void
+  onApprove?: (id: number) => void
+  onReject?: (id: number) => void
+  onPause?: (id: number) => void
 }
 
-export function PromotionTable({ promotions }: PromotionTableProps) {
+export function PromotionTable({ promotions, onView, onApprove, onReject, onPause }: PromotionTableProps) {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'ACTIVE':
@@ -36,6 +40,30 @@ export function PromotionTable({ promotions }: PromotionTableProps) {
             Chờ duyệt
           </Badge>
         )
+      case 'APPROVED':
+        return (
+          <Badge className="bg-blue-50 text-blue-600 hover:bg-blue-50 border-blue-100 shadow-none font-normal">
+            Đã duyệt
+          </Badge>
+        )
+      case 'REJECTED':
+        return (
+          <Badge className="bg-red-50 text-red-500 hover:bg-red-50 border-red-100 shadow-none font-normal">
+            Đã từ chối
+          </Badge>
+        )
+      case 'DELETED':
+        return (
+          <Badge className="bg-gray-50 text-gray-400 hover:bg-gray-50 border-gray-200 shadow-none font-normal">
+            Đã dừng
+          </Badge>
+        )
+      case 'PAUSED':
+        return (
+          <Badge className="bg-orange-50 text-orange-500 hover:bg-orange-50 border-orange-100 shadow-none font-normal">
+            Đã tạm dừng
+          </Badge>
+        )
       case 'NOT_STARTED':
         return (
           <Badge className="bg-gray-50 text-gray-500 hover:bg-gray-50 border-gray-200 shadow-none font-normal">
@@ -45,6 +73,14 @@ export function PromotionTable({ promotions }: PromotionTableProps) {
       default:
         return <Badge variant="outline">{status}</Badge>
     }
+  }
+
+  if (promotions.length === 0) {
+    return (
+      <div className="py-12 text-center text-gray-500">
+        Không có khuyến mãi nào
+      </div>
+    )
   }
 
   return (
@@ -61,7 +97,7 @@ export function PromotionTable({ promotions }: PromotionTableProps) {
             <TableHeaderCell>Ngày bắt đầu</TableHeaderCell>
             <TableHeaderCell>Ngày kết thúc</TableHeaderCell>
             <TableHeaderCell className="text-center">Trạng thái</TableHeaderCell>
-            <TableHeaderCell className="text-center w-32">Thao tác</TableHeaderCell>
+            <TableHeaderCell className="text-center w-[220px]">Thao tác</TableHeaderCell>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-50 bg-white">
@@ -87,13 +123,46 @@ export function PromotionTable({ promotions }: PromotionTableProps) {
               <TableCell>{promo.endDate}</TableCell>
               <TableCell className="text-center">{getStatusBadge(promo.status)}</TableCell>
               <TableCell className="text-center">
-                <Button
-                  variant="default"
-                  size="sm"
-                  className="bg-blue-600 hover:bg-blue-700 h-8 px-4 cursor-pointer text-[13px]"
-                >
-                  Xem chi tiết
-                </Button>
+                <div className="flex items-center justify-center gap-1 min-w-[200px]">
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-700 h-8 px-3 cursor-pointer text-[13px] w-[60px]"
+                    onClick={() => onView?.(promo.id)}
+                  >
+                    Xem
+                  </Button>
+                  {promo.status === 'PENDING' && (
+                    <>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        className="bg-green-600 hover:bg-green-700 h-8 px-2 flex-1 cursor-pointer text-[13px]"
+                        onClick={() => onApprove?.(promo.id)}
+                      >
+                        Duyệt
+                      </Button>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        className="bg-red-600 hover:bg-red-700 h-8 px-2 flex-1 cursor-pointer text-[13px]"
+                        onClick={() => onReject?.(promo.id)}
+                      >
+                        Từ chối
+                      </Button>
+                    </>
+                  )}
+                  {promo.status === 'ACTIVE' && (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="bg-orange-500 hover:bg-orange-600 h-8 px-2 flex-1 cursor-pointer text-[13px]"
+                      onClick={() => onPause?.(promo.id)}
+                    >
+                      Dừng
+                    </Button>
+                  )}
+                </div>
               </TableCell>
             </TableRow>
           ))}

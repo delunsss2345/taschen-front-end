@@ -11,12 +11,19 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-export function PromotionHeader() {
+interface PromotionHeaderProps {
+  onCreateClick: () => void
+}
+
+export function PromotionHeader({ onCreateClick }: PromotionHeaderProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight text-gray-900">Quản lý Khuyến mãi</h1>
-        <Button className="bg-blue-600 hover:bg-blue-700 cursor-pointer">
+        <Button 
+          className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
+          onClick={onCreateClick}
+        >
           <Plus className="h-4 w-4" />
           Tạo khuyến mãi mới
         </Button>
