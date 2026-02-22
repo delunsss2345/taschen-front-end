@@ -16,7 +16,7 @@ const COOKIE_OPTIONS = {
 export async function POST(request: NextRequest) {
   try {
     const payload = await request.json();
-    const response = await api.post<LogoutApiResponse>("auth/logout", payload);
+    const response = await api.post<LogoutApiResponse>("api/auth/logout", payload);
 
     const cookieStore = await cookies();
     cookieStore.set("refreshToken", "", {

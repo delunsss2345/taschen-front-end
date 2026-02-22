@@ -21,7 +21,7 @@ export const authService = {
       payload,
     );
 
-    return response.data;
+    return response.data.data;
   },
 
   async register(payload: RegisterRequest): Promise<RegisterResponseData> {
@@ -30,7 +30,7 @@ export const authService = {
       payload,
     );
 
-    return response.data;
+    return response.data.data;
   },
 
   async logout(payload: LogoutRequest): Promise<null> {
@@ -39,7 +39,7 @@ export const authService = {
       payload,
     );
 
-    return response.data;
+    return response.data.data;
   },
 
   async changePassword(payload: ChangePasswordRequest): Promise<null> {
@@ -48,7 +48,7 @@ export const authService = {
       payload,
     );
 
-    return response.data;
+    return response.data.data;
   },
 
   async verifyAccount(
@@ -60,7 +60,7 @@ export const authService = {
       payload,
     );
 
-    return response.data;
+    return response.data.data;
   },
 
   async refreshToken(payload: RefreshTokenRequest): Promise<RefreshTokenResponseData> {
@@ -69,6 +69,6 @@ export const authService = {
       payload,
     );
 
-    return response.data;
+    return response.data.data;
   },
 };
