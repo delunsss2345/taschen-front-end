@@ -1,4 +1,5 @@
 import http from "@/utils/http";
+import { getArrayData } from "./helpers/response";
 
 export interface User {
   id: number;
@@ -12,35 +13,12 @@ export interface User {
   addresses: unknown[];
 }
 
-export interface UserResponse {
-  error: string | null;
-  message: string;
-  statusCode: number;
-  data: User[];
-}
-
-// Helper function to extract data from various response structures
-function extractData<T>(response: { data?: unknown }): T | null {
-  if (response.data && typeof response.data === 'object' && 'data' in response.data) {
-    const innerData = (response.data as { data: unknown }).data;
-    if (innerData && typeof innerData === 'object' && 'data' in innerData) {
-      return (innerData as { data: T }).data;
-    }
-    return innerData as T;
-  }
-  if (response.data && typeof response.data === 'object' && 'data' in response.data) {
-    return (response.data as { data: T }).data;
-  }
-  // Try: directly array or object
-  return response.data as T;
-}
-
 export const userService = {
   async getAllUsers(): Promise<User[]> {
     try {
       const response = await http.get("/api/users");
-      const usersData = extractData<User[]>(response);
-      return Array.isArray(usersData) ? usersData : [];
+      const usersData = getArrayData<User>(response);
+      return usersData;
     } catch {
       return [];
     }
@@ -49,8 +27,8 @@ export const userService = {
   async getUserById(userId: number | string): Promise<User | null> {
     try {
       const response = await http.get(`/api/users/${userId}`);
-      const data = extractData<User>(response);
-      return data;
+      const data = getArrayData<User>(response);
+      return data[0] ?? null;
     } catch {
       return null;
     }
@@ -64,15 +42,23 @@ export const userService = {
     phoneNumber?: string;
     gender?: string;
   }): Promise<User | null> {
-    const response = await http.post("/api/users", payload);
-    const result = extractData<User>(response);
-    return result;
+    try {
+      const response = await http.post("/api/users", payload);
+      const result = getArrayData<User>(response);
+      return result[0] ?? null;
+    } catch {
+      return null;
+    }
   },
 
   async updateUser(userId: number | string, payload: Record<string, unknown>): Promise<User | null> {
-    const response = await http.put(`/api/users/${userId}`, payload);
-    const result = extractData<User>(response);
-    return result;
+    try {
+      const response = await http.put(`/api/users/${userId}`, payload);
+      const result = getArrayData<User>(response);
+      return result[0] ?? null;
+    } catch {
+      return null;
+    }
   },
 
   async deleteUser(userId: number | string): Promise<boolean> {

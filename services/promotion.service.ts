@@ -1,4 +1,5 @@
 import http from "@/utils/http";
+import { getResponseData } from "./helpers/response";
 
 export interface Promotion {
   id: number;
@@ -27,27 +28,12 @@ export interface CreatePromotionData {
   priceOrderActive: number | null;
 }
 
-function extractData<T>(response: { data?: unknown }): T | null {
-  if (response.data && typeof response.data === 'object' && 'data' in response.data) {
-    const innerData = (response.data as { data: unknown }).data;
-    if (innerData && typeof innerData === 'object' && 'data' in innerData) {
-      return (innerData as { data: T }).data;
-    }
-    return innerData as T;
-  }
-
-  if (response.data && typeof response.data === 'object' && 'data' in response.data) {
-    return (response.data as { data: T }).data;
-  }
-  return response.data as T;
-}
-
 export const promotionService = {
   async getAllPromotions(): Promise<Promotion[]> {
     try {
       const response = await http.get("/api/promotions");
-      const promotionsData = extractData<Promotion[]>(response);
-      return Array.isArray(promotionsData) ? promotionsData : [];
+      const promotionsData = getResponseData<Promotion[]>(response);
+      return promotionsData ?? [];
     } catch {
       return [];
     }
@@ -55,31 +41,31 @@ export const promotionService = {
 
   async getPromotionById(promotionId: number | string): Promise<Promotion> {
     const response = await http.get(`/api/promotions/${promotionId}`);
-    const data = extractData<Promotion>(response);
+    const data = getResponseData<Promotion>(response);
     return data as Promotion;
   },
 
   async createPromotion(data: CreatePromotionData): Promise<Promotion> {
     const response = await http.post("/api/promotions", data);
-    const result = extractData<Promotion>(response);
+    const result = getResponseData<Promotion>(response);
     return result as Promotion;
   },
 
   async rejectPromotion(promotionId: number | string): Promise<Promotion> {
     const response = await http.patch(`/api/promotions/${promotionId}/deactivate`);
-    const result = extractData<Promotion>(response);
+    const result = getResponseData<Promotion>(response);
     return result as Promotion;
   },
 
   async approvePromotion(promotionId: number | string): Promise<Promotion> {
     const response = await http.patch(`/api/promotions/${promotionId}/approve`);
-    const result = extractData<Promotion>(response);
+    const result = getResponseData<Promotion>(response);
     return result as Promotion;
   },
 
   async pausePromotion(promotionId: number | string): Promise<Promotion> {
     const response = await http.patch(`/api/promotions/${promotionId}/pause`);
-    const result = extractData<Promotion>(response);
+    const result = getResponseData<Promotion>(response);
     return result as Promotion;
   },
 };

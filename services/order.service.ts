@@ -1,4 +1,5 @@
 import http from "@/utils/http";
+import { getResponseData, getArrayData } from "./helpers/response";
 
 export interface OrderDetail {
   id: number;
@@ -25,40 +26,35 @@ export interface Order {
   orderDetails: OrderDetail[];
 }
 
-function extractData<T>(response: { data?: unknown }): T | null {
-  if (response.data && typeof response.data === 'object' && 'data' in response.data) {
-    const innerData = (response.data as { data: unknown }).data;
-    if (innerData && typeof innerData === 'object' && 'data' in innerData) {
-      return (innerData as { data: T }).data;
-    }
-    return innerData as T;
-  }
-  if (response.data && typeof response.data === 'object' && 'data' in response.data) {
-    return (response.data as { data: T }).data;
-  }
-  return response.data as T;
-}
-
 export const orderService = {
   async getAllOrders(): Promise<Order[]> {
     try {
       const response = await http.get("/api/orders");
-      const ordersData = extractData<Order[]>(response);
-      return Array.isArray(ordersData) ? ordersData : [];
+      const ordersData = getArrayData<Order>(response);
+      return ordersData;
     } catch {
       return [];
     }
   },
 
-  async getOrderById(orderId: number | string): Promise<Order> {
-    const response = await http.get(`/api/orders/${orderId}`);
-    const data = extractData<Order>(response);
-    return data as Order;
+  async getOrderById(orderId: number | string): Promise<Order | null> {
+    try {
+      const id = typeof orderId === 'string' ? parseInt(orderId, 10) : orderId;
+      const response = await http.get(`/api/orders/${id}`);
+      const data = getResponseData<Order>(response);
+      return data;
+    } catch {
+      return null;
+    }
   },
 
-  async updateOrderStatus(orderId: number | string, status: string): Promise<Order> {
-    const response = await http.put(`/api/orders/${orderId}/status`, { status });
-    const data = extractData<Order>(response);
-    return data as Order;
+  async updateOrderStatus(orderId: number | string, status: string): Promise<Order | null> {
+    try {
+      const response = await http.put(`/api/orders/${orderId}/status`, { status });
+      const data = getResponseData<Order>(response);
+      return data;
+    } catch {
+      return null;
+    }
   },
 };

@@ -5,97 +5,45 @@ import type {
 import type {
   Book,
   BookListData,
+  BookListMeta,
 } from "@/types/response/book.response";
 import type { Category } from "@/types/response/category.response";
 import { http } from "@/utils/http";
 import { categoryService } from "./category.service";
-
-function extractData<T>(response: { data?: unknown }): T | null {
-  if (response.data && typeof response.data === 'object' && 'data' in response.data) {
-    const innerData = (response.data as { data: unknown }).data;
-    if (innerData && typeof innerData === 'object' && 'data' in innerData) {
-      return (innerData as { data: T }).data;
-    }
-    return innerData as T;
-  }
-  if (response.data && typeof response.data === 'object' && 'data' in response.data) {
-    return (response.data as { data: T }).data;
-  }
-  return response.data as T;
-}
-
-// Helper for list responses with pagination
-function extractListData<T>(response: { data?: unknown }): { data: T[]; meta?: unknown } {
-  const extracted = extractData<{ result: T[]; meta?: unknown }>(response);
-  if (extracted) {
-    return { data: extracted.result || [], meta: extracted.meta };
-  }
-  const arrayData = extractData<T[]>(response);
-  if (arrayData) {
-    return { data: arrayData };
-  }
-  return { data: [] };
-}
+import { getListData, getResponseData } from "./helpers/response";
 
 export const bookService = {
   async getAllBooks(params?: { page?: number; pageSize?: number }): Promise<BookListData> {
-    const queryParams = new URLSearchParams()
-    if (params?.page) queryParams.set('page', params.page.toString())
-    if (params?.pageSize) queryParams.set('pageSize', params.pageSize.toString())
-    
-    const queryString = queryParams.toString()
-    const url = queryString ? `/api/books?${queryString}` : '/api/books'
-    
-    const response = await http.get(url);
-    const { data: booksResult, meta } = extractListData<Book>(response);
-    
-    if (!Array.isArray(booksResult)) {
-      return {
-        result: [],
-        meta: { page: 1, pageSize: 10, total: 0, pages: 0 }
-      };
-    }
+    const queryParams = new URLSearchParams();
+    if (params?.page) queryParams.set('page', params.page.toString());
+    if (params?.pageSize) queryParams.set('pageSize', params.pageSize.toString());
 
-    let categories: Category[] = [];
-    try {
-      categories = await categoryService.getAllCategories();
-    } catch {
-      // Error fetching categories is non-critical
-    }
-    
-    const categoryList = Array.isArray(categories) ? categories : [];
-    
-    const booksWithCategories = booksResult.map((book: Book) => ({
-      ...book,
-      categories: book.categoryIds && book.categoryIds.length > 0
-        ? (book.categoryIds
-            .map((id: number) => categoryList.find((cat: Category) => cat.id === id) || null)
-            .filter((cat: Category | null): cat is Category => cat !== null && cat !== undefined))
-        : [],
-    }));
+    const queryString = queryParams.toString();
+    const url = queryString ? `/api/books?${queryString}` : '/api/books';
+
+    const response = await http.get(url);
+    const { data: booksResult, meta } = getListData<Book, BookListMeta>(response);
+
+    const categories = await getCategoriesSafe();
+    const booksWithCategories = mapBooksWithCategories(booksResult, categories);
 
     return {
       result: booksWithCategories,
-      meta: (meta as BookListData['meta']) || { page: 1, pageSize: 10, total: 0, pages: 0 }
+      meta: meta ?? { page: 1, pageSize: 10, total: 0, pages: 0 }
     };
   },
 
   async getBookById(bookId: number | string): Promise<Book> {
     const response = await http.get(`/api/books/${bookId}`);
-    const book = extractData<Book>(response);
-    
+    const book = getResponseData<Book>(response);
+
     if (!book) {
       throw new Error('Book not found');
     }
-    
+
     try {
-      const categories = await categoryService.getAllCategories();
-      const categoryList = Array.isArray(categories) ? categories : [];
-      const bookCategories = book.categoryIds && book.categoryIds.length > 0
-        ? book.categoryIds
-            .map((id: number) => categoryList.find((cat: Category) => cat.id === id) || null)
-            .filter((cat: Category | null): cat is Category => cat !== null && cat !== undefined)
-        : [];
+      const categories = await getCategoriesSafe();
+      const bookCategories = mapBookCategories(book, categories);
       return { ...book, categories: bookCategories };
     } catch {
       return book;
@@ -104,13 +52,13 @@ export const bookService = {
 
   async createBook(payload: CreateBookRequest): Promise<Book> {
     const response = await http.post("/api/books", payload);
-    const result = extractData<Book>(response);
+    const result = getResponseData<Book>(response);
     return result as Book;
   },
 
   async updateBook(bookId: number | string, payload: UpdateBookRequest): Promise<Book> {
     const response = await http.put(`/api/books/${bookId}`, payload);
-    const result = extractData<Book>(response);
+    const result = getResponseData<Book>(response);
     return result as Book;
   },
 
@@ -125,35 +73,47 @@ export const bookService = {
 
   async getSortedBooks(): Promise<BookListData> {
     const response = await http.get("/api/books/sorted");
-    const { data: booksResult, meta } = extractListData<Book>(response);
+    const { data: booksResult, meta } = getListData<Book, BookListMeta>(response);
 
-    if (!Array.isArray(booksResult)) {
-      return {
-        result: [],
-        meta: { page: 1, pageSize: 10, total: 0, pages: 0 }
-      };
-    }
-    
     return {
       result: booksResult,
-      meta: (meta as BookListData['meta']) || { page: 1, pageSize: 10, total: booksResult.length, pages: 1 }
+      meta: meta ?? { page: 1, pageSize: 10, total: booksResult.length, pages: 1 }
     };
   },
 
   async getBooksByCategory(categoryId: number | string): Promise<BookListData> {
     const response = await http.get(`/api/books/category/${categoryId}`);
-    const { data: booksResult, meta } = extractListData<Book>(response);
+    const { data: booksResult, meta } = getListData<Book, BookListMeta>(response);
 
-    if (!Array.isArray(booksResult)) {
-      return {
-        result: [],
-        meta: { page: 1, pageSize: 10, total: 0, pages: 0 }
-      };
-    }
-    
     return {
       result: booksResult,
-      meta: (meta as BookListData['meta']) || { page: 1, pageSize: 10, total: booksResult.length, pages: 1 }
+      meta: meta ?? { page: 1, pageSize: 10, total: booksResult.length, pages: 1 }
     };
   },
 };
+
+async function getCategoriesSafe(): Promise<Category[]> {
+  try {
+    const categories = await categoryService.getAllCategories();
+    return Array.isArray(categories) ? categories : [];
+  } catch {
+    return [];
+  }
+}
+
+function mapBooksWithCategories(books: Book[], categories: Category[]): Book[] {
+  return books.map(book => ({
+    ...book,
+    categories: mapBookCategories(book, categories)
+  }));
+}
+
+function mapBookCategories(book: Book, categories: Category[]): Category[] {
+  if (!book.categoryIds || book.categoryIds.length === 0) {
+    return [];
+  }
+
+  return book.categoryIds
+    .map(id => categories.find(cat => cat.id === id) || null)
+    .filter((cat): cat is Category => cat !== null && cat !== undefined);
+}
