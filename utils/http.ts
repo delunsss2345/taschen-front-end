@@ -20,6 +20,7 @@ const axiosInstance: AxiosInstance = axios.create({
 axiosInstance.interceptors.request.use((config) => {
   const accessToken = localStorage.getItem("accessToken");
 
+  // CHỈ THÊM HEADER NẾU KHÔNG PHẢI PUBLIC API VÀ CÓ TOKEN
   if (!isPublicApi(config.url) && accessToken) {
     config.headers.set("Authorization", `Bearer ${accessToken}`);
   }
@@ -50,12 +51,11 @@ const refreshAxiosInstance = axios.create({
   },
 });
 
-// Gọi refreshToken
+// Gọi refreshToken qua Next.js API route (để dùng cookie)
 const refreshToken = async () => {
   try {
-    const result = await refreshAxiosInstance.post("/api/auth/refresh", {
-      refreshToken: localStorage.getItem("refreshToken"),
-    });
+    // Gọi Next.js API route, không gọi trực tiếp backend
+    const result = await axiosInstance.post("/api/auth/refresh");
 
     localStorage.setItem("accessToken", result.data.data.accessToken);
 
