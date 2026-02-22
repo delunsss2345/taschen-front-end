@@ -1,4 +1,4 @@
-import { http } from "@/utils/http";
+import http from "@/utils/http";
 
 export interface OrderDetail {
   id: number;
@@ -25,12 +25,25 @@ export interface Order {
   orderDetails: OrderDetail[];
 }
 
+function extractData<T>(response: { data?: unknown }): T | null {
+  if (response.data && typeof response.data === 'object' && 'data' in response.data) {
+    const innerData = (response.data as { data: unknown }).data;
+    if (innerData && typeof innerData === 'object' && 'data' in innerData) {
+      return (innerData as { data: T }).data;
+    }
+    return innerData as T;
+  }
+  if (response.data && typeof response.data === 'object' && 'data' in response.data) {
+    return (response.data as { data: T }).data;
+  }
+  return response.data as T;
+}
+
 export const orderService = {
   async getAllOrders(): Promise<Order[]> {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const response: any = await http.get("/api/orders");
-      const ordersData = response.data?.data;
+      const response = await http.get("/api/orders");
+      const ordersData = extractData<Order[]>(response);
       return Array.isArray(ordersData) ? ordersData : [];
     } catch {
       return [];
@@ -38,14 +51,14 @@ export const orderService = {
   },
 
   async getOrderById(orderId: number | string): Promise<Order> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const response: any = await http.get(`/api/orders/${orderId}`);
-    return response.data?.data;
+    const response = await http.get(`/api/orders/${orderId}`);
+    const data = extractData<Order>(response);
+    return data as Order;
   },
 
   async updateOrderStatus(orderId: number | string, status: string): Promise<Order> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const response: any = await http.put(`/api/orders/${orderId}/status`, { status });
-    return response.data?.data;
+    const response = await http.put(`/api/orders/${orderId}/status`, { status });
+    const data = extractData<Order>(response);
+    return data as Order;
   },
 };
