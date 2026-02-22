@@ -8,17 +8,17 @@ import type {
   CheckoutPreview,
   RouteSuccessResponse,
 } from "@/types/response/cart.response";
-import { http } from "@/utils/http";
+import http from "@/utils/http";
 
 export const cartService = {
   async getCartByUserId(userId: number | string): Promise<Cart> {
     const response = await http.get<RouteSuccessResponse<Cart>>(`/carts/users/${userId}`);
-    return response.data;
+    return response.data.data;
   },
 
   async getCurrentCart(): Promise<Cart> {
     const response = await http.get<RouteSuccessResponse<Cart>>("/carts/current");
-    return response.data;
+    return response.data.data;
   },
 
   async addToCart(
@@ -30,12 +30,12 @@ export const cartService = {
       payload,
     );
 
-    return response.data;
+    return response.data.data;
   },
 
   async clearCart(userId: number | string): Promise<null> {
-    const response = await http.del<RouteSuccessResponse<null>>(`/carts/users/${userId}`);
-    return response.data;
+    const response = await http.delete<RouteSuccessResponse<null>>(`/carts/users/${userId}`);
+    return response.data.data;
   },
 
   async checkoutCurrentUser(): Promise<CheckoutPreview> {
@@ -43,7 +43,7 @@ export const cartService = {
       "/carts/current/checkout",
     );
 
-    return response.data;
+    return response.data.data;
   },
 
   async getCartItem(cartItemId: number | string): Promise<CartItem> {
@@ -51,7 +51,7 @@ export const cartService = {
       `/cart-items/${cartItemId}`,
     );
 
-    return response.data;
+    return response.data.data;
   },
 
   async increaseCartItemQuantity(cartItemId: number | string): Promise<CartItem> {
@@ -60,7 +60,7 @@ export const cartService = {
       {},
     );
 
-    return response.data;
+    return response.data.data;
   },
 
   async decreaseCartItemQuantity(cartItemId: number | string): Promise<CartItem> {
@@ -69,7 +69,7 @@ export const cartService = {
       {},
     );
 
-    return response.data;
+    return response.data.data;
   },
 
   async updateCartItemQuantity(
@@ -81,14 +81,14 @@ export const cartService = {
       payload,
     );
 
-    return response.data;
+    return response.data.data;
   },
 
   async deleteCartItem(cartItemId: number | string): Promise<null> {
-    const response = await http.del<RouteSuccessResponse<null>>(
+    const response = await http.delete<RouteSuccessResponse<null>>(
       `/cart-items/${cartItemId}`,
     );
 
-    return response.data;
+    return response.data.data;
   },
 };
