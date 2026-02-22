@@ -11,9 +11,9 @@ import { NextRequest } from "next/server";
 export async function GET(request: NextRequest) {
   try {
     const headers = getAuthorizationHeader(request);
-    const response = await api.get("/api/orders", { headers });
+    const response = await api.get<{ data: unknown }>("/api/orders", { headers });
 
-    return ResponseApi.success(response, HttpStatusCode.Ok);
+    return ResponseApi.success(response.data, HttpStatusCode.Ok);
   } catch (error) {
     return handleRouteError(error, API_MESSAGE.SYSTEM_TRY_AGAIN, "Get Orders API Error");
   }

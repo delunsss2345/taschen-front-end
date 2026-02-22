@@ -2,25 +2,25 @@ import { envConfig } from "@/config/envConfig";
 import type { PromiseHandlers } from "@/types/lib/axios";
 import axios, {
   type AxiosInstance,
-  type AxiosRequestConfig,
   type AxiosResponse,
 } from "axios";
 import { isPublicApi } from "./isPublicPath";
 
 const baseURL = envConfig.NEXT_PUBLIC_BASE_API ?? "";
 
-export const axiosInstance: AxiosInstance = axios.create({
+const axiosInstance: AxiosInstance = axios.create({
   baseURL,
-});
-
-const refreshAxiosInstance: AxiosInstance = axios.create({
-  baseURL,
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 // Mỗi request đều gắn accessToken
 axiosInstance.interceptors.request.use((config) => {
   const accessToken = localStorage.getItem("accessToken");
 
+  // CHỈ THÊM HEADER NẾU KHÔNG PHẢI PUBLIC API VÀ CÓ TOKEN
   if (!isPublicApi(config.url) && accessToken) {
     config.headers.set("Authorization", `Bearer ${accessToken}`);
   }
@@ -28,30 +28,34 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
-// Có đang refreshToken không
+// Handling RefreshToken
 let isRefreshing = false;
-// Ngăn xếp queue
-let failedQueue: PromiseHandlers[] = [];
+const failedQueue: PromiseHandlers[] = [];
 
-// Xử lí queue
-const processQueue = (error: unknown) => {
+const processQueue = (error: Error | null) => {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
     } else {
-      prom.resolve();
+      prom.resolve("");
     }
   });
-
-  failedQueue = [];
+  failedQueue.length = 0;
 };
 
-// Gọi refreshToken
+const refreshAxiosInstance = axios.create({
+  baseURL,
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+// Gọi refreshToken qua Next.js API route (để dùng cookie)
 const refreshToken = async () => {
   try {
-    const result = await refreshAxiosInstance.post("/auth/refresh", {
-      refreshToken: localStorage.getItem("refreshToken"),
-    });
+    // Gọi Next.js API route, không gọi trực tiếp backend
+    const result = await axiosInstance.post("/api/auth/refresh");
 
     localStorage.setItem("accessToken", result.data.data.accessToken);
 
@@ -61,8 +65,8 @@ const refreshToken = async () => {
 
     // Gắn queue  null nếu thành công
     processQueue(null);
-  } catch (error) {
-    processQueue(error);
+  } catch (error: unknown) {
+    processQueue(error instanceof Error ? error : new Error(String(error)));
     localStorage.removeItem("accessToken");
     // localStorage.removeItem("refreshToken");
     throw error;
@@ -85,10 +89,9 @@ const getNewToken = async () => {
   });
 };
 
-/// Sử dụng bắt request
+// Response interceptor
 axiosInstance.interceptors.response.use(
   (response: AxiosResponse) => response,
-
   async (error) => {
     const originalRequest = error.config;
     const isAuthApi = isPublicApi(originalRequest?.url);
@@ -110,69 +113,14 @@ axiosInstance.interceptors.response.use(
         await getNewToken();
         return axiosInstance(originalRequest); // Trả request
       } catch (error) {
-        return Promise.reject(error); // Lỗi ném reject
+        processQueue(error as Error);
+        return Promise.reject(error);
       }
     }
-    // Đã từng đánh dấu thì ném reject
+
     return Promise.reject(error);
-  },
+  }
 );
 
-// != T mặc định là any
-class AxiosHttp {
-  private _send = async <T = unknown>(
-    method: "get" | "post" | "put" | "delete" | "patch",
-    path: string,
-    data: object | undefined,
-    config?: AxiosRequestConfig,
-  ) => {
-    const response = await axiosInstance.request<T>({
-      method,
-      url: path,
-      data,
-      ...config,
-    });
-
-    return response.data;
-  };
-
-  get = <T = unknown>(
-    path: string,
-    config?: AxiosRequestConfig,
-  ): Promise<T> => {
-    return this._send<T>("get", path, undefined, config);
-  };
-
-  post = <T = unknown>(
-    path: string,
-    data?: object,
-    config?: AxiosRequestConfig,
-  ): Promise<T> => {
-    return this._send<T>("post", path, data, config);
-  };
-
-  put = <T = unknown>(
-    path: string,
-    data: object,
-    config?: AxiosRequestConfig,
-  ): Promise<T> => {
-    return this._send<T>("put", path, data, config);
-  };
-
-  patch = <T = unknown>(
-    path: string,
-    data: object,
-    config?: AxiosRequestConfig,
-  ): Promise<T> => {
-    return this._send<T>("patch", path, data, config);
-  };
-
-  del = <T = unknown>(
-    path: string,
-    data?: object | undefined,
-    config?: AxiosRequestConfig,
-  ): Promise<T> => {
-    return this._send<T>("delete", path, data, config);
-  };
-}
-export const http = new AxiosHttp();
+export default axiosInstance;
+export const http = axiosInstance;

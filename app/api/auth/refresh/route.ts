@@ -24,7 +24,7 @@ export async function POST() {
       );
     }
 
-    const response = await api.post<RefreshTokenApiResponse>("auth/refresh", {
+    const response = await api.post<RefreshTokenApiResponse>("api/auth/refresh", {
       refreshToken,
     });
 

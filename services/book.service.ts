@@ -5,145 +5,115 @@ import type {
 import type {
   Book,
   BookListData,
+  BookListMeta,
 } from "@/types/response/book.response";
 import type { Category } from "@/types/response/category.response";
 import { http } from "@/utils/http";
 import { categoryService } from "./category.service";
+import { getListData, getResponseData } from "./helpers/response";
 
 export const bookService = {
   async getAllBooks(params?: { page?: number; pageSize?: number }): Promise<BookListData> {
-    const queryParams = new URLSearchParams()
-    if (params?.page) queryParams.set('page', params.page.toString())
-    if (params?.pageSize) queryParams.set('pageSize', params.pageSize.toString())
-    
-    const queryString = queryParams.toString()
-    const url = queryString ? `/api/books?${queryString}` : '/api/books'
-    
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const response = await http.get(url) as any;
+    const queryParams = new URLSearchParams();
+    if (params?.page) queryParams.set('page', params.page.toString());
+    if (params?.pageSize) queryParams.set('pageSize', params.pageSize.toString());
 
-    const booksData = response.data;
-    const booksResult = booksData?.result;
-    
-    if (!booksResult || !Array.isArray(booksResult)) {
-      return {
-        result: [],
-        meta: booksData?.meta || { page: 1, pageSize: 10, total: 0, pages: 0 }
-      };
-    }
+    const queryString = queryParams.toString();
+    const url = queryString ? `/api/books?${queryString}` : '/api/books';
 
-    let categories: Category[] = [];
-    try {
-      categories = await categoryService.getAllCategories();
-    } catch (error) {
-      // Error fetching categories is non-critical
-    }
-    
-    const categoryList = Array.isArray(categories) ? categories : [];
-    
-    const booksWithCategories = booksResult.map((book: Book) => ({
-      ...book,
-      categories: book.categoryIds && book.categoryIds.length > 0
-        ? (book.categoryIds
-            .map((id: number) => categoryList.find((cat: Category) => cat.id === id) || null)
-            .filter((cat: Category | null): cat is Category => cat !== null && cat !== undefined))
-        : [],
-    }));
+    const response = await http.get(url);
+    const { data: booksResult, meta } = getListData<Book, BookListMeta>(response);
+
+    const categories = await getCategoriesSafe();
+    const booksWithCategories = mapBooksWithCategories(booksResult, categories);
 
     return {
-      ...booksData,
       result: booksWithCategories,
+      meta: meta ?? { page: 1, pageSize: 10, total: 0, pages: 0 }
     };
   },
 
   async getBookById(bookId: number | string): Promise<Book> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const response = await http.get(`/api/books/${bookId}`) as any;
-    
-    if (response.data && !response.data.data) {
-      const book = response.data;
-      try {
-        const categories = await categoryService.getAllCategories();
-        const categoryList = Array.isArray(categories) ? categories : [];
-        const bookCategories = book.categoryIds && book.categoryIds.length > 0
-          ? book.categoryIds
-              .map((id: number) => categoryList.find((cat: Category) => cat.id === id) || null)
-              .filter((cat: Category | null): cat is Category => cat !== null && cat !== undefined)
-          : [];
-        return { ...book, categories: bookCategories };
-      } catch (error) {
-        return book;
-      }
+    const response = await http.get(`/api/books/${bookId}`);
+    const book = getResponseData<Book>(response);
+
+    if (!book) {
+      throw new Error('Book not found');
     }
-    
-    const wrappedData = response.data;
-    const bookBackendData = wrappedData.data;
-    const book = bookBackendData.data;
-    
+
     try {
-      const categories = await categoryService.getAllCategories();
-      const categoryList = Array.isArray(categories) ? categories : [];
-      const bookCategories = book.categoryIds && book.categoryIds.length > 0
-        ? book.categoryIds
-            .map((id: number) => categoryList.find((cat: Category) => cat.id === id) || null)
-            .filter((cat: Category | null): cat is Category => cat !== null && cat !== undefined)
-        : [];
+      const categories = await getCategoriesSafe();
+      const bookCategories = mapBookCategories(book, categories);
       return { ...book, categories: bookCategories };
-    } catch (error) {
-      // Error fetching categories is non-critical
+    } catch {
       return book;
     }
   },
 
   async createBook(payload: CreateBookRequest): Promise<Book> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const response = await http.post("/api/books", payload) as any;
-    return response.data;
+    const response = await http.post("/api/books", payload);
+    const result = getResponseData<Book>(response);
+    return result as Book;
   },
 
   async updateBook(bookId: number | string, payload: UpdateBookRequest): Promise<Book> {
-    try {
-      const response = await http.put(
-        `/api/books/${bookId}`,
-        payload,
-      ) as any; // eslint-disable-line @typescript-eslint/no-explicit-any
-      return response.data?.data?.data || response.data?.data || response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await http.put(`/api/books/${bookId}`, payload);
+    const result = getResponseData<Book>(response);
+    return result as Book;
   },
 
   async deleteBook(bookId: number | string): Promise<null> {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const response = await http.del(`/api/books/${bookId}`) as any;
-      return response.data?.data || response.data;
-    } catch (error: unknown) {
+      await http.delete(`/api/books/${bookId}`);
+      return null;
+    } catch {
       return null;
     }
   },
 
   async getSortedBooks(): Promise<BookListData> {
-    const response = await http.get("/api/books/sorted") as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    const response = await http.get("/api/books/sorted");
+    const { data: booksResult, meta } = getListData<Book, BookListMeta>(response);
 
-    if (Array.isArray(response.data)) {
-      return {
-        result: response.data,
-        meta: { page: 1, pageSize: 10, total: response.data.length, pages: 1 }
-      };
-    }
-    return response.data.data.data;
+    return {
+      result: booksResult,
+      meta: meta ?? { page: 1, pageSize: 10, total: booksResult.length, pages: 1 }
+    };
   },
 
   async getBooksByCategory(categoryId: number | string): Promise<BookListData> {
-    const response = await http.get(`/api/books/category/${categoryId}`) as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    const response = await http.get(`/api/books/category/${categoryId}`);
+    const { data: booksResult, meta } = getListData<Book, BookListMeta>(response);
 
-    if (Array.isArray(response.data)) {
-      return {
-        result: response.data,
-        meta: { page: 1, pageSize: 10, total: response.data.length, pages: 1 }
-      };
-    }
-    return response.data;
+    return {
+      result: booksResult,
+      meta: meta ?? { page: 1, pageSize: 10, total: booksResult.length, pages: 1 }
+    };
   },
 };
+
+async function getCategoriesSafe(): Promise<Category[]> {
+  try {
+    const categories = await categoryService.getAllCategories();
+    return Array.isArray(categories) ? categories : [];
+  } catch {
+    return [];
+  }
+}
+
+function mapBooksWithCategories(books: Book[], categories: Category[]): Book[] {
+  return books.map(book => ({
+    ...book,
+    categories: mapBookCategories(book, categories)
+  }));
+}
+
+function mapBookCategories(book: Book, categories: Category[]): Category[] {
+  if (!book.categoryIds || book.categoryIds.length === 0) {
+    return [];
+  }
+
+  return book.categoryIds
+    .map(id => categories.find(cat => cat.id === id) || null)
+    .filter((cat): cat is Category => cat !== null && cat !== undefined);
+}

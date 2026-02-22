@@ -1,4 +1,5 @@
-import { http } from "@/utils/http";
+import http from "@/utils/http";
+import { getResponseData, getArrayData } from "./helpers/response";
 
 export interface OrderDetail {
   id: number;
@@ -28,24 +29,32 @@ export interface Order {
 export const orderService = {
   async getAllOrders(): Promise<Order[]> {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const response: any = await http.get("/api/orders");
-      const ordersData = response.data?.data;
-      return Array.isArray(ordersData) ? ordersData : [];
+      const response = await http.get("/api/orders");
+      const ordersData = getArrayData<Order>(response);
+      return ordersData;
     } catch {
       return [];
     }
   },
 
-  async getOrderById(orderId: number | string): Promise<Order> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const response: any = await http.get(`/api/orders/${orderId}`);
-    return response.data?.data;
+  async getOrderById(orderId: number | string): Promise<Order | null> {
+    try {
+      const id = typeof orderId === 'string' ? parseInt(orderId, 10) : orderId;
+      const response = await http.get(`/api/orders/${id}`);
+      const data = getResponseData<Order>(response);
+      return data;
+    } catch {
+      return null;
+    }
   },
 
-  async updateOrderStatus(orderId: number | string, status: string): Promise<Order> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const response: any = await http.put(`/api/orders/${orderId}/status`, { status });
-    return response.data?.data;
+  async updateOrderStatus(orderId: number | string, status: string): Promise<Order | null> {
+    try {
+      const response = await http.put(`/api/orders/${orderId}/status`, { status });
+      const data = getResponseData<Order>(response);
+      return data;
+    } catch {
+      return null;
+    }
   },
 };

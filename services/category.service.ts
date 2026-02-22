@@ -1,34 +1,37 @@
-import type { Category, CategoryResponseWrapper } from "@/types/response/category.response";
-import { http } from "@/utils/http";
+import type { Category } from "@/types/response/category.response";
+import http from "@/utils/http";
+import { getResponseData } from "./helpers/response";
 
 export const categoryService = {
   async getAllCategories(): Promise<Category[]> {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const response: any = await http.get("/api/categories");
-      const categoriesData = response.data;
-      return Array.isArray(categoriesData) ? categoriesData : [];
-    } catch (error) {
+      const response = await http.get("/api/categories");
+      const categoriesData = getResponseData<Category[]>(response);
+      return categoriesData ?? [];
+    } catch {
       return [];
     }
   },
 
   async getCategoryById(categoryId: number | string): Promise<Category> {
-    const response = await http.get<CategoryResponseWrapper>(`/api/categories/${categoryId}`);
-    return response.data.data;
+    const response = await http.get(`/api/categories/${categoryId}`);
+    const data = getResponseData<Category>(response);
+    return data as Category;
   },
 
   async createCategory(payload: { name: string; code?: string; description?: string }): Promise<Category> {
-    const response = await http.post<CategoryResponseWrapper>("/api/categories", payload);
-    return response.data.data;
+    const response = await http.post("/api/categories", payload);
+    const result = getResponseData<Category>(response);
+    return result as Category;
   },
 
   async updateCategory(categoryId: number | string, payload: { name?: string; code?: string; description?: string }): Promise<Category> {
-    const response = await http.put<CategoryResponseWrapper>(`/api/categories/${categoryId}`, payload);
-    return response.data.data;
+    const response = await http.put(`/api/categories/${categoryId}`, payload);
+    const result = getResponseData<Category>(response);
+    return result as Category;
   },
 
   async deleteCategory(categoryId: number | string): Promise<void> {
-    await http.del(`/api/categories/${categoryId}`);
+    await http.delete(`/api/categories/${categoryId}`);
   },
 };

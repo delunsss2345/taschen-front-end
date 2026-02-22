@@ -4,13 +4,13 @@ import { HttpStatusCode } from "axios";
 import type { NextRequest } from "next/server";
 
 export const getAuthorizationHeader = (request: NextRequest) => {
-  const authorization = request.headers.get("authorization");
+  const authorization = request.headers.get("Authorization");
 
   if (!authorization) {
     return undefined;
   }
 
-  return { authorization };
+  return { Authorization: authorization };
 };
 
 export const handleRouteError = (
@@ -23,12 +23,18 @@ export const handleRouteError = (
   }
 
   if (error instanceof HttpError) {
-    const status =
-      typeof error.status === "number"
-        ? (error.status as HttpStatusCode)
+    let status = error.status;
+    const messageLower = error.message.toLowerCase();
+    if (status === 400 && (messageLower.includes('unauthorized') || messageLower.includes('not authenticated') || messageLower.includes('not authorized'))) {
+      status = HttpStatusCode.Unauthorized;
+    }
+
+    const finalStatus =
+      typeof status === "number"
+        ? (status as HttpStatusCode)
         : HttpStatusCode.BadRequest;
 
-    return ResponseApi.error(error.message || fallbackMessage, status, error.data);
+    return ResponseApi.error(error.message || fallbackMessage, finalStatus, error.data);
   }
 
   return ResponseApi.error(fallbackMessage, HttpStatusCode.BadRequest);

@@ -23,6 +23,7 @@ export const useLoginMutation = () => {
       setAuthLoading(true);
     },
     onSuccess: (data) => {
+      if (!data) return;
       setSession({
         currentUser: data.user,
         accessToken: data.accessToken,
@@ -75,6 +76,7 @@ export const useRefreshTokenMutation = () => {
   return useMutation({
     mutationFn: (payload: RefreshTokenRequest) => authService.refreshToken(payload),
     onSuccess: (data) => {
+      if (!data) return;
       const currentUser = useAuthStore.getState().currentUser;
 
       if (!currentUser) {
