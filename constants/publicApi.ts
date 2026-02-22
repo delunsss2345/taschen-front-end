@@ -1,9 +1,9 @@
 export const PUBLIC_API_PATHS = [
-"/auth/login",
-"/auth/register",
-"/auth/logout",
-"/auth/refresh",
-"/auth/forgot",
-"/auth/reset",
-"/auth/verify",
+"/api/auth/login",
+"/api/auth/register",
+"/api/auth/logout",
+"/api/auth/refresh",
+"/api/auth/forgot",
+"/api/auth/reset",
+"/api/auth/verify",
 ];
