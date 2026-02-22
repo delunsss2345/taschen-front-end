@@ -1,6 +1,6 @@
 
 export const envConfig = {
-  backendApiUrl: process.env.BACKEND_API_URL || 'https://api.phamtra.dev',
+  backendApiUrl: process.env.BACKEND_API_URL || 'http://api.phamtra.dev',
   
   publicBaseApi: process.env.NEXT_PUBLIC_BASE_API || 'http://localhost:3000',
   
@@ -22,7 +22,7 @@ export const envConfig = {
   
   // API Endpoints
   getApiUrl: (path: string) => {
-    const base = process.env.BACKEND_API_URL || 'https://api.phamtra.dev';
+    const base = process.env.BACKEND_API_URL || 'http://api.phamtra.dev';
     return `${base}${path.startsWith('/') ? path : `/${path}`}`;
   },
   
