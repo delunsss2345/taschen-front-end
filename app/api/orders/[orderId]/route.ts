@@ -11,10 +11,29 @@ export async function GET(
   try {
     const { orderId } = await params
     const headers = getAuthorizationHeader(request)
-    const response = await api.get(`/api/orders/${orderId}`, { headers })
-    return ResponseApi.success(response, HttpStatusCode.Ok)
-  } catch (error) {
-    console.error('Order API Error:', error)
-    return ResponseApi.error('Failed to fetch order', HttpStatusCode.InternalServerError)
+    
+    const allOrdersResponse = await api.get<{ data: unknown }>('/api/orders', { headers })
+    const ordersData = allOrdersResponse.data
+    
+    let ordersArray: unknown[] = []
+    if (Array.isArray(ordersData)) {
+      ordersArray = ordersData
+    } else if (ordersData && typeof ordersData === 'object' && 'result' in ordersData) {
+      ordersArray = (ordersData as { result: unknown[] }).result
+    }
+    
+    const order = ordersArray.find((o: unknown) => {
+      const obj = o as { id?: number }
+      return obj.id === Number(orderId)
+    })
+    
+    if (!order) {
+      return ResponseApi.error('Order not found', HttpStatusCode.NotFound)
+    }
+    
+    return ResponseApi.success(order, HttpStatusCode.Ok)
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+    return ResponseApi.error(`Failed to fetch order: ${message}`, HttpStatusCode.InternalServerError)
   }
 }

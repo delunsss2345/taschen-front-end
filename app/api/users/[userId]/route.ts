@@ -15,9 +15,9 @@ export async function GET(
   try {
     const { userId } = await params;
     const headers = getAuthorizationHeader(request);
-    const response = await api.get(`/api/users/${userId}`, { headers });
+    const response = await api.get<{ data: unknown }>(`/api/users/${userId}`, { headers });
 
-    return ResponseApi.success(response, HttpStatusCode.Ok);
+    return ResponseApi.success(response.data, HttpStatusCode.Ok);
   } catch (error) {
     return handleRouteError(error, API_MESSAGE.SYSTEM_TRY_AGAIN, "Get User API Error");
   }
@@ -31,10 +31,11 @@ export async function PUT(
     const { userId } = await params;
     const payload = await request.json();
     const headers = getAuthorizationHeader(request);
-    const response = await api.put(`/api/users/${userId}`, payload, { headers });
 
-    return ResponseApi.success(response, HttpStatusCode.Ok);
-  } catch (error) {
+    const response = await api.put<{ data: unknown }>(`/api/users/${userId}`, payload, { headers });
+
+    return ResponseApi.success(response.data, HttpStatusCode.Ok);
+  } catch (error: unknown) {
     return handleRouteError(
       error,
       API_MESSAGE.SYSTEM_TRY_AGAIN,

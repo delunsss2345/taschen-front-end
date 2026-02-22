@@ -58,8 +58,6 @@ export async function POST(request: NextRequest) {
     const headers = getAuthorizationHeader(request);
     const body: CreatePromotionRequest = await request.json();
 
-    console.log('Create promotion body:', JSON.stringify(body));
-
     // Validate required fields
     if (!body.name || !body.code || !body.discountPercent || !body.startDate || !body.endDate || !body.quantity) {
       return ResponseApi.error("Vui lòng điền đầy đủ thông tin", HttpStatusCode.BadRequest);

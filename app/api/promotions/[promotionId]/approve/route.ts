@@ -40,9 +40,6 @@ export async function PATCH(
     const { promotionId } = await params;
     const headers = getAuthorizationHeader(request);
     
-    console.log('[APPROVE] Request headers:', request.headers.get('authorization'));
-    console.log('[APPROVE] Headers to backend:', headers);
-    
     const response = await api.patch<PromotionApiResponse>(`api/promotions/${promotionId}/approve`, undefined, { headers });
 
     return ResponseApi.success(response.data, HttpStatusCode.Ok);
