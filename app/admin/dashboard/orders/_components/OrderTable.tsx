@@ -110,7 +110,7 @@ export function OrderTable({ orders, onStatusChange }: OrderTableProps) {
       <table className="w-full text-sm">
         <thead className="bg-[#fcfcfc] border-b border-gray-50">
           <tr className="text-gray-500 font-medium">
-            <TableHeaderCell className="w-24">Mã đơn</TableHeaderCell>
+            <TableHeaderCell className="w-32">Mã đơn</TableHeaderCell>
             <TableHeaderCell>Khách hàng</TableHeaderCell>
             <TableHeaderCell>Ngày đặt</TableHeaderCell>
             <TableHeaderCell>Tổng tiền</TableHeaderCell>
