@@ -4,10 +4,9 @@ import { authService } from "@/services/auth.service";
 import type {
   ChangePasswordRequest,
   LoginRequest,
-  LogoutRequest,
   RefreshTokenRequest,
   RegisterRequest,
-  VerifyAccountRequest,
+  VerifyAccountRequest
 } from "@/types/request/auth.request";
 import { useMutation } from "@tanstack/react-query";
 import { useAuthStore } from "../store/auth.store";
@@ -25,9 +24,8 @@ export const useLoginMutation = () => {
     onSuccess: (data) => {
       if (!data) return;
       setSession({
-        currentUser: data.user,
-        accessToken: data.accessToken,
-        refreshToken: data.refreshToken,
+        currentUser: data.data.user,
+        accessToken: data.data.accessToken,
       });
     },
     onError: () => {
@@ -49,7 +47,7 @@ export const useLogoutMutation = () => {
   const clearSession = useAuthStore((state) => state.clearSession);
 
   return useMutation({
-    mutationFn: (payload: LogoutRequest) => authService.logout(payload),
+    mutationFn: authService.logout,
     onSuccess: () => {
       clearSession();
     },
@@ -85,8 +83,7 @@ export const useRefreshTokenMutation = () => {
 
       setSession({
         currentUser,
-        accessToken: data.accessToken,
-        refreshToken: data.refreshToken,
+        accessToken: data.data.accessToken,
       });
     },
   });

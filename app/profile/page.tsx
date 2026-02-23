@@ -8,11 +8,18 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { selectorCurrentUser, useAuthStore } from "@/features/auth";
 import useTranslator from "@/hooks/use-translator";
+import { useRouter } from "next/navigation";
+import React from "react";
 
 const ProfilePage = () => {
   const { t } = useTranslator();
   const currentUser = useAuthStore(selectorCurrentUser);
+  const router = useRouter();
+  React.useEffect(() => {
+    if (!currentUser) router.replace("/login");
+  }, [currentUser, router]);
 
+  if (!currentUser) return null;
   return (
     <main className="min-h-[calc(100vh-8rem)] bg-background">
       <div className="mx-auto max-w-6xl px-4 py-10">

@@ -1,7 +1,6 @@
 "use client";
 
-import LoginForm, { type LoginValues } from "@/components/auth/LoginForm";
-import { LoginButtons } from "@/components/auth/LoginWithGoogle";
+import LoginForm, { LoginValues } from "@/app/(auth)/_components/LoginForm";
 import {
   selectorAuthLoading,
   useAuthStore,
@@ -32,7 +31,6 @@ const Login = () => {
         isLoading={authLoading || loginMutation.isPending}
         onSubmit={onSubmit}
       />
-      <LoginButtons />
     </>
   );
 };

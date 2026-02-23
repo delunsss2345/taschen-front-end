@@ -1,5 +1,5 @@
 import type { Category } from "@/types/response/category.response";
-import http from "@/utils/http";
+import { http } from "@/utils/http";
 import { getResponseData } from "./helpers/response";
 
 export const categoryService = {
@@ -32,6 +32,6 @@ export const categoryService = {
   },
 
   async deleteCategory(categoryId: number | string): Promise<void> {
-    await http.delete(`/api/categories/${categoryId}`);
+    await http.del(`/api/categories/${categoryId}`);
   },
 };

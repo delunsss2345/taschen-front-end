@@ -15,16 +15,18 @@ const COOKIE_OPTIONS = {
 
 export async function POST(request: NextRequest) {
   try {
-    const payload = await request.json();
-    const response = await api.post<LogoutApiResponse>("api/auth/logout", payload);
-
     const cookieStore = await cookies();
+    const refreshToken = cookieStore.get("refreshToken")?.value;
+    const response = await api.post<LogoutApiResponse>("auth/logout", {
+      refreshToken
+    });
+
     cookieStore.set("refreshToken", "", {
       ...COOKIE_OPTIONS,
       maxAge: 0,
     });
 
-    return ResponseApi.success(response.data, HttpStatusCode.Ok);
+    return ResponseApi.success(response, HttpStatusCode.Ok);
   } catch (error) {
     return handleRouteError(
       error,

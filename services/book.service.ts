@@ -64,7 +64,7 @@ export const bookService = {
 
   async deleteBook(bookId: number | string): Promise<null> {
     try {
-      await http.delete(`/api/books/${bookId}`);
+      await http.del(`/api/books/${bookId}`);
       return null;
     } catch {
       return null;

@@ -7,7 +7,7 @@ import type {
   CartItem,
   CheckoutPreview,
 } from "@/types/response/cart.response";
-import http from "@/utils/http";
+import { http } from "@/utils/http";
 import { getResponseData } from "./helpers/response";
 
 export const cartService = {
@@ -46,7 +46,7 @@ export const cartService = {
 
   async clearCart(userId: number | string): Promise<boolean> {
     try {
-      await http.delete(`/carts/users/${userId}`);
+      await http.del(`/carts/users/${userId}`);
       return true;
     } catch {
       return false;
@@ -112,7 +112,7 @@ export const cartService = {
 
   async deleteCartItem(cartItemId: number | string): Promise<boolean> {
     try {
-      await http.delete(`/cart-items/${cartItemId}`);
+      await http.del(`/cart-items/${cartItemId}`);
       return true;
     } catch {
       return false;

@@ -1,4 +1,4 @@
-import http from "@/utils/http";
+import { http } from "@/utils/http";
 import { getArrayData } from "./helpers/response";
 
 export interface User {
@@ -63,7 +63,7 @@ export const userService = {
 
   async deleteUser(userId: number | string): Promise<boolean> {
     try {
-      await http.delete(`/api/users/${userId}`);
+      await http.del(`/api/users/${userId}`);
       return true;
     } catch {
       return false;

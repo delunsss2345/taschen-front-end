@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { ChevronDown, User } from "lucide-react";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
+import { useLogoutMutation } from "@/features/auth";
 import useTranslator from "@/hooks/use-translator";
 
 const Header = () => {
@@ -25,7 +26,7 @@ const Header = () => {
     { href: "/contact", key: "contactInformation" },
   ];
   const activeCountryKey = "germany";
-
+  const { mutateAsync: logout } = useLogoutMutation()
   return (
     <header className="w-full">
       <div className="border-b bg-background">
@@ -58,7 +59,7 @@ const Header = () => {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/logout">{t("profile.header.menu.signOut")}</Link>
+                <Button className="p-0!" onClick={() => logout()}>{t("profile.header.menu.signOut")}</Button>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

@@ -1,4 +1,4 @@
-import http from "@/utils/http";
+import { http } from "@/utils/http";
 import { getResponseData } from "./helpers/response";
 
 // Helper nhỏ: tạo FormData cho upload

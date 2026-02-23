@@ -1,4 +1,4 @@
-import AuthGuard from "@/components/auth/AuthGuard";
+import AuthGuard from "@/app/(auth)/_components/AuthGuard";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (

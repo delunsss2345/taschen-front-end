@@ -1,8 +1,8 @@
 import { handleRouteError } from "@/app/api/_utils/route-utils";
 import { API_MESSAGE } from "@/constants/api/messageApi";
-import type { RegisterApiResponse } from "@/types/response/auth.response";
 import { api } from "@/lib/api/fetchHandler";
 import { ResponseApi } from "@/lib/api/responseHandler";
+import type { RegisterApiResponse } from "@/types/response/auth.response";
 import { RegisterSchema } from "@/validation/auth/registerValidation";
 import { HttpStatusCode } from "axios";
 import { NextRequest } from "next/server";
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const response = await api.post<RegisterApiResponse>("api/auth/register", payload);
+    const response = await api.post<RegisterApiResponse>("auth/register", payload);
 
     return ResponseApi.success(response.data, HttpStatusCode.Created);
   } catch (error) {

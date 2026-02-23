@@ -1,4 +1,4 @@
-import http from "@/utils/http";
+import { http } from "@/utils/http";
 import { getResponseData } from "./helpers/response";
 
 export interface Promotion {
@@ -52,19 +52,19 @@ export const promotionService = {
   },
 
   async rejectPromotion(promotionId: number | string): Promise<Promotion> {
-    const response = await http.patch(`/api/promotions/${promotionId}/deactivate`);
+    const response = await http.patch(`/api/promotions/${promotionId}/deactivate`, {});
     const result = getResponseData<Promotion>(response);
     return result as Promotion;
   },
 
   async approvePromotion(promotionId: number | string): Promise<Promotion> {
-    const response = await http.patch(`/api/promotions/${promotionId}/approve`);
+    const response = await http.patch(`/api/promotions/${promotionId}/approve`, {});
     const result = getResponseData<Promotion>(response);
     return result as Promotion;
   },
 
   async pausePromotion(promotionId: number | string): Promise<Promotion> {
-    const response = await http.patch(`/api/promotions/${promotionId}/pause`);
+    const response = await http.patch(`/api/promotions/${promotionId}/pause`, {});
     const result = getResponseData<Promotion>(response);
     return result as Promotion;
   },

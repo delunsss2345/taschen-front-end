@@ -1,4 +1,4 @@
-import http from "@/utils/http";
+import { http } from "@/utils/http";
 import { getResponseData, getArrayData } from "./helpers/response";
 
 export interface OrderDetail {
