@@ -21,7 +21,7 @@ export const uploadService = {
 
     try {
       const response = await http.post<ApiResponseEnvelope<{ url: string }>>(
-        `/api/cloudinary/upload/${folder}`,
+        `cloudinary/upload/${folder}`,
         formData,
       );
       return extractUrlFromResponse(response);
