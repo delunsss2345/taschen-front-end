@@ -45,7 +45,7 @@ type CreatePromotionRequest = {
 export async function GET(request: NextRequest) {
   try {
     const headers = getAuthorizationHeader(request);
-    const response = await api.get<PromotionsApiResponse>("api/promotions", { headers });
+    const response = await api.get<PromotionsApiResponse>("promotions", { headers });
 
     return ResponseApi.success(response.data, HttpStatusCode.Ok);
   } catch (error) {
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
       return ResponseApi.error("Vui lòng điền đầy đủ thông tin", HttpStatusCode.BadRequest);
     }
 
-    const response = await api.post<{ data: Promotion }>("api/promotions", body, { headers });
+    const response = await api.post<{ data: Promotion }>("promotions", body, { headers });
 
     return ResponseApi.success(response.data, HttpStatusCode.Created);
   } catch (error) {

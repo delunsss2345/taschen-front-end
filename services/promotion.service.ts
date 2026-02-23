@@ -43,7 +43,7 @@ export interface CreatePromotionData {
 export const promotionService = {
   async getAllPromotions(): Promise<Promotion[]> {
     try {
-      const response = await http.get<ApiResponseEnvelope<Promotion[]>>("/api/promotions");
+      const response = await http.get<ApiResponseEnvelope<Promotion[]>>("promotions");
       const promotionsData = getResponseData<Promotion[]>(response);
       return promotionsData ?? [];
     } catch {
@@ -52,18 +52,18 @@ export const promotionService = {
   },
 
   async getPromotionById(promotionId: number | string): Promise<Promotion> {
-    const response = await http.get<ApiResponseEnvelope<Promotion>>(`/api/promotions/${promotionId}`);
+    const response = await http.get<ApiResponseEnvelope<Promotion>>(`promotions/${promotionId}`);
     return requireResponseData(response, "Promotion not found");
   },
 
   async createPromotion(data: CreatePromotionData): Promise<Promotion> {
-    const response = await http.post<ApiResponseEnvelope<Promotion>>("/api/promotions", data);
+    const response = await http.post<ApiResponseEnvelope<Promotion>>("promotions", data);
     return requireResponseData(response, "Create promotion response is missing data");
   },
 
   async rejectPromotion(promotionId: number | string): Promise<Promotion> {
     const response = await http.patch<ApiResponseEnvelope<Promotion>>(
-      `/api/promotions/${promotionId}/deactivate`,
+      `promotions/${promotionId}/deactivate`,
       {},
     );
     return requireResponseData(response, "Reject promotion response is missing data");
@@ -71,7 +71,7 @@ export const promotionService = {
 
   async approvePromotion(promotionId: number | string): Promise<Promotion> {
     const response = await http.patch<ApiResponseEnvelope<Promotion>>(
-      `/api/promotions/${promotionId}/approve`,
+      `promotions/${promotionId}/approve`,
       {},
     );
     return requireResponseData(response, "Approve promotion response is missing data");
@@ -79,9 +79,17 @@ export const promotionService = {
 
   async pausePromotion(promotionId: number | string): Promise<Promotion> {
     const response = await http.patch<ApiResponseEnvelope<Promotion>>(
-      `/api/promotions/${promotionId}/pause`,
+      `promotions/${promotionId}/pause`,
       {},
     );
     return requireResponseData(response, "Pause promotion response is missing data");
+  },
+
+  async resumePromotion(promotionId: number | string): Promise<Promotion> {
+    const response = await http.patch<ApiResponseEnvelope<Promotion>>(
+      `promotions/${promotionId}/resume`,
+      {},
+    );
+    return requireResponseData(response, "Resume promotion response is missing data");
   },
 };

@@ -39,7 +39,7 @@ export async function GET(
   try {
     const { promotionId } = await params;
     const headers = getAuthorizationHeader(request);
-    const response = await api.get<PromotionApiResponse>(`api/promotions/${promotionId}`, { headers });
+    const response = await api.get<PromotionApiResponse>(`promotions/${promotionId}`, { headers });
 
     return ResponseApi.success(response.data, HttpStatusCode.Ok);
   } catch (error) {
