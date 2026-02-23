@@ -29,7 +29,8 @@ const refreshAxiosInstance: AxiosInstance = axios.create({
 
 // Mỗi request đều gắn accessToken
 axiosInstance.interceptors.request.use((config) => {
-  const accessToken = useAuthStore.getState().accessToken;
+  const storeState = useAuthStore.getState();
+  const accessToken = storeState.accessToken;
 
   if (!isPublicApi(config.url) && accessToken) {
     if (!config.headers) {

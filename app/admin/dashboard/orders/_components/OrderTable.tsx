@@ -75,12 +75,18 @@ export function OrderTable({ orders, onStatusChange }: OrderTableProps) {
   }
 
   const handleApprove = async (orderId: number) => {
+    const loadingToast = toast.loading('Đang duyệt đơn hàng...', {
+      duration: Infinity,
+    })
+
     try {
       setApprovingId(orderId)
       await orderService.updateOrderStatus(orderId, 'PROCESSING')
+      toast.dismiss(loadingToast)
       toast.success('Đơn hàng đã được duyệt')
       onStatusChange?.()
     } catch {
+      toast.dismiss(loadingToast)
       toast.error('Không thể duyệt đơn hàng')
     } finally {
       setApprovingId(null)
@@ -88,12 +94,18 @@ export function OrderTable({ orders, onStatusChange }: OrderTableProps) {
   }
 
   const handleShip = async (orderId: number) => {
+    const loadingToast = toast.loading('Đang chuyển giao hàng...', {
+      duration: Infinity,
+    })
+
     try {
       setShippingId(orderId)
       await orderService.updateOrderStatus(orderId, 'DELIVERING')
+      toast.dismiss(loadingToast)
       toast.success('Đơn hàng đã chuyển sang giao hàng')
       onStatusChange?.()
     } catch {
+      toast.dismiss(loadingToast)
       toast.error('Không thể chuyển sang giao hàng')
     } finally {
       setShippingId(null)
