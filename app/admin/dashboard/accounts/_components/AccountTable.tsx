@@ -182,6 +182,10 @@ function UpdateAccountModal({
   const onSubmit = async () => {
     setSaving(true)
     
+    const loadingToast = toast.loading('Đang cập nhật...', {
+      duration: Infinity,
+    })
+    
     const nameParts = form.fullName.trim().split(' ')
     const firstName = nameParts[0] || ''
     const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : undefined
@@ -198,6 +202,7 @@ function UpdateAccountModal({
       const result = await userService.updateUser(account.id, updatePayload)
 
       if (!result) {
+        toast.dismiss(loadingToast)
         toast.error('Không thể cập nhật tài khoản. Vui lòng thử lại.')
         setSaving(false)
         return
@@ -213,9 +218,11 @@ function UpdateAccountModal({
 
       onUpdate?.(updatedAccount)
       onRefresh?.()
+      toast.dismiss(loadingToast)
       toast.success('Thông tin tài khoản đã được cập nhật.')
       setOpen(false)
     } catch (error: unknown) {
+      toast.dismiss(loadingToast)
       const axiosError = error as { response?: { data?: { message?: string } } }
       const errorMessage = axiosError?.response?.data?.message || 'Có lỗi xảy ra khi cập nhật tài khoản.'
       toast.error(errorMessage)

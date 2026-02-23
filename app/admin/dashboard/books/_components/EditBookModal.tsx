@@ -135,6 +135,10 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
   const onSubmit = async () => {
     if (!canSubmit) return
 
+    const loadingToast = toast.loading('Đang lưu sách...', {
+      duration: Infinity,
+    })
+
     setIsSubmitting(true)
 
     try {
@@ -162,10 +166,12 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
 
       await bookService.updateBook(book.id, payload)
       
+      toast.dismiss(loadingToast)
       toast.success('Thông tin sách đã được cập nhật.')
       setOpen(false)
       onSuccess?.()
     } catch (error) {
+      toast.dismiss(loadingToast)
       toast.error('Có lỗi xảy ra khi cập nhật sách.')
     } finally {
       setIsSubmitting(false)
