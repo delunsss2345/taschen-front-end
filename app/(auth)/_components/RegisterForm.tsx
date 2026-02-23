@@ -23,13 +23,13 @@ const getRegisterSchema = (t: TFunction) =>
       lastName: z.string().min(1, t("auth.errors.required")),
       email: z.string().email(t("auth.errors.emailInvalid")),
       password: z.string().min(6, t("auth.errors.passwordMin", { count: 6 })),
-      confirm_password: z
+      confirmPassword: z
         .string()
         .min(6, t("auth.errors.passwordMin", { count: 6 })),
     })
-    .refine((values) => values.password === values.confirm_password, {
+    .refine((values) => values.password === values.confirmPassword, {
       message: t("auth.errors.passwordMismatch"),
-      path: ["confirm_password"],
+      path: ["confirmPassword"],
     });
 
 export type RegisterValues = z.infer<ReturnType<typeof getRegisterSchema>>;
@@ -49,7 +49,7 @@ const RegisterForm = ({ isLoading = false, onSubmit }: RegisterFormProps) => {
       lastName: "",
       email: "",
       password: "",
-      confirm_password: "",
+      confirmPassword: "",
     },
     mode: "onSubmit",
   });
@@ -137,7 +137,7 @@ const RegisterForm = ({ isLoading = false, onSubmit }: RegisterFormProps) => {
 
         <FormField
           control={form.control}
-          name="confirm_password"
+          name="confirmPassword"
           render={({ field }) => (
             <FormItem>
               <FormLabel>{t("auth.confirmPasswordLabel")}</FormLabel>
