@@ -38,7 +38,7 @@ export interface Order {
 export const orderService = {
   async getAllOrders(): Promise<Order[]> {
     try {
-      const response = await http.get<ApiResponseEnvelope<Order[] | { result: Order[] }>>("/api/orders");
+      const response = await http.get<ApiResponseEnvelope<Order[] | { result: Order[] }>>("orders");
       const ordersData = getArrayData<Order>(response);
       return ordersData;
     } catch {
@@ -53,7 +53,7 @@ export const orderService = {
         return null;
       }
 
-      const response = await http.get<ApiResponseEnvelope<Order>>(`/api/orders/${id}`);
+      const response = await http.get<ApiResponseEnvelope<Order>>(`orders/${id}`);
       const data = getResponseData<Order>(response);
       return data;
     } catch {
@@ -63,7 +63,7 @@ export const orderService = {
 
   async updateOrderStatus(orderId: number | string, status: OrderStatus): Promise<Order | null> {
     try {
-      const response = await http.put<ApiResponseEnvelope<Order>>(`/api/orders/${orderId}/status`, { status });
+      const response = await http.put<ApiResponseEnvelope<Order>>(`orders/${orderId}/status`, { status });
       const data = getResponseData<Order>(response);
       return data;
     } catch {

@@ -12,7 +12,7 @@ export async function GET(
     const { orderId } = await params
     const headers = getAuthorizationHeader(request)
     
-    const allOrdersResponse = await api.get<{ data: unknown }>('/api/orders', { headers })
+    const allOrdersResponse = await api.get<{ data: unknown }>('orders', { headers })
     const ordersData = allOrdersResponse.data
     
     let ordersArray: unknown[] = []
