@@ -1,5 +1,5 @@
 import { http } from "@/utils/http";
-import { getResponseData } from "./helpers/response";
+import { getResponseData, type ApiResponseEnvelope } from "./helpers/response";
 
 // Helper nhỏ: tạo FormData cho upload
 function createUploadFormData(file: File, folder: string): FormData {
@@ -10,7 +10,7 @@ function createUploadFormData(file: File, folder: string): FormData {
 }
 
 // Helper nhỏ: extract URL từ response upload
-function extractUrlFromResponse(response: { data?: unknown }): string {
+function extractUrlFromResponse(response: ApiResponseEnvelope<{ url: string }>): string {
   const data = getResponseData<{ url: string }>(response);
   return data?.url ?? "";
 }
@@ -18,9 +18,12 @@ function extractUrlFromResponse(response: { data?: unknown }): string {
 export const uploadService = {
   async uploadImage(file: File, folder: string = "books"): Promise<string> {
     const formData = createUploadFormData(file, folder);
-    
+
     try {
-      const response = await http.post(`/api/cloudinary/upload/${folder}`, formData);
+      const response = await http.post<ApiResponseEnvelope<{ url: string }>>(
+        `/api/cloudinary/upload/${folder}`,
+        formData,
+      );
       return extractUrlFromResponse(response);
     } catch {
       return "";
