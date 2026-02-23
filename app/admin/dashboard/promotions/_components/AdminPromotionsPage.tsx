@@ -26,9 +26,9 @@ const TAB_FILTERS: Record<string, string | null> = {
   all: null,
   active: 'ACTIVE',
   pending: 'PENDING',
-  approved: 'ACTIVE', // Hiển thị khuyến mãi đang hoạt động (đã duyệt)
+  approved: 'APPROVED', // Hiển thị khuyến mãi đã duyệt
   rejected: 'REJECTED',
-  deleted: 'DELETED',
+  paused: 'PAUSED', // Hiển thị khuyến mãi tạm dừng
 }
 
 export function AdminPromotionsPage() {
@@ -38,6 +38,7 @@ export function AdminPromotionsPage() {
   const [selectedPromotionId, setSelectedPromotionId] = useState<number | null>(null)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   const fetchPromotions = async () => {
     try {
@@ -69,12 +70,29 @@ export function AdminPromotionsPage() {
     fetchPromotions()
   }, [])
 
-  // Filter promotions based on active tab
+  // Filter promotions based on active tab and search query
   const filteredPromotions = useMemo(() => {
     const statusFilter = TAB_FILTERS[activeTab]
-    if (!statusFilter) return promotions
-    return promotions.filter(promo => promo.status === statusFilter)
-  }, [activeTab, promotions])
+    
+    let filtered = promotions
+    
+    // Filter by status
+    if (statusFilter) {
+      filtered = filtered.filter(promo => promo.status === statusFilter)
+    }
+    
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim()
+      filtered = filtered.filter(
+        promo => 
+          promo.name.toLowerCase().includes(query) || 
+          promo.code.toLowerCase().includes(query)
+      )
+    }
+    
+    return filtered
+  }, [activeTab, promotions, searchQuery])
 
   // Calculate counts for tabs
   const tabCounts = useMemo(() => {
@@ -83,9 +101,9 @@ export function AdminPromotionsPage() {
       all: promotions.length,
       active: activeCount,
       pending: promotions.filter(p => p.status === 'PENDING').length,
-      approved: activeCount, // Tab Đã duyệt cũng hiển thị ACTIVE
+      approved: promotions.filter(p => p.status === 'APPROVED').length,
       rejected: promotions.filter(p => p.status === 'REJECTED').length,
-      deleted: promotions.filter(p => p.status === 'DELETED').length,
+      paused: promotions.filter(p => p.status === 'PAUSED').length,
     }
   }, [promotions])
 
@@ -136,9 +154,26 @@ export function AdminPromotionsPage() {
     }
   }
 
+  const handleResume = async (id: number) => {
+    const loadingToast = toast.loading('Đang tiếp tục khuyến mãi...')
+    try {
+      await promotionService.resumePromotion(id)
+      toast.dismiss(loadingToast)
+      toast.success('Tiếp tục khuyến mãi thành công')
+      await fetchPromotions()
+    } catch (err) {
+      console.error('Failed to resume promotion:', err)
+      toast.dismiss(loadingToast)
+      toast.error('Không thể tiếp tục khuyến mãi')
+    }
+  }
+
   return (
     <div className="space-y-6">
-      <PromotionHeader onCreateClick={() => setIsCreateModalOpen(true)} />
+      <PromotionHeader 
+        onCreateClick={() => setIsCreateModalOpen(true)} 
+        onSearchChange={setSearchQuery}
+      />
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <PromotionTabs 
           activeTab={activeTab} 
@@ -154,6 +189,7 @@ export function AdminPromotionsPage() {
             onApprove={handleApprove}
             onReject={handleReject}
             onPause={handlePause}
+            onResume={handleResume}
           />
         )}
       </div>

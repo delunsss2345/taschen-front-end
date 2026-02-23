@@ -53,11 +53,14 @@ export function CreatePromotionModal({ open, onOpenChange, onSuccess }: CreatePr
       endDate: new Date(formData.endDate).toISOString(),
     }
 
-    console.log('Submitting promotion data:', submitData)
+    const loadingToast = toast.loading('Đang tạo khuyến mãi...', {
+      duration: Infinity,
+    })
 
     try {
       setIsLoading(true)
       await promotionService.createPromotion(submitData)
+      toast.dismiss(loadingToast)
       toast.success('Tạo khuyến mãi thành công')
       onOpenChange(false)
       onSuccess()
@@ -72,7 +75,7 @@ export function CreatePromotionModal({ open, onOpenChange, onSuccess }: CreatePr
         priceOrderActive: null,
       })
     } catch (error) {
-      console.error('Failed to create promotion:', error)
+      toast.dismiss(loadingToast)
       toast.error('Không thể tạo khuyến mãi')
     } finally {
       setIsLoading(false)

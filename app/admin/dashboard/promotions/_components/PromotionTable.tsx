@@ -2,7 +2,6 @@
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
 
 interface Promotion {
@@ -23,9 +22,10 @@ interface PromotionTableProps {
   onApprove?: (id: number) => void
   onReject?: (id: number) => void
   onPause?: (id: number) => void
+  onResume?: (id: number) => void
 }
 
-export function PromotionTable({ promotions, onView, onApprove, onReject, onPause }: PromotionTableProps) {
+export function PromotionTable({ promotions, onView, onApprove, onReject, onPause, onResume }: PromotionTableProps) {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'ACTIVE':
@@ -97,7 +97,7 @@ export function PromotionTable({ promotions, onView, onApprove, onReject, onPaus
             <TableHeaderCell>Ngày bắt đầu</TableHeaderCell>
             <TableHeaderCell>Ngày kết thúc</TableHeaderCell>
             <TableHeaderCell className="text-center">Trạng thái</TableHeaderCell>
-            <TableHeaderCell className="text-center w-[220px]">Thao tác</TableHeaderCell>
+            <TableHeaderCell className="text-center w-[240px]">Thao tác</TableHeaderCell>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-50 bg-white">
@@ -123,11 +123,11 @@ export function PromotionTable({ promotions, onView, onApprove, onReject, onPaus
               <TableCell>{promo.endDate}</TableCell>
               <TableCell className="text-center">{getStatusBadge(promo.status)}</TableCell>
               <TableCell className="text-center">
-                <div className="flex items-center justify-center gap-1 min-w-[200px]">
+                <div className="flex items-center justify-center gap-1 min-w-[230px]">
                   <Button
                     variant="default"
                     size="sm"
-                    className="bg-blue-600 hover:bg-blue-700 h-8 px-3 cursor-pointer text-[13px] w-[60px]"
+                    className="bg-blue-600 hover:bg-blue-700 h-8 px-2 cursor-pointer text-[13px] w-[55px]"
                     onClick={() => onView?.(promo.id)}
                   >
                     Xem
@@ -137,7 +137,7 @@ export function PromotionTable({ promotions, onView, onApprove, onReject, onPaus
                       <Button
                         variant="default"
                         size="sm"
-                        className="bg-green-600 hover:bg-green-700 h-8 px-2 flex-1 cursor-pointer text-[13px]"
+                        className="bg-green-600 hover:bg-green-700 h-8 px-2 cursor-pointer text-[13px] w-[55px]"
                         onClick={() => onApprove?.(promo.id)}
                       >
                         Duyệt
@@ -145,7 +145,7 @@ export function PromotionTable({ promotions, onView, onApprove, onReject, onPaus
                       <Button
                         variant="default"
                         size="sm"
-                        className="bg-red-600 hover:bg-red-700 h-8 px-2 flex-1 cursor-pointer text-[13px]"
+                        className="bg-red-600 hover:bg-red-700 h-8 px-2 cursor-pointer text-[13px] w-[65px]"
                         onClick={() => onReject?.(promo.id)}
                       >
                         Từ chối
@@ -156,10 +156,20 @@ export function PromotionTable({ promotions, onView, onApprove, onReject, onPaus
                     <Button
                       variant="default"
                       size="sm"
-                      className="bg-orange-500 hover:bg-orange-600 h-8 px-2 flex-1 cursor-pointer text-[13px]"
+                      className="bg-orange-500 hover:bg-orange-600 h-8 px-2 cursor-pointer text-[13px] w-[55px]"
                       onClick={() => onPause?.(promo.id)}
                     >
                       Dừng
+                    </Button>
+                  )}
+                  {promo.status === 'PAUSED' && (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="bg-green-600 hover:bg-green-700 h-8 px-2 cursor-pointer text-[13px] w-[65px]"
+                      onClick={() => onResume?.(promo.id)}
+                    >
+                      Tiếp tục
                     </Button>
                   )}
                 </div>
