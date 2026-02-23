@@ -21,11 +21,11 @@ export const useLoginMutation = () => {
     onMutate: () => {
       setAuthLoading(true);
     },
-    onSuccess: (data) => {
-      if (!data) return;
+    onSuccess: (response) => {
+      if (!response) return;
       setSession({
-        currentUser: data.data.user,
-        accessToken: data.data.accessToken,
+        currentUser: response.data.user,
+        accessToken: response.data.accessToken,
       });
     },
     onError: () => {
@@ -73,8 +73,8 @@ export const useRefreshTokenMutation = () => {
 
   return useMutation({
     mutationFn: (payload: RefreshTokenRequest) => authService.refreshToken(payload),
-    onSuccess: (data) => {
-      if (!data) return;
+    onSuccess: (response) => {
+      if (!response) return;
       const currentUser = useAuthStore.getState().currentUser;
 
       if (!currentUser) {
@@ -83,7 +83,7 @@ export const useRefreshTokenMutation = () => {
 
       setSession({
         currentUser,
-        accessToken: data.data.accessToken,
+        accessToken: response.data.accessToken,
       });
     },
   });
