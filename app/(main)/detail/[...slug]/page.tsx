@@ -299,17 +299,17 @@ export default function DetailPage() {
 
           <div className="grid gap-x-14 gap-y-16 sm:grid-cols-2 xl:grid-cols-4 place-items-start">
             {relatedTitles.map((book) => (
-              <BookCard
-                key={`${book.title}-${book.subtitle}`}
-                title={book.title}
-                subtitle={book.subtitle}
-                price={book.price}
-                imageUrl={book.imageUrl}
-                badge="NEW"         // hoặc XL/XXL/ADULTS ONLY
-                variant="compact"
-                href="/detail/related-book"
-              // bỏ mx-auto để grid tự canh đều
-              />
+              // <BookCard
+              //   key={`${book.title}-${book.subtitle}`}
+              //   title={book.title}
+              //   subtitle={book.subtitle}
+              //   price={book.price}
+              //   imageUrl={book.imageUrl}
+              //   badge="NEW"         // hoặc XL/XXL/ADULTS ONLY
+              //   variant="compact"
+              //   href="/detail/related-book"
+              // // bỏ mx-auto để grid tự canh đều
+              // />
             ))}
           </div>
         </div>
