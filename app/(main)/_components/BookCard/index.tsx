@@ -13,7 +13,7 @@ type BookCardProps = {
     href?: string;
     variant?: BookCardVariant;
     className?: string;
-    bookVariantId: number;
+    // bookVariantId: number;
 };
 
 const formatPrice = (price: number, currency: string) =>
@@ -41,7 +41,7 @@ function CardInner({
     imageUrl,
     variant = "default",
     className,
-    bookVariantId
+    // bookVariantId
 }: BookCardProps) {
     const style = S[variant];
     return (

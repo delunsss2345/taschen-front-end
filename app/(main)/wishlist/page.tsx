@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 
-import BookCard from "@/app/(main)/_components/BookCard";
 import { Button } from "@/components/ui/button";
 
 const WishlistPage = () => {
@@ -28,13 +27,13 @@ const WishlistPage = () => {
             </p>
 
             <div className="mt-10 grid grid-cols-4">
-                <BookCard
+                {/* <BookCard
                     title="Homes for Our Time."
                     subtitle="Sustainable Living"
                     price={80}
                     imageUrl="https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=800&q=80"
                     href="/detail/homes-for-our-time-sustainable-living"
-                />
+                /> */}
             </div>
         </div>
     );
