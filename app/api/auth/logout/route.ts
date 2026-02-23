@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies();
     const refreshToken = cookieStore.get("refreshToken")?.value;
-    const response = await api.post<LogoutApiResponse>("/api/auth/logout", {
+    const response = await api.post<LogoutApiResponse>("auth/logout", {
       refreshToken
     });
 

@@ -1,8 +1,8 @@
 import { handleRouteError } from "@/app/api/_utils/route-utils";
 import { API_MESSAGE } from "@/constants/api/messageApi";
-import type { VerifyAccountApiResponse } from "@/types/response/auth.response";
 import { api } from "@/lib/api/fetchHandler";
 import { ResponseApi } from "@/lib/api/responseHandler";
+import type { VerifyAccountApiResponse } from "@/types/response/auth.response";
 import { VerifyEmailSchema } from "@/validation/auth/verifyEmailValidation";
 import { HttpStatusCode } from "axios";
 import { NextRequest } from "next/server";
@@ -24,7 +24,7 @@ export async function POST(
     }
 
     const response = await api.post<VerifyAccountApiResponse>(
-      `/api/auth/verify/${userId}`,
+      `auth/verify/${userId}`,
       payload,
     );
 
