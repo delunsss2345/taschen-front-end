@@ -55,7 +55,7 @@ function getFirstUserFromResponse(
 export const userService = {
   async getAllUsers(): Promise<User[]> {
     try {
-      const response = await http.get<ApiResponseEnvelope<User[] | { result: User[] }>>("/api/users");
+      const response = await http.get<ApiResponseEnvelope<User[] | { result: User[] }>>("users");
       const usersData = getArrayData<User>(response);
       return usersData;
     } catch {
@@ -65,7 +65,7 @@ export const userService = {
 
   async getUserById(userId: number | string): Promise<User | null> {
     try {
-      const response = await http.get<ApiResponseEnvelope<User | User[]>>(`/api/users/${userId}`);
+      const response = await http.get<ApiResponseEnvelope<User | User[]>>(`users/${userId}`);
       return getFirstUserFromResponse(response);
     } catch {
       return null;
@@ -74,7 +74,7 @@ export const userService = {
 
   async createUser(payload: CreateUserRequest): Promise<User | null> {
     try {
-      const response = await http.post<ApiResponseEnvelope<User | User[]>>("/api/users", payload);
+      const response = await http.post<ApiResponseEnvelope<User | User[]>>("users", payload);
       return getFirstUserFromResponse(response);
     } catch {
       return null;
@@ -83,7 +83,7 @@ export const userService = {
 
   async updateUser(userId: number | string, payload: UpdateUserRequest): Promise<User | null> {
     try {
-      const response = await http.put<ApiResponseEnvelope<User | User[]>>(`/api/users/${userId}`, payload);
+      const response = await http.put<ApiResponseEnvelope<User | User[]>>(`users/${userId}`, payload);
       return getFirstUserFromResponse(response);
     } catch {
       return null;
@@ -92,7 +92,7 @@ export const userService = {
 
   async deleteUser(userId: number | string): Promise<boolean> {
     try {
-      await http.del<ApiResponseEnvelope<null>>(`/api/users/${userId}`);
+      await http.del<ApiResponseEnvelope<null>>(`users/${userId}`);
       return true;
     } catch {
       return false;
