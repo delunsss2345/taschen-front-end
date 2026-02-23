@@ -1,5 +1,17 @@
-import http from "@/utils/http";
-import { getResponseData } from "./helpers/response";
+import { http } from "@/utils/http";
+import {
+  getResponseData,
+  requireResponseData,
+  type ApiResponseEnvelope,
+} from "./helpers/response";
+
+export type PromotionStatus =
+  | "PENDING"
+  | "ACTIVE"
+  | "REJECTED"
+  | "DELETED"
+  | "PAUSED"
+  | (string & {});
 
 export interface Promotion {
   id: number;
@@ -10,7 +22,7 @@ export interface Promotion {
   priceOrderActive: number | null;
   startDate: string;
   endDate: string;
-  status: string;
+  status: PromotionStatus;
   isActive: boolean;
   createdById: number;
   createdByName: string;
@@ -31,7 +43,7 @@ export interface CreatePromotionData {
 export const promotionService = {
   async getAllPromotions(): Promise<Promotion[]> {
     try {
-      const response = await http.get("/api/promotions");
+      const response = await http.get<ApiResponseEnvelope<Promotion[]>>("promotions");
       const promotionsData = getResponseData<Promotion[]>(response);
       return promotionsData ?? [];
     } catch {
@@ -40,32 +52,44 @@ export const promotionService = {
   },
 
   async getPromotionById(promotionId: number | string): Promise<Promotion> {
-    const response = await http.get(`/api/promotions/${promotionId}`);
-    const data = getResponseData<Promotion>(response);
-    return data as Promotion;
+    const response = await http.get<ApiResponseEnvelope<Promotion>>(`promotions/${promotionId}`);
+    return requireResponseData(response, "Promotion not found");
   },
 
   async createPromotion(data: CreatePromotionData): Promise<Promotion> {
-    const response = await http.post("/api/promotions", data);
-    const result = getResponseData<Promotion>(response);
-    return result as Promotion;
+    const response = await http.post<ApiResponseEnvelope<Promotion>>("promotions", data);
+    return requireResponseData(response, "Create promotion response is missing data");
   },
 
   async rejectPromotion(promotionId: number | string): Promise<Promotion> {
-    const response = await http.patch(`/api/promotions/${promotionId}/deactivate`);
-    const result = getResponseData<Promotion>(response);
-    return result as Promotion;
+    const response = await http.patch<ApiResponseEnvelope<Promotion>>(
+      `promotions/${promotionId}/deactivate`,
+      {},
+    );
+    return requireResponseData(response, "Reject promotion response is missing data");
   },
 
   async approvePromotion(promotionId: number | string): Promise<Promotion> {
-    const response = await http.patch(`/api/promotions/${promotionId}/approve`);
-    const result = getResponseData<Promotion>(response);
-    return result as Promotion;
+    const response = await http.patch<ApiResponseEnvelope<Promotion>>(
+      `promotions/${promotionId}/approve`,
+      {},
+    );
+    return requireResponseData(response, "Approve promotion response is missing data");
   },
 
   async pausePromotion(promotionId: number | string): Promise<Promotion> {
-    const response = await http.patch(`/api/promotions/${promotionId}/pause`);
-    const result = getResponseData<Promotion>(response);
-    return result as Promotion;
+    const response = await http.patch<ApiResponseEnvelope<Promotion>>(
+      `promotions/${promotionId}/pause`,
+      {},
+    );
+    return requireResponseData(response, "Pause promotion response is missing data");
+  },
+
+  async resumePromotion(promotionId: number | string): Promise<Promotion> {
+    const response = await http.patch<ApiResponseEnvelope<Promotion>>(
+      `promotions/${promotionId}/resume`,
+      {},
+    );
+    return requireResponseData(response, "Resume promotion response is missing data");
   },
 };

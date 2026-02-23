@@ -8,8 +8,10 @@ export default function DefaultLayout({
 }: {
   children: React.ReactNode;
 }) {
+
   return (
     <>
+
       <Header />
       <main>{children}</main>
       <Footer />

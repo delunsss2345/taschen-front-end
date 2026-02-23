@@ -1,12 +1,12 @@
 "use client";
 
-import ForgotPasswordForm from "@/components/auth/ForgotPasswordForm";
+import ForgotPasswordForm from "@/app/(auth)/_components/ForgotPasswordForm";
 import useTranslator from "@/hooks/use-translator";
 
 const ForgotPassword = () => {
   const { t } = useTranslator();
 
-  const onSubmit = async () => {};
+  const onSubmit = async () => { };
 
   return (
     <div className="space-y-4">

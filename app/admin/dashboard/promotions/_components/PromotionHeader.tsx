@@ -3,19 +3,22 @@
 import { Plus, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { useState } from 'react'
 
 interface PromotionHeaderProps {
   onCreateClick: () => void
+  onSearchChange?: (search: string) => void
 }
 
-export function PromotionHeader({ onCreateClick }: PromotionHeaderProps) {
+export function PromotionHeader({ onCreateClick, onSearchChange }: PromotionHeaderProps) {
+  const [searchValue, setSearchValue] = useState('')
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setSearchValue(value)
+    onSearchChange?.(value)
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -35,19 +38,10 @@ export function PromotionHeader({ onCreateClick }: PromotionHeaderProps) {
           <Input
             placeholder="Tìm theo tên hoặc mã khuyến mãi"
             className="pl-10 h-10 bg-white border-gray-200"
+            value={searchValue}
+            onChange={handleSearchChange}
           />
         </div>
-        <Select>
-          <SelectTrigger className="w-40 h-10 bg-white border-gray-200 cursor-pointer">
-            <SelectValue placeholder="Trạng thái" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tất cả</SelectItem>
-            <SelectItem value="active">Đang hoạt động</SelectItem>
-            <SelectItem value="inactive">Đã kết thúc</SelectItem>
-            <SelectItem value="scheduled">Sắp diễn ra</SelectItem>
-          </SelectContent>
-        </Select>
       </div>
     </div>
   )

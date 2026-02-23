@@ -42,11 +42,17 @@ interface BooksTableProps {
 
 export function BooksTable({ books, isLoading, onDeleteSuccess, onEditSuccess }: BooksTableProps) {
   const handleDelete = async (bookId: number) => {
+    const loadingToast = toast.loading('Đang xóa sách...', {
+      duration: Infinity,
+    })
+
     try {
       await bookService.deleteBook(bookId)
+      toast.dismiss(loadingToast)
       toast.success('Sách đã được xóa thành công.')
       onDeleteSuccess?.(bookId)
     } catch (error: unknown) {
+      toast.dismiss(loadingToast)
       const axiosError = error as { response?: { data?: { message?: string; error?: string } } };
       const backendMessage = axiosError?.response?.data?.message
       toast.error(backendMessage || 'Có lỗi xảy ra khi xóa sách.')

@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     if (page) query.page = page;
     if (pageSize) query.pageSize = pageSize;
   
-    const response = await api.get<BooksApiResponse>("api/books", { 
+    const response = await api.get<BooksApiResponse>("books", { 
       headers,
       query: Object.keys(query).length > 0 ? query : undefined 
     });
@@ -35,7 +35,8 @@ export async function POST(request: NextRequest) {
   try {
     const payload = await request.json();
     const headers = getAuthorizationHeader(request);
-    const response = await api.post<BookApiResponse>("api/books", payload, { headers });
+    
+    const response = await api.post<BookApiResponse>("books", payload, { headers });
 
     return ResponseApi.success(response.data, HttpStatusCode.Created);
   } catch (error) {

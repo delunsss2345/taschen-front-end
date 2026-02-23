@@ -17,7 +17,7 @@ export async function PUT(
     const headers = getAuthorizationHeader(request);
     const body = await request.json();
 
-    const response = await api.put<{ data: unknown }>(`/api/orders/${orderId}/status`, body, {
+    const response = await api.put<{ data: unknown }>(`orders/${orderId}/status`, body, {
       headers,
     });
 

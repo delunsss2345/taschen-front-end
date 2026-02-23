@@ -12,7 +12,7 @@ import { NextRequest } from "next/server";
 export async function GET(request: NextRequest) {
   try {
     const headers = getAuthorizationHeader(request);
-    const response = await api.get<CategoriesApiResponse>("/api/categories", { headers });
+    const response = await api.get<CategoriesApiResponse>("categories", { headers });
 
     return ResponseApi.success(response.data, HttpStatusCode.Ok);
   } catch (error) {
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
   try {
     const payload = await request.json();
     const headers = getAuthorizationHeader(request);
-    const response = await api.post<CategoryApiResponse>("/api/categories", payload, { headers });
+    const response = await api.post<CategoryApiResponse>("categories", payload, { headers });
 
     return ResponseApi.success(response.data, HttpStatusCode.Created);
   } catch (error) {

@@ -1,43 +1,37 @@
-/**
- * Shared response helpers for services
- * 
- * Cấu trúc API response - có 2 dạng:
- * 
- * Dạng 1 (Books, Categories, Promotions):
- * - axios response = { data: { success: true, data: { meta, result } } }
- * - response.data = { success: true, data: {...} }
- * - response.data.data = { meta, result }
- * 
- * Dạng 2 (Users, Orders):
- * - axios response = { data: { success: true, data: [...] } }
- * - response.data = { success: true, data: [...] }
- * - response.data.data = [...] (trùng lặp!)
- */
+
+export type ApiResponseEnvelope<T> = {
+  data?: T | { data?: T };
+};
 
 // Helper nhỏ: kiểm tra object
 const isObject = (value: unknown): value is Record<string, unknown> =>
-  value !== null && typeof value === 'object';
+  value !== null && typeof value === "object";
 
 // Helper nhỏ: kiểm tra có property 'data'
 const hasDataProperty = (value: unknown): value is { data: unknown } =>
-  isObject(value) && 'data' in value;
+  isObject(value) && "data" in value;
 
 /**
  * Lấy data từ response - tự động phát hiện cấu trúc
  * @param response - Axios response object
  * @returns Data bên trong hoặc null
  */
-export function getResponseData<T>(response: { data?: unknown }): T | null {
-  if (!hasDataProperty(response)) {
+export function getResponseData<T>(
+  response: ApiResponseEnvelope<T> | null | undefined,
+): T | null {
+  if (!response || !hasDataProperty(response)) {
     return null;
   }
 
   const successData = response.data;
-  
+  if (successData === undefined || successData === null) {
+    return null;
+  }
+
   // Kiểm tra có nested data không (Dạng 1: Books)
   // successData = { success: true, data: { meta, result } }
   if (hasDataProperty(successData)) {
-    return successData.data as T;
+    return (successData.data as T | null | undefined) ?? null;
   }
 
   // Không có nested data (Dạng 2: Users, Orders)
@@ -48,7 +42,10 @@ export function getResponseData<T>(response: { data?: unknown }): T | null {
 /**
  * Lấy data từ response với fallback
  */
-export function getResponseDataOr<T>(response: { data?: unknown }, fallback: T): T {
+export function getResponseDataOr<T>(
+  response: ApiResponseEnvelope<T> | null | undefined,
+  fallback: T,
+): T {
   const data = getResponseData<T>(response);
   return data ?? fallback;
 }
@@ -57,9 +54,11 @@ export function getResponseDataOr<T>(response: { data?: unknown }, fallback: T):
  * Lấy array từ response - an toàn cho cả 2 dạng
  * @returns Array data
  */
-export function getArrayData<T>(response: { data?: unknown }): T[] {
+export function getArrayData<T>(
+  response: ApiResponseEnvelope<unknown> | null | undefined,
+): T[] {
   const successData = getResponseData<unknown>(response);
-  
+
   if (!successData) {
     return [];
   }
@@ -93,17 +92,34 @@ export function getArrayData<T>(response: { data?: unknown }): T[] {
  * @returns Object chứa data array và meta
  */
 export function getListData<T, M = unknown>(
-  response: { data?: unknown }
+  response: ApiResponseEnvelope<unknown> | null | undefined,
 ): { data: T[]; meta: M | undefined } {
   const arrayData = getArrayData<T>(response);
-  
+
   // Thử lấy meta nếu có
   const successData = getResponseData<unknown>(response);
-  
+
   let meta: M | undefined;
   if (isObject(successData) && 'meta' in successData) {
     meta = successData.meta as M;
   }
 
   return { data: arrayData, meta };
+}
+
+/**
+ * Lấy data bắt buộc từ response
+ * @throws Error khi response không có data hợp lệ
+ */
+export function requireResponseData<T>(
+  response: ApiResponseEnvelope<T> | null | undefined,
+  errorMessage = "Invalid API response",
+): T {
+  const data = getResponseData<T>(response);
+
+  if (data === null) {
+    throw new Error(errorMessage);
+  }
+
+  return data;
 }

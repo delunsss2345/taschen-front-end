@@ -8,7 +8,7 @@ interface TabCounts {
   pending: number
   approved: number
   rejected: number
-  deleted: number
+  paused: number
 }
 
 interface PromotionTabsProps {
@@ -23,7 +23,7 @@ const tabs = [
   { id: 'pending', label: 'Chờ duyệt', countKey: 'pending' as keyof TabCounts },
   { id: 'approved', label: 'Đã duyệt', countKey: 'approved' as keyof TabCounts },
   { id: 'rejected', label: 'Đã từ chối', countKey: 'rejected' as keyof TabCounts },
-  { id: 'deleted', label: 'Đã dừng', countKey: 'deleted' as keyof TabCounts },
+  { id: 'paused', label: 'Đã dừng', countKey: 'paused' as keyof TabCounts },
 ]
 
 export function PromotionTabs({ activeTab, onTabChange, counts }: PromotionTabsProps) {

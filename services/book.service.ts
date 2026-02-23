@@ -10,7 +10,12 @@ import type {
 import type { Category } from "@/types/response/category.response";
 import { http } from "@/utils/http";
 import { categoryService } from "./category.service";
-import { getListData, getResponseData } from "./helpers/response";
+import {
+  getListData,
+  getResponseData,
+  requireResponseData,
+  type ApiResponseEnvelope,
+} from "./helpers/response";
 
 export const bookService = {
   async getAllBooks(params?: { page?: number; pageSize?: number }): Promise<BookListData> {
@@ -19,9 +24,9 @@ export const bookService = {
     if (params?.pageSize) queryParams.set('pageSize', params.pageSize.toString());
 
     const queryString = queryParams.toString();
-    const url = queryString ? `/api/books?${queryString}` : '/api/books';
+    const url = queryString ? `books?${queryString}` : 'books';
 
-    const response = await http.get(url);
+    const response = await http.get<ApiResponseEnvelope<BookListData>>(url);
     const { data: booksResult, meta } = getListData<Book, BookListMeta>(response);
 
     const categories = await getCategoriesSafe();
@@ -34,7 +39,7 @@ export const bookService = {
   },
 
   async getBookById(bookId: number | string): Promise<Book> {
-    const response = await http.get(`/api/books/${bookId}`);
+    const response = await http.get<ApiResponseEnvelope<Book>>(`books/${bookId}`);
     const book = getResponseData<Book>(response);
 
     if (!book) {
@@ -51,20 +56,18 @@ export const bookService = {
   },
 
   async createBook(payload: CreateBookRequest): Promise<Book> {
-    const response = await http.post("/api/books", payload);
-    const result = getResponseData<Book>(response);
-    return result as Book;
+    const response = await http.post<ApiResponseEnvelope<Book>>("books", payload);
+    return requireResponseData(response, "Create book response is missing data");
   },
 
   async updateBook(bookId: number | string, payload: UpdateBookRequest): Promise<Book> {
-    const response = await http.put(`/api/books/${bookId}`, payload);
-    const result = getResponseData<Book>(response);
-    return result as Book;
+    const response = await http.put<ApiResponseEnvelope<Book>>(`books/${bookId}`, payload);
+    return requireResponseData(response, "Update book response is missing data");
   },
 
   async deleteBook(bookId: number | string): Promise<null> {
     try {
-      await http.delete(`/api/books/${bookId}`);
+      await http.del<ApiResponseEnvelope<null>>(`books/${bookId}`);
       return null;
     } catch {
       return null;
@@ -72,7 +75,7 @@ export const bookService = {
   },
 
   async getSortedBooks(): Promise<BookListData> {
-    const response = await http.get("/api/books/sorted");
+    const response = await http.get<ApiResponseEnvelope<BookListData | Book[]>>("books/sorted");
     const { data: booksResult, meta } = getListData<Book, BookListMeta>(response);
 
     return {
@@ -82,7 +85,9 @@ export const bookService = {
   },
 
   async getBooksByCategory(categoryId: number | string): Promise<BookListData> {
-    const response = await http.get(`/api/books/category/${categoryId}`);
+    const response = await http.get<ApiResponseEnvelope<BookListData | Book[]>>(
+      `books/category/${categoryId}`,
+    );
     const { data: booksResult, meta } = getListData<Book, BookListMeta>(response);
 
     return {

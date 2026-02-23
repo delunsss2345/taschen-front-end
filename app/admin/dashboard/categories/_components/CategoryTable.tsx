@@ -38,11 +38,18 @@ interface CategoryTableProps {
 export function CategoryTable({ categories, isLoading, onEditSuccess, onDeleteSuccess }: CategoryTableProps) {
   
   const handleDelete = async (cat: Category) => {
+    const loadingToast = toast.loading('Đang xóa...', {
+      duration: Infinity,
+    })
+
     try {
       await categoryService.deleteCategory(cat.id)
+      toast.dismiss(loadingToast)
       toast.success(`Thể loại "${cat.name}" đã được xóa.`)
       onDeleteSuccess?.()
     } catch (error: unknown) {
+      toast.dismiss(loadingToast)
+      
       // Handle AxiosError
       let errorMessage = 'Đã xảy ra lỗi không xác định'
       
@@ -168,13 +175,19 @@ function EditCategoryModal({ trigger, category, onSuccess }: { trigger: React.Re
   const onSubmit = async () => {
     if (!name.trim()) return
 
+    const loadingToast = toast.loading('Đang lưu...', {
+      duration: Infinity,
+    })
+
     try {
       setIsSubmitting(true)
       await categoryService.updateCategory(category.id, { name })
+      toast.dismiss(loadingToast)
       toast.success('Thông tin thể loại đã được cập nhật.')
       setOpen(false)
       onSuccess?.()
     } catch (error) {
+      toast.dismiss(loadingToast)
       toast.error('Không thể cập nhật thể loại')
     } finally {
       setIsSubmitting(false)

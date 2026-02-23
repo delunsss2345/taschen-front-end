@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/select'
 import { MultiSelectCombobox } from './MultiSelectCombobox'
 import { ImagePlus } from 'lucide-react'
+import Image from 'next/image'
 import { toast } from 'sonner'
 import { bookService } from '@/services/book.service'
 import { categoryService } from '@/services/category.service'
@@ -139,6 +140,10 @@ export function AddBookModal({
   const onSubmit = async () => {
     if (!canSubmit) return
 
+    const loadingToast = toast.loading('Đang lưu sách...', {
+      duration: Infinity,
+    })
+    
     setIsSubmitting(true)
     
     try {
@@ -166,11 +171,13 @@ export function AddBookModal({
 
       await bookService.createBook(payload)
       
+      toast.dismiss(loadingToast)
       toast.success('Sách đã được thêm thành công.')
       setOpen(false)
       resetForm()
       onSuccess?.()
-    } catch (error) {
+    } catch {
+      toast.dismiss(loadingToast)
       toast.error('Có lỗi xảy ra khi thêm sách.')
     } finally {
       setIsSubmitting(false)
@@ -199,7 +206,14 @@ export function AddBookModal({
                   <div className="h-48 w-full rounded-md border border-gray-200 bg-white overflow-hidden flex items-center justify-center relative group">
                     {previewUrl ? (
                       <>
-                        <img src={previewUrl} alt="Hình ảnh" className="h-full w-full object-contain" />
+                        <div className="relative h-full w-full">
+                          <Image 
+                            src={previewUrl} 
+                            alt="Hình ảnh" 
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                           <Button
                             type="button"

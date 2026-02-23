@@ -39,11 +39,11 @@ export async function PATCH(
   try {
     const { promotionId } = await params;
     const headers = getAuthorizationHeader(request);
-
-    const response = await api.patch<PromotionApiResponse>(`promotions/${promotionId}/pause`, undefined, { headers });
+    
+    const response = await api.patch<PromotionApiResponse>(`promotions/${promotionId}/resume`, undefined, { headers });
 
     return ResponseApi.success(response.data, HttpStatusCode.Ok);
   } catch (error) {
-    return handleRouteError(error, API_MESSAGE.SYSTEM_TRY_AGAIN, "Pause Promotion API Error");
+    return handleRouteError(error, API_MESSAGE.SYSTEM_TRY_AGAIN, "Resume Promotion API Error");
   }
 }

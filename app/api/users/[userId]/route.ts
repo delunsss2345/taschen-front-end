@@ -15,7 +15,7 @@ export async function GET(
   try {
     const { userId } = await params;
     const headers = getAuthorizationHeader(request);
-    const response = await api.get<{ data: unknown }>(`/api/users/${userId}`, { headers });
+    const response = await api.get<{ data: unknown }>(`users/${userId}`, { headers });
 
     return ResponseApi.success(response.data, HttpStatusCode.Ok);
   } catch (error) {
@@ -32,7 +32,7 @@ export async function PUT(
     const payload = await request.json();
     const headers = getAuthorizationHeader(request);
 
-    const response = await api.put<{ data: unknown }>(`/api/users/${userId}`, payload, { headers });
+    const response = await api.put<{ data: unknown }>(`users/${userId}`, payload, { headers });
 
     return ResponseApi.success(response.data, HttpStatusCode.Ok);
   } catch (error: unknown) {
@@ -51,7 +51,7 @@ export async function DELETE(
   try {
     const { userId } = await params;
     const headers = getAuthorizationHeader(request);
-    await api.delete(`/api/users/${userId}`, undefined, { headers });
+    await api.delete(`users/${userId}`, undefined, { headers });
 
     return ResponseApi.success({ message: "User deleted" }, HttpStatusCode.NoContent);
   } catch (error) {

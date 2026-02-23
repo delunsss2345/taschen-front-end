@@ -78,6 +78,10 @@ function CreateAccountModal({
       return
     }
 
+    const loadingToast = toast.loading('Đang tạo tài khoản...', {
+      duration: Infinity,
+    })
+
     setSaving(true)
     try {
       const result = await userService.createUser({
@@ -89,15 +93,18 @@ function CreateAccountModal({
       })
 
       if (!result) {
+        toast.dismiss(loadingToast)
         toast.error('Không thể tạo tài khoản. Vui lòng thử lại.')
         return
       }
 
+      toast.dismiss(loadingToast)
       toast.success('Tài khoản đã được tạo thành công.')
       setOpen(false)
       setForm({ email: '', password: '', firstName: '', lastName: '', phone: '', role: 'USER' })
       onSuccess?.()
     } catch {
+      toast.dismiss(loadingToast)
       toast.error('Có lỗi xảy ra khi tạo tài khoản.')
     } finally {
       setSaving(false)

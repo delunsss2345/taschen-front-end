@@ -17,7 +17,7 @@ export async function GET(
     const { id } = await params;
     const headers = getAuthorizationHeader(request);
 
-    const response = await api.get<BookApiResponse>(`api/books/${id}`, { headers });
+    const response = await api.get<BookApiResponse>(`books/${id}`, { headers });
     return ResponseApi.success(response.data, HttpStatusCode.Ok);
   } catch (error) {
     return handleRouteError(
@@ -37,7 +37,7 @@ export async function PUT(
     const payload = await request.json();
     const headers = getAuthorizationHeader(request);
 
-    const response = await api.put<BookApiResponse>(`/api/books/${id}`, payload, {
+    const response = await api.put<BookApiResponse>(`books/${id}`, payload, {
       headers,
     });
 
@@ -59,12 +59,12 @@ export async function DELETE(
     const { id } = await params;
     const headers = getAuthorizationHeader(request);
 
-    const response = await api.delete<DeleteBookApiResponse>(`/api/books/${id}`, undefined, {
+    const response = await api.delete<DeleteBookApiResponse>(`books/${id}`, undefined, {
       headers,
     });
 
     return ResponseApi.success(response.data, HttpStatusCode.NoContent);
-  } catch (error: unknown) {
+  } catch {
     return new Response(JSON.stringify({ success: true, data: { message: "Deleted" } }), {
       status: 204,
       headers: { "Content-Type": "application/json" },

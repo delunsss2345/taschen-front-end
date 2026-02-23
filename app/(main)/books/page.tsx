@@ -1,4 +1,5 @@
 "use client";
+
 import BookCard from "@/app/(main)/_components/BookCard";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -327,7 +328,7 @@ export default function AllTitlesPage() {
     };
 
     return (
-        <div className="mx-auto w-full max-w-[var(--container-main)] px-6 pb-16">
+        <div className="container-main w-full pb-16">
             {/* Breadcrumb */}
             <div className="flex items-center gap-2 py-4 text-xs text-zinc-500">
                 <Link href="/" className="hover:text-zinc-900">

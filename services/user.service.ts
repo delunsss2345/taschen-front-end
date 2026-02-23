@@ -1,5 +1,19 @@
-import http from "@/utils/http";
-import { getArrayData } from "./helpers/response";
+import { http } from "@/utils/http";
+import { getArrayData, getResponseData, type ApiResponseEnvelope } from "./helpers/response";
+
+export type UserRole = "ADMIN" | "SELLER" | "WAREHOUSE_STAFF" | "USER" | (string & {});
+
+export interface Address {
+  id: number;
+  addressType: string;
+  street: string;
+  district: string;
+  ward: string;
+  city: string;
+  recipientName: string;
+  phoneNumber: string;
+  isDefault: boolean;
+}
 
 export interface User {
   id: number;
@@ -9,14 +23,39 @@ export interface User {
   gender: string | null;
   phoneNumber: string | null;
   active: boolean;
-  roles: string[];
-  addresses: unknown[];
+  roles: UserRole[];
+  addresses: Address[];
+}
+
+export interface CreateUserRequest {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName?: string;
+  phoneNumber?: string;
+  gender?: string;
+  roles?: UserRole[];
+  active?: boolean;
+}
+
+export type UpdateUserRequest = Partial<CreateUserRequest> & Record<string, unknown>;
+
+function getFirstUserFromResponse(
+  response: ApiResponseEnvelope<User | User[]>,
+): User | null {
+  const data = getResponseData<User | User[]>(response);
+
+  if (!data) {
+    return null;
+  }
+
+  return Array.isArray(data) ? data[0] ?? null : data;
 }
 
 export const userService = {
   async getAllUsers(): Promise<User[]> {
     try {
-      const response = await http.get("/api/users");
+      const response = await http.get<ApiResponseEnvelope<User[] | { result: User[] }>>("users");
       const usersData = getArrayData<User>(response);
       return usersData;
     } catch {
@@ -26,36 +65,26 @@ export const userService = {
 
   async getUserById(userId: number | string): Promise<User | null> {
     try {
-      const response = await http.get(`/api/users/${userId}`);
-      const data = getArrayData<User>(response);
-      return data[0] ?? null;
+      const response = await http.get<ApiResponseEnvelope<User | User[]>>(`users/${userId}`);
+      return getFirstUserFromResponse(response);
     } catch {
       return null;
     }
   },
 
-  async createUser(payload: {
-    email: string;
-    password: string;
-    firstName: string;
-    lastName?: string;
-    phoneNumber?: string;
-    gender?: string;
-  }): Promise<User | null> {
+  async createUser(payload: CreateUserRequest): Promise<User | null> {
     try {
-      const response = await http.post("/api/users", payload);
-      const result = getArrayData<User>(response);
-      return result[0] ?? null;
+      const response = await http.post<ApiResponseEnvelope<User | User[]>>("users", payload);
+      return getFirstUserFromResponse(response);
     } catch {
       return null;
     }
   },
 
-  async updateUser(userId: number | string, payload: Record<string, unknown>): Promise<User | null> {
+  async updateUser(userId: number | string, payload: UpdateUserRequest): Promise<User | null> {
     try {
-      const response = await http.put(`/api/users/${userId}`, payload);
-      const result = getArrayData<User>(response);
-      return result[0] ?? null;
+      const response = await http.put<ApiResponseEnvelope<User | User[]>>(`users/${userId}`, payload);
+      return getFirstUserFromResponse(response);
     } catch {
       return null;
     }
@@ -63,7 +92,7 @@ export const userService = {
 
   async deleteUser(userId: number | string): Promise<boolean> {
     try {
-      await http.delete(`/api/users/${userId}`);
+      await http.del<ApiResponseEnvelope<null>>(`users/${userId}`);
       return true;
     } catch {
       return false;

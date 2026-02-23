@@ -1,12 +1,12 @@
 "use client";
 
-import ResetPasswordForm from "@/components/auth/ResetPasswordForm";
+import ResetPasswordForm from "@/app/(auth)/_components/ResetPasswordForm";
 import useTranslator from "@/hooks/use-translator";
 
 const ResetPassword = () => {
   const { t } = useTranslator();
 
-  const onSubmit = async () => {};
+  const onSubmit = async () => { };
 
   return (
     <div className="space-y-4">

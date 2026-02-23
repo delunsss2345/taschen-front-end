@@ -7,13 +7,13 @@ import type {
   CartItem,
   CheckoutPreview,
 } from "@/types/response/cart.response";
-import http from "@/utils/http";
-import { getResponseData } from "./helpers/response";
+import { http } from "@/utils/http";
+import { getResponseData, type ApiResponseEnvelope } from "./helpers/response";
 
 export const cartService = {
   async getCartByUserId(userId: number | string): Promise<Cart | null> {
     try {
-      const response = await http.get(`/carts/users/${userId}`);
+      const response = await http.get<ApiResponseEnvelope<Cart>>(`/carts/users/${userId}`);
       return getResponseData<Cart>(response);
     } catch {
       return null;
@@ -22,7 +22,7 @@ export const cartService = {
 
   async getCurrentCart(): Promise<Cart | null> {
     try {
-      const response = await http.get("/carts/current");
+      const response = await http.get<ApiResponseEnvelope<Cart>>("/carts/current");
       return getResponseData<Cart>(response);
     } catch {
       return null;
@@ -34,7 +34,7 @@ export const cartService = {
     payload: AddToCartRequest,
   ): Promise<Cart | null> {
     try {
-      const response = await http.post(
+      const response = await http.post<ApiResponseEnvelope<Cart>>(
         `/carts/users/${userId}/items`,
         payload,
       );
@@ -46,7 +46,7 @@ export const cartService = {
 
   async clearCart(userId: number | string): Promise<boolean> {
     try {
-      await http.delete(`/carts/users/${userId}`);
+      await http.del<ApiResponseEnvelope<null>>(`/carts/users/${userId}`);
       return true;
     } catch {
       return false;
@@ -55,7 +55,7 @@ export const cartService = {
 
   async checkoutCurrentUser(): Promise<CheckoutPreview | null> {
     try {
-      const response = await http.get("/carts/current/checkout");
+      const response = await http.get<ApiResponseEnvelope<CheckoutPreview>>("/carts/current/checkout");
       return getResponseData<CheckoutPreview>(response);
     } catch {
       return null;
@@ -64,7 +64,7 @@ export const cartService = {
 
   async getCartItem(cartItemId: number | string): Promise<CartItem | null> {
     try {
-      const response = await http.get(`/cart-items/${cartItemId}`);
+      const response = await http.get<ApiResponseEnvelope<CartItem>>(`/cart-items/${cartItemId}`);
       return getResponseData<CartItem>(response);
     } catch {
       return null;
@@ -73,7 +73,7 @@ export const cartService = {
 
   async increaseCartItemQuantity(cartItemId: number | string): Promise<CartItem | null> {
     try {
-      const response = await http.patch(
+      const response = await http.patch<ApiResponseEnvelope<CartItem>>(
         `/cart-items/${cartItemId}/increase`,
         {},
       );
@@ -85,7 +85,7 @@ export const cartService = {
 
   async decreaseCartItemQuantity(cartItemId: number | string): Promise<CartItem | null> {
     try {
-      const response = await http.patch(
+      const response = await http.patch<ApiResponseEnvelope<CartItem>>(
         `/cart-items/${cartItemId}/decrease`,
         {},
       );
@@ -100,7 +100,7 @@ export const cartService = {
     payload: UpdateCartItemQuantityRequest,
   ): Promise<CartItem | null> {
     try {
-      const response = await http.put(
+      const response = await http.put<ApiResponseEnvelope<CartItem>>(
         `/cart-items/${cartItemId}/quantity`,
         payload,
       );
@@ -112,7 +112,7 @@ export const cartService = {
 
   async deleteCartItem(cartItemId: number | string): Promise<boolean> {
     try {
-      await http.delete(`/cart-items/${cartItemId}`);
+      await http.del<ApiResponseEnvelope<null>>(`/cart-items/${cartItemId}`);
       return true;
     } catch {
       return false;

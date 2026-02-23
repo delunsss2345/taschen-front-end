@@ -16,7 +16,7 @@ export async function GET(
   try {
     const { id } = await params;
     const headers = getAuthorizationHeader(request);
-    const response = await api.get<CategoryApiResponse>(`/api/categories/${id}`, { headers });
+    const response = await api.get<CategoryApiResponse>(`categories/${id}`, { headers });
 
     return ResponseApi.success(response.data, HttpStatusCode.Ok);
   } catch (error) {
@@ -32,7 +32,7 @@ export async function PUT(
     const { id } = await params;
     const payload = await request.json();
     const headers = getAuthorizationHeader(request);
-    const response = await api.put<CategoryApiResponse>(`/api/categories/${id}`, payload, { headers });
+    const response = await api.put<CategoryApiResponse>(`categories/${id}`, payload, { headers });
 
     return ResponseApi.success(response.data, HttpStatusCode.Ok);
   } catch (error) {
@@ -51,7 +51,7 @@ export async function DELETE(
   try {
     const { id } = await params;
     const headers = getAuthorizationHeader(request);
-    await api.delete(`/api/categories/${id}`, {}, { headers });
+    await api.delete(`categories/${id}`, {}, { headers });
 
     return ResponseApi.success({ message: "Category deleted successfully" }, HttpStatusCode.Ok);
   } catch (error) {

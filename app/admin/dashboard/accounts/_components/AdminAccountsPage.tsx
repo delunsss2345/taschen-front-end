@@ -2,19 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { AccountHeader } from './AccountHeader'
-import { AccountTable } from './AccountTable'
+import { AccountTable, type Account } from './AccountTable'
 import { userService, type User } from '@/services/user.service'
 import { toast } from 'sonner'
-
-interface Account {
-  id: number
-  username: string
-  email: string
-  fullName: string
-  phone: string
-  role: string
-  status: boolean
-}
 
 function mapUserToAccount(user: User): Account {
   return {
@@ -27,6 +17,7 @@ function mapUserToAccount(user: User): Account {
     phone: user.phoneNumber || '-',
     role: user.roles && user.roles.length > 0 ? user.roles[0] : 'USER',
     status: user.active,
+    addresses: user.addresses || [],
   }
 }
 

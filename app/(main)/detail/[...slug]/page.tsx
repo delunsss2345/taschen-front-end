@@ -4,7 +4,6 @@ import { Heart, Minus, Plus } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
 
-import BookCard from "@/app/(main)/_components/BookCard";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
@@ -298,19 +297,7 @@ export default function DetailPage() {
           </h2>
 
           <div className="grid gap-x-14 gap-y-16 sm:grid-cols-2 xl:grid-cols-4 place-items-start">
-            {relatedTitles.map((book) => (
-              <BookCard
-                key={`${book.title}-${book.subtitle}`}
-                title={book.title}
-                subtitle={book.subtitle}
-                price={book.price}
-                imageUrl={book.imageUrl}
-                badge="NEW"         // hoặc XL/XXL/ADULTS ONLY
-                variant="compact"
-                href="/detail/related-book"
-              // bỏ mx-auto để grid tự canh đều
-              />
-            ))}
+
           </div>
         </div>
       </section>

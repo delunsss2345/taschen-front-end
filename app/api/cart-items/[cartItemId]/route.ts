@@ -39,7 +39,7 @@ export async function DELETE(
     const { cartItemId } = await params;
     const headers = getAuthorizationHeader(request);
 
-    const response = await api.delete<EmptyApiResponse>(`/api/cart-items/${cartItemId}`, undefined, {
+    const response = await api.delete<EmptyApiResponse>(`cart-items/${cartItemId}`, undefined, {
       headers,
     });
 

@@ -40,7 +40,7 @@ export async function PATCH(
     const { promotionId } = await params;
     const headers = getAuthorizationHeader(request);
     
-    const response = await api.patch<PromotionApiResponse>(`api/promotions/${promotionId}/approve`, undefined, { headers });
+    const response = await api.patch<PromotionApiResponse>(`promotions/${promotionId}/approve`, undefined, { headers });
 
     return ResponseApi.success(response.data, HttpStatusCode.Ok);
   } catch (error) {

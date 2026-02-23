@@ -1,12 +1,12 @@
 "use client";
 
-import LoginForm, { type LoginValues } from "@/components/auth/LoginForm";
-import { LoginButtons } from "@/components/auth/LoginWithGoogle";
+import LoginForm, { LoginValues } from "@/app/(auth)/_components/LoginForm";
 import {
   selectorAuthLoading,
   useAuthStore,
   useLoginMutation,
 } from "@/features/auth";
+import Link from "next/link"; // Import Link
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -27,13 +27,19 @@ const Login = () => {
   };
 
   return (
-    <>
+    <div className="space-y-4">
       <LoginForm
         isLoading={authLoading || loginMutation.isPending}
         onSubmit={onSubmit}
       />
-      <LoginButtons />
-    </>
+
+      <div className="text-center text-sm">
+        Chưa có tài khoản?{" "}
+        <Link href="/register" className="font-medium text-primary hover:underline">
+          Đăng ký ngay
+        </Link>
+      </div>
+    </div>
   );
 };
 
