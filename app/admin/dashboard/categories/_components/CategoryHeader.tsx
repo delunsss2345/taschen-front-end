@@ -55,16 +55,22 @@ function AddCategoryModal({ trigger, onSuccess }: { trigger: React.ReactNode; on
   const onSubmit = async () => {
     if (!name.trim()) return
 
+    const loadingToast = toast.loading('Đang lưu...', {
+      duration: Infinity,
+    })
+
     try {
       setIsSubmitting(true)
       const categoryCode = code.trim() || name.trim().toUpperCase().replace(/[^A-Z0-9]/g, '_')
       await categoryService.createCategory({ name, code: categoryCode })
+      toast.dismiss(loadingToast)
       toast.success('Thể loại mới đã được thêm.')
       setOpen(false)
       setName('')
       setCode('')
       onSuccess?.()
     } catch (error) {
+      toast.dismiss(loadingToast)
       toast.error('Không thể thêm thể loại')
     } finally {
       setIsSubmitting(false)
