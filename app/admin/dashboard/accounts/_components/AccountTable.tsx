@@ -22,9 +22,9 @@ import {
 } from '@/components/ui/select'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { userService } from '@/services/user.service'
+import { userService, type Address } from '@/services/user.service'
 
-interface Account {
+export interface Account {
   id: number
   username: string
   email: string
@@ -32,6 +32,7 @@ interface Account {
   phone: string
   role: string
   status: boolean
+  addresses: Address[]
 }
 
 interface AccountTableProps {
@@ -122,6 +123,18 @@ export function AccountTable({ accounts, loading = false, onUpdate, onRefresh }:
               </TableCell>
               <TableCell>
                 <div className="flex items-center justify-center gap-2">
+                  <ViewAddressesDialog
+                    account={acc}
+                    trigger={
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 gap-1 px-3 cursor-pointer"
+                      >
+                        Xem
+                      </Button>
+                    }
+                  />
                   <UpdateAccountModal
                     account={acc}
                     onUpdate={onUpdate}
@@ -289,6 +302,70 @@ function UpdateAccountModal({
             )}
           </Button>
         </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function ViewAddressesDialog({ 
+  trigger, 
+  account 
+}: { 
+  trigger: React.ReactNode
+  account: Account 
+}) {
+  const [open, setOpen] = useState(false)
+  const addresses = account.addresses || []
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Địa chỉ của: {account.fullName}</DialogTitle>
+        </DialogHeader>
+        {addresses.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            Người dùng chưa có địa chỉ nào
+          </div>
+        ) : (
+          <table className="w-full text-sm border-collapse">
+            <thead className="bg-gray-50">
+              <tr>
+                <TableHeaderCell>Loại</TableHeaderCell>
+                <TableHeaderCell>Người nhận</TableHeaderCell>
+                <TableHeaderCell>Địa chỉ</TableHeaderCell>
+                <TableHeaderCell>Điện thoại</TableHeaderCell>
+                <TableHeaderCell>Mặc định</TableHeaderCell>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {addresses.map((addr) => (
+                <TableRow key={addr.id}>
+                  <TableCell>
+                    <Badge variant="outline">
+                      {addr.addressType === 'HOME' ? 'Nhà riêng' : addr.addressType === 'OFFICE' ? 'Văn phòng' : addr.addressType}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{addr.recipientName}</TableCell>
+                  <TableCell>
+                    <div className="max-w-[200px]">
+                      {addr.street}, {addr.ward}, {addr.district}, {addr.city}
+                    </div>
+                  </TableCell>
+                  <TableCell>{addr.phoneNumber}</TableCell>
+                  <TableCell>
+                    {addr.isDefault && (
+                      <Badge className="bg-green-100 text-green-700 border-none shadow-none">
+                        Mặc định
+                      </Badge>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </tbody>
+          </table>
+        )}
       </DialogContent>
     </Dialog>
   )

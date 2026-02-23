@@ -1,7 +1,7 @@
 import { envConfig } from "@/config/envConfig";
 import { useAuthStore } from "@/features/auth/store/auth.store";
 import type { PromiseHandlers } from "@/types/lib/axios";
-import type { RefreshTokenResponseData } from "@/types/response/auth.response";
+import type { RefreshTokenResponseData, UserLoginResponse } from "@/types/response/auth.response";
 import axios, {
   AxiosHeaders,
   type AxiosInstance,
@@ -11,6 +11,13 @@ import axios, {
 import { isPublicApi } from "./isPublicPath";
 
 const baseURL = envConfig.NEXT_PUBLIC_BASE_API ?? "";
+
+// Hàm redirect to login (chỉ chạy trên browser)
+const redirectToLogin = () => {
+  if (typeof window !== "undefined") {
+    window.location.href = "/login";
+  }
+};
 
 export const axiosInstance: AxiosInstance = axios.create({
   baseURL,
@@ -70,16 +77,16 @@ const extractBearerToken = (value: string | undefined) => {
 
 type RefreshRouteResponse = {
   success?: boolean;
-  data?: RefreshTokenResponseData;
-} & Partial<RefreshTokenResponseData>;
+  data?: RefreshTokenResponseData & { user?: UserLoginResponse };
+} & Partial<RefreshTokenResponseData> & { user?: UserLoginResponse };
 
 const refreshToken = async () => {
-  const { user, setAccessToken, setSession, clearSession } =
+  const { currentUser, setSession, clearSession } =
     useAuthStore.getState();
 
   try {
     const result = await refreshAxiosInstance.post<RefreshRouteResponse>(
-      "/auth/refresh-token",
+      "/api/auth/refresh",
     );
 
     const authHeader =
@@ -95,16 +102,14 @@ const refreshToken = async () => {
 
     if (payload?.user) {
       setSession({
-        user: payload.user,
+        currentUser: payload.user,
         accessToken,
       });
-    } else if (user) {
+    } else if (currentUser) {
       setSession({
-        user,
+        currentUser,
         accessToken,
       });
-    } else {
-      setAccessToken(accessToken);
     }
 
     // Gắn queue  null nếu thành công
@@ -143,6 +148,13 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
     const isAuthApi = isPublicApi(originalRequest?.url);
     const hasAccessToken = Boolean(useAuthStore.getState().accessToken);
+    const status = error.response?.status;
+
+    // Redirect to login 
+    if ((status === 401 || status === 403) && !isAuthApi) {
+      useAuthStore.getState().clearSession();
+      redirectToLogin();
+    }
 
     // Đánh dấu lỗi
     const shouldRenewToken =
@@ -161,6 +173,7 @@ axiosInstance.interceptors.response.use(
         await getNewToken();
         return axiosInstance(originalRequest); // Trả request
       } catch (error) {
+        redirectToLogin();
         return Promise.reject(error); // Lỗi ném reject
       }
     }

@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     const headers = getAuthorizationHeader(request);
 
     const response = await api.post<ChangePasswordApiResponse>(
-      "auth/change-password",
+      "/api/auth/change-password",
       payload,
       { headers },
     );

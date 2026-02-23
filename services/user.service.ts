@@ -1,6 +1,18 @@
 import { http } from "@/utils/http";
 import { getArrayData } from "./helpers/response";
 
+export interface Address {
+  id: number;
+  addressType: string;
+  street: string;
+  district: string;
+  ward: string;
+  city: string;
+  recipientName: string;
+  phoneNumber: string;
+  isDefault: boolean;
+}
+
 export interface User {
   id: number;
   email: string;
@@ -10,7 +22,7 @@ export interface User {
   phoneNumber: string | null;
   active: boolean;
   roles: string[];
-  addresses: unknown[];
+  addresses: Address[];
 }
 
 export const userService = {

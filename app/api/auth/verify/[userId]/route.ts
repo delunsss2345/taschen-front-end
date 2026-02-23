@@ -24,7 +24,7 @@ export async function POST(
     }
 
     const response = await api.post<VerifyAccountApiResponse>(
-      `auth/verify/${userId}`,
+      `/api/auth/verify/${userId}`,
       payload,
     );
 
