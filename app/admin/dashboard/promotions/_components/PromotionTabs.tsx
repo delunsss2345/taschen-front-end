@@ -2,31 +2,33 @@
 
 import { cn } from '@/lib/utils'
 
+interface TabItem {
+  id: string
+  label: string
+  countKey?: string
+}
+
 interface TabCounts {
-  all: number
-  active: number
-  pending: number
-  approved: number
-  rejected: number
-  paused: number
+  [key: string]: number
 }
 
 interface PromotionTabsProps {
   activeTab: string
   onTabChange: (id: string) => void
   counts: TabCounts
+  tabs?: TabItem[]
 }
 
-const tabs = [
-  { id: 'all', label: 'Tất cả', countKey: 'all' as keyof TabCounts },
-  { id: 'active', label: 'Đang hoạt động', countKey: 'active' as keyof TabCounts },
-  { id: 'pending', label: 'Chờ duyệt', countKey: 'pending' as keyof TabCounts },
-  { id: 'approved', label: 'Đã duyệt', countKey: 'approved' as keyof TabCounts },
-  { id: 'rejected', label: 'Đã từ chối', countKey: 'rejected' as keyof TabCounts },
-  { id: 'paused', label: 'Đã dừng', countKey: 'paused' as keyof TabCounts },
+const defaultTabs: TabItem[] = [
+  { id: 'all', label: 'Tất cả', countKey: 'all' },
+  { id: 'active', label: 'Đang hoạt động', countKey: 'active' },
+  { id: 'pending', label: 'Chờ duyệt', countKey: 'pending' },
+  { id: 'approved', label: 'Đã duyệt', countKey: 'approved' },
+  { id: 'rejected', label: 'Đã từ chối', countKey: 'rejected' },
+  { id: 'paused', label: 'Đã dừng', countKey: 'paused' },
 ]
 
-export function PromotionTabs({ activeTab, onTabChange, counts }: PromotionTabsProps) {
+export function PromotionTabs({ activeTab, onTabChange, counts, tabs = defaultTabs }: PromotionTabsProps) {
   return (
     <div className="border-b border-gray-100 bg-white px-4">
       <div className="flex items-center gap-8 overflow-x-auto no-scrollbar">
@@ -41,7 +43,7 @@ export function PromotionTabs({ activeTab, onTabChange, counts }: PromotionTabsP
                 : 'text-gray-500 hover:text-gray-700'
             )}
           >
-            {tab.label} ({counts[tab.countKey]})
+            {tab.label} ({counts[tab.countKey || tab.id] ?? 0})
             {activeTab === tab.id && (
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full" />
             )}
