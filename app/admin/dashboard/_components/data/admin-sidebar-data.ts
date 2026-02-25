@@ -14,7 +14,8 @@ import {
   Warehouse,
   History,
   RotateCw,
-  LayoutGrid
+  LayoutGrid,
+  FileText
 } from 'lucide-react'
 
 export const adminSidebarData = {
@@ -39,6 +40,11 @@ export const adminSidebarData = {
       title: 'Quản lý Thể loại',
       url: '/admin/dashboard/categories',
       icon: Tags,
+    },
+    {
+      title: 'Quản lý Định dạng',
+      url: '/admin/dashboard/formats',
+      icon: FileText,
     },
     {
       title: 'Quản lý Tài khoản',

@@ -31,6 +31,17 @@ interface Book {
     id: number
     name: string
   }[]
+  supplierId?: number
+  supplier?: {
+    id: number
+    name: string
+  }
+  variantFormats?: {
+    formatCode: string
+    formatName: string
+    price: number
+    stockQuantity: number
+  }[]
 }
 
 interface BooksTableProps {
@@ -89,6 +100,8 @@ export function BooksTable({ books, isLoading, onDeleteSuccess, onEditSuccess }:
             <TableHeaderCell>Giá</TableHeaderCell>
             <TableHeaderCell>Số lượng</TableHeaderCell>
             <TableHeaderCell>Thể loại</TableHeaderCell>
+            <TableHeaderCell>Nhà cung cấp</TableHeaderCell>
+            <TableHeaderCell>Định dạng</TableHeaderCell>
             <TableHeaderCell className="text-center">Thao tác</TableHeaderCell>
           </tr>
         </thead>
@@ -137,6 +150,14 @@ export function BooksTable({ books, isLoading, onDeleteSuccess, onEditSuccess }:
                 {book.categories?.map((cat) => cat.name).join(", ") || "Chưa có thể loại"}
               </TableCell>
 
+              <TableCell className="max-w-[150px]">
+                {book.supplier?.name || "Chưa có NCC"}
+              </TableCell>
+
+              <TableCell className="max-w-[100px]">
+                {book.variantFormats?.[0]?.formatName || "Chưa có"}
+              </TableCell>
+
               <TableCell className="text-right">
                 <div className="flex items-center justify-end gap-2">
                   <EditBookModal
@@ -147,7 +168,11 @@ export function BooksTable({ books, isLoading, onDeleteSuccess, onEditSuccess }:
                       author: book.author,
                       price: book.price,
                       quantity: book.stockQuantity,
-                      category: book.categories?.map((cat) => cat.name).join(", ") || ""
+                      category: book.categories?.map((cat) => cat.name).join(", ") || "",
+                      supplierId: book.supplierId,
+                      supplierName: book.supplier?.name || "",
+                      formatCode: book.variantFormats?.[0]?.formatCode || '',
+                      variantId: undefined
                     }}
                     onSuccess={onEditSuccess}
                     trigger={

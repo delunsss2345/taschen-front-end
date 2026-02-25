@@ -26,14 +26,10 @@ import Image from 'next/image'
 import { toast } from 'sonner'
 import { bookService } from '@/services/book.service'
 import { categoryService } from '@/services/category.service'
+import { supplierService } from '@/services/supplier.service'
 import { uploadService } from '@/services/upload.service'
+import { formatService } from '@/services/format.service'
 import { useEffect } from 'react'
-
-const mockFormats = [
-  { value: 'Bìa cứng', label: 'Bìa cứng' },
-  { value: 'Bìa mềm', label: 'Bìa mềm' },
-  { value: 'E-book', label: 'E-book' },
-]
 
 export type BookCreateModel = {
   tenSach: string
@@ -48,6 +44,7 @@ export type BookCreateModel = {
   kichHoat: boolean
   maTheLoai: number[]
   dinhDang: string
+  maNhaCungCap?: number
 }
 
 const defaultValues: BookCreateModel = {
@@ -63,6 +60,7 @@ const defaultValues: BookCreateModel = {
   kichHoat: true,
   maTheLoai: [],
   dinhDang: '',
+  maNhaCungCap: undefined,
 }
 
 function Field({
@@ -107,11 +105,19 @@ export function AddBookModal({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [categories, setCategories] = useState<{ value: number; label: string }[]>([])
+  const [suppliers, setSuppliers] = useState<{ value: number; label: string }[]>([])
+  const [formats, setFormats] = useState<{ value: string; label: string; variantId: number }[]>([])
 
   useEffect(() => {
     if (open) {
       categoryService.getAllCategories().then((cats) => {
         setCategories(cats.map((c) => ({ value: c.id, label: c.name })))
+      })
+      supplierService.getAllSuppliers().then((sups) => {
+        setSuppliers(sups.map((s) => ({ value: s.id, label: s.name })))
+      })
+      formatService.getAllFormats().then((fmts) => {
+        setFormats(fmts.map((f) => ({ value: f.formatCode, label: f.formatName, variantId: f.id })))
       })
     }
   }, [open])
@@ -154,6 +160,10 @@ export function AddBookModal({
         imageUrl = await uploadService.uploadImage(form.hinhAnh, 'books')
       }
 
+      // Lấy variantId từ format được chọn
+      const selectedFormat = formats.find(f => f.value === form.dinhDang)
+      const variantId = selectedFormat ? [selectedFormat.variantId] : []
+
       const payload = {
         title: form.tenSach,
         author: form.tacGia,
@@ -166,7 +176,8 @@ export function AddBookModal({
         imageUrl: imageUrl,
         isActive: form.kichHoat,
         categoryIds: form.maTheLoai,
-        variantFormats: form.dinhDang ? [form.dinhDang] : [],
+        variantIds: variantId,
+        supplierId: form.maNhaCungCap,
       }
 
       await bookService.createBook(payload)
@@ -354,7 +365,7 @@ export function AddBookModal({
             </Section>
 
             <Section>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Field label="Thể loại" helper="Có thể chọn nhiều">
                   <MultiSelectCombobox
                     options={categories}
@@ -366,6 +377,24 @@ export function AddBookModal({
                   />
                 </Field>
 
+                <Field label="Nhà cung cấp">
+                  <Select
+                    value={form.maNhaCungCap?.toString() || ''}
+                    onValueChange={(value) => setForm((p) => ({ ...p, maNhaCungCap: value ? Number(value) : undefined }))}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Chọn nhà cung cấp" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {suppliers.map((supplier) => (
+                        <SelectItem key={supplier.value} value={supplier.value.toString()}>
+                          {supplier.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+
                 <Field label="Định dạng" helper="Chọn 1 định dạng">
                   <Select
                     value={form.dinhDang}
@@ -375,7 +404,7 @@ export function AddBookModal({
                       <SelectValue placeholder="Chọn định dạng" />
                     </SelectTrigger>
                     <SelectContent>
-                      {mockFormats.map((fmt) => (
+                      {formats.map((fmt) => (
                         <SelectItem key={fmt.value} value={fmt.value}>
                           {fmt.label}
                         </SelectItem>
