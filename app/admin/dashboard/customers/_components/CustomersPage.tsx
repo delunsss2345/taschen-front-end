@@ -1,76 +1,69 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { CustomersHeader } from './CustomersHeader'
 import { CustomersTable } from './CustomersTable'
+import { userService, type User } from '@/services/user.service'
+import { toast } from 'sonner'
+import { LoadingSpinner } from '@/components/ui/loading'
 
-const mockCustomers = [
-  {
-    id: 1,
-    username: 'test1',
-    email: 'test1@gmail.com',
-    fullName: 'Nguyễn Văn Test1',
-    phone: '0123456789',
-    totalOrders: 5,
-    totalSpent: 250000,
-    status: 'ACTIVE',
-    joinDate: '2024-01-15',
-  },
-  {
-    id: 2,
-    username: 'test2',
-    email: 'test2@gmail.com',
-    fullName: 'Trần Thị Test2',
-    phone: '0123456790',
-    totalOrders: 3,
-    totalSpent: 150000,
-    status: 'ACTIVE',
-    joinDate: '2024-02-20',
-  },
-  {
-    id: 3,
-    username: 'test3',
-    email: 'test3@gmail.com',
-    fullName: 'Lê Hoàng Test3',
-    phone: '0123456791',
-    totalOrders: 8,
-    totalSpent: 520000,
-    status: 'ACTIVE',
-    joinDate: '2024-03-10',
-  },
-  {
-    id: 4,
-    username: 'test4',
-    email: 'test4@gmail.com',
-    fullName: 'Phạm Minh Test4',
-    phone: '0123456792',
-    totalOrders: 2,
-    totalSpent: 80000,
-    status: 'LOCKED',
-    joinDate: '2024-04-05',
-  },
-  {
-    id: 5,
-    username: 'test5',
-    email: 'test5@gmail.com',
-    fullName: 'Hoàng Đức Test5',
-    phone: '0123456793',
-    totalOrders: 10,
-    totalSpent: 980000,
-    status: 'ACTIVE',
-    joinDate: '2024-05-18',
-  },
-]
+interface Customer {
+  id: number
+  username: string
+  email: string
+  fullName: string
+  phone: string
+  totalOrders: number
+  totalSpent: number
+  status: string
+  joinDate: string
+}
+
+function mapUserToCustomer(user: User): Customer {
+  return {
+    id: user.id,
+    username: user.email.split('@')[0],
+    email: user.email,
+    fullName: `${user.firstName} ${user.lastName || ''}`.trim(),
+    phone: user.phoneNumber || '',
+    totalOrders: 0,
+    totalSpent: 0,
+    status: user.active ? 'ACTIVE' : 'LOCKED',
+    joinDate: new Date().toISOString().split('T')[0],
+  }
+}
 
 export function CustomersPage() {
+  const [customers, setCustomers] = useState<Customer[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
 
+  const fetchCustomers = async () => {
+    try {
+      setIsLoading(true)
+      const users = await userService.getAllUsers()
+      const customerUsers = users.filter(user => 
+        user.roles.includes('USER') || !user.roles.includes('ADMIN')
+      )
+      const mappedCustomers = customerUsers.map(mapUserToCustomer)
+      setCustomers(mappedCustomers)
+    } catch (error) {
+      toast.error('Không thể tải danh sách khách hàng')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchCustomers()
+  }, [])
+
   const filteredCustomers = useMemo(() => {
-    if (!searchQuery.trim()) return mockCustomers
+    if (!searchQuery.trim()) return customers
 
     const query = searchQuery.toLowerCase().trim()
 
-    return mockCustomers.filter((item) => {
+    return customers.filter((item) => {
       return (
         item.username.toLowerCase().includes(query) ||
         item.email.toLowerCase().includes(query) ||
@@ -78,7 +71,16 @@ export function CustomersPage() {
         item.phone.includes(query)
       )
     })
-  }, [searchQuery])
+  }, [searchQuery, customers])
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <CustomersHeader searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+        <LoadingSpinner />
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-4">
