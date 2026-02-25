@@ -37,6 +37,8 @@ export async function PUT(
     const payload = await request.json();
     const headers = getAuthorizationHeader(request);
 
+    console.log('PUT /books/[id] payload:', JSON.stringify(payload, null, 2));
+
     const response = await api.put<BookApiResponse>(`books/${id}`, payload, {
       headers,
     });
