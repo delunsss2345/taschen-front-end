@@ -14,11 +14,12 @@ export function AdminBooksPage() {
   const [meta, setMeta] = useState<BookListMeta | null>(null)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(5)
+  const [search, setSearch] = useState('')
 
   const fetchBooks = async () => {
     try {
       setIsLoading(true)
-      const response = await bookService.getAllBooks({ page, pageSize })
+      const response = await bookService.getAllBooks({ page, pageSize, search: search || undefined })
       setBooks(response.result)
       setMeta(response.meta)
     } catch (error) {
@@ -30,7 +31,12 @@ export function AdminBooksPage() {
 
   useEffect(() => {
     fetchBooks()
-  }, [page, pageSize])
+  }, [page, pageSize, search])
+
+  const handleSearch = (searchTerm: string) => {
+    setSearch(searchTerm)
+    setPage(1)
+  }
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage)
@@ -50,7 +56,7 @@ export function AdminBooksPage() {
 
   return (
     <div className="space-y-4">
-      <BooksHeader onSuccess={fetchBooks} />
+      <BooksHeader onSuccess={fetchBooks} onSearch={handleSearch} />
       <BooksTable 
         books={books} 
         isLoading={isLoading}

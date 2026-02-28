@@ -218,7 +218,7 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
         isActive: form.kinhDoanh,
         categoryIds: form.maTheLoai,
         variantIds: form.dinhDang ? [parseInt(form.dinhDang)] : [],
-        supplierId: form.maNhaCungCap || 1,
+        supplierId: form.maNhaCungCap ?? undefined,
       }
 
       console.log('Update book payload:', JSON.stringify(bookPayload, null, 2))
