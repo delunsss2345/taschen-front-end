@@ -15,16 +15,18 @@ import { categoryService } from "./category.service";
 import { supplierService } from "./supplier.service";
 import {
   getListData,
+  getArrayData,
   getResponseData,
   requireResponseData,
   type ApiResponseEnvelope,
 } from "./helpers/response";
 
 export const bookService = {
-  async getAllBooks(params?: { page?: number; pageSize?: number }): Promise<BookListData> {
+  async getAllBooks(params?: { page?: number; pageSize?: number; search?: string }): Promise<BookListData> {
     const queryParams = new URLSearchParams();
     if (params?.page) queryParams.set('page', params.page.toString());
     if (params?.pageSize) queryParams.set('pageSize', params.pageSize.toString());
+    if (params?.search) queryParams.set('search', params.search);
 
     const queryString = queryParams.toString();
     const url = queryString ? `books?${queryString}` : 'books';
@@ -111,6 +113,16 @@ export const bookService = {
       result: booksResult,
       meta: meta ?? { page: 1, pageSize: 10, total: booksResult.length, pages: 1 }
     };
+  },
+
+  async getSimpleBooks(): Promise<{ id: number; title: string }[]> {
+    try {
+      const response = await http.get<ApiResponseEnvelope<Book[]>>("books?pageSize=1000");
+      const data = getArrayData<Book>(response);
+      return data.map(book => ({ id: book.id, title: book.title }));
+    } catch {
+      return [];
+    }
   },
 };
 

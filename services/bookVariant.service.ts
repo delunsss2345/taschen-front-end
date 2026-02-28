@@ -1,4 +1,3 @@
-import type { BackendApiResponse } from "@/types/response/book.response";
 import type { UpdateVariantRequest } from "@/types/request/book.request";
 import { http } from "@/utils/http";
 import {
@@ -14,11 +13,8 @@ export type BookVariant = {
   price: number;
   stockQuantity: number;
   isActive: boolean;
-  variant?: {
-    id: number;
-    formatCode: string;
-    formatName: string;
-  };
+  variantFormatCode?: string;
+  variantFormatName?: string;
 };
 
 export type BookVariantListResponse = BookVariant[];
