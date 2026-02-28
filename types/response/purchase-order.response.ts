@@ -6,6 +6,7 @@ export interface PurchaseOrderItem {
   variantFormat?: string | null;
   quantity: number;
   importPrice: number;
+  sellingPrice?: number | null;
 }
 
 export interface PurchaseOrder {
