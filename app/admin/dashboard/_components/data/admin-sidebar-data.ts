@@ -12,7 +12,6 @@ import {
   BarChart3,
   PackagePlus,
   Warehouse,
-  History,
   RotateCw,
   LayoutGrid,
   FileText
@@ -72,14 +71,19 @@ export const adminSidebarData = {
       icon: PackageCheck,
     },
     {
-      title: 'Quản lý Khách hàng',
-      url: '/admin/dashboard/customers',
-      icon: UserRound,
+      title: 'Phiếu Nhập kho',
+      url: '/admin/dashboard/import',
+      icon: LayoutGrid,
     },
     {
       title: 'Quản lý lô hàng',
       url: '/admin/dashboard/batch',
       icon: Warehouse,
+    },
+    {
+      title: 'Quản lý Khách hàng',
+      url: '/admin/dashboard/customers',
+      icon: UserRound,
     },
     {
       title: 'Yêu cầu Hoàn/Đổi',
@@ -90,11 +94,6 @@ export const adminSidebarData = {
       title: 'Trả về Kho',
       url: '/admin/dashboard/return-to-warehouse',
       icon: RotateCw,
-    },
-    {
-      title: 'Phiếu Nhập kho',
-      url: '/admin/dashboard/import',
-      icon: LayoutGrid,
     },
     {
       title: 'Yêu cầu Nhập kho',
@@ -113,11 +112,6 @@ export const adminSidebarData = {
           url: '/admin/dashboard/import-requests/rejected',
         },
       ],
-    },
-    {
-      title: 'Lịch sử Hoạt động',
-      url: '/admin/dashboard/activities',
-      icon: History,
     },
   ],
 }
