@@ -58,7 +58,7 @@ export async function POST(
       { headers }
     );
 
-    return ResponseApi.success(response.data, HttpStatusCode.Ok);
+    return ResponseApi.success(response, HttpStatusCode.Ok);
   } catch (error) {
     return handleRouteError(error, API_MESSAGE.SYSTEM_TRY_AGAIN, "Receive Import Stock API Error");
   }

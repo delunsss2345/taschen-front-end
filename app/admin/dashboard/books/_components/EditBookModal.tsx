@@ -142,8 +142,8 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
           const variantId = firstVariant?.id || null
           
           // Lấy format code từ variant đầu tiên, hoặc dùng format từ props nếu không có variant
-          const currentFormat = firstVariant?.variant?.formatCode 
-            || firstVariant?.variant?.formatName 
+          const currentFormat = firstVariant?.variantFormatCode 
+            || firstVariant?.variantFormatName 
             || bookData.variantFormats?.[0]?.formatCode
             || bookData.variantFormats?.[0]?.formatName
             || book.formatCode 
@@ -218,7 +218,7 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
         isActive: form.kinhDoanh,
         categoryIds: form.maTheLoai,
         variantIds: form.dinhDang ? [parseInt(form.dinhDang)] : [],
-        supplierId: form.maNhaCungCap ?? undefined,
+        supplierId: form.maNhaCungCap || 0,
       }
 
       console.log('Update book payload:', JSON.stringify(bookPayload, null, 2))

@@ -1,59 +1,27 @@
 'use server'
 
-import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
+import { api } from '@/lib/api/fetchHandler'
+import { ResponseApi } from '@/lib/api/responseHandler'
+import { HttpStatusCode } from 'axios'
+import { NextRequest } from 'next/server'
 
 export async function PUT(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ purchaseOrderId: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session) {
-      return NextResponse.json(
-        { error: 'Chưa xác thực', message: 'Unauthorized', statusCode: 401 },
-        { status: 401 }
-      )
-    }
-
     const { purchaseOrderId } = await params
     const body = await request.json()
     const { status } = body
 
-    const purchaseOrder = await prisma.purchaseOrder.findUnique({
-      where: { id: Number(purchaseOrderId) },
-    })
+    const response = await api.put<any>(
+      `purchase-orders/${purchaseOrderId}/status`,
+      { status }
+    )
 
-    if (!purchaseOrder) {
-      return NextResponse.json(
-        { error: 'Không tìm thấy đơn đặt hàng', message: 'Purchase order not found', statusCode: 404 },
-        { status: 404 }
-      )
-    }
-
-    const updatedPurchaseOrder = await prisma.purchaseOrder.update({
-      where: { id: Number(purchaseOrderId) },
-      data: { status },
-      include: {
-        supplier: true,
-        createdBy: true,
-        approvedBy: true,
-      },
-    })
-
-    return NextResponse.json({
-      error: null,
-      message: 'Cập nhật trạng thái thành công',
-      statusCode: 200,
-      data: updatedPurchaseOrder,
-    })
+    return ResponseApi.success(response, HttpStatusCode.Ok)
   } catch (error) {
     console.error('Update status error:', error)
-    return NextResponse.json(
-      { error: 'Lỗi server', message: 'Internal server error', statusCode: 500 },
-      { status: 500 }
-    )
+    return ResponseApi.error('Internal server error', HttpStatusCode.InternalServerError)
   }
 }
