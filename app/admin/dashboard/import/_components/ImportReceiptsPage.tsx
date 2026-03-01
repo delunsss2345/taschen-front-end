@@ -1,67 +1,39 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { ImportReceiptsHeader } from './ImportReceiptsHeader'
 import { ImportReceiptsTable } from './ImportReceiptsTable'
-
-// Mock data tạm thời - chỉ hiển thị Đã duyệt
-const mockImportReceipts = [
-  {
-    id: 'PN001',
-    supplier: 'Nhà xuất bản Kim Đồng',
-    creator: 'Nguyễn Văn An',
-    date: '15/01/2025',
-    bookTypes: 5,
-    totalQuantity: 150,
-    totalAmount: 4500000,
-    status: 'APPROVED' as const,
-  },
-  {
-    id: 'PN002',
-    supplier: 'Công ty Sách Đại NAM',
-    creator: 'Trần Thị Bình',
-    date: '14/01/2025',
-    bookTypes: 3,
-    totalQuantity: 80,
-    totalAmount: 2800000,
-    status: 'APPROVED' as const,
-  },
-  {
-    id: 'PN004',
-    supplier: 'Nhà xuất bản Trẻ',
-    creator: 'Phạm Thị Dung',
-    date: '12/01/2025',
-    bookTypes: 4,
-    totalQuantity: 120,
-    totalAmount: 3600000,
-    status: 'APPROVED' as const,
-  },
-  {
-    id: 'PN006',
-    supplier: 'Công ty Sách Minh Khai',
-    creator: 'Vũ Thị Hoa',
-    date: '10/01/2025',
-    bookTypes: 2,
-    totalQuantity: 50,
-    totalAmount: 1500000,
-    status: 'APPROVED' as const,
-  },
-  {
-    id: 'PN007',
-    supplier: 'NXB Tổng hợp TP.HCM',
-    creator: 'Đặng Văn Hùng',
-    date: '09/01/2025',
-    bookTypes: 7,
-    totalQuantity: 250,
-    totalAmount: 7500000,
-    status: 'APPROVED' as const,
-  },
-]
+import { importStockService, ImportStock } from '@/services/import-stock.service'
+import { toast } from 'sonner'
 
 export function ImportReceiptsPage() {
+  const [importReceipts, setImportReceipts] = useState<ImportStock[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  const fetchImportReceipts = async () => {
+    try {
+      setIsLoading(true)
+      const data = await importStockService.getAll()
+      setImportReceipts(data)
+    } catch (error) {
+      toast.error('Không thể tải danh sách phiếu nhập')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchImportReceipts()
+  }, [])
+
   return (
     <div className="space-y-6">
       <ImportReceiptsHeader />
-      <ImportReceiptsTable importReceipts={mockImportReceipts} />
+      {isLoading ? (
+        <div className="text-center py-10 text-gray-500">Đang tải...</div>
+      ) : (
+        <ImportReceiptsTable importReceipts={importReceipts} onRefresh={fetchImportReceipts} />
+      )}
     </div>
   )
 }
