@@ -12,6 +12,8 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useAuthStore } from '@/features/auth/store/auth.store'
+import { toast } from 'sonner'
 import {
   Select,
   SelectContent,
@@ -24,7 +26,6 @@ import { supplierService } from '@/services/supplier.service'
 import type { Supplier } from '@/types/response/supplier.response'
 import { bookService } from '@/services/book.service'
 import type { Book } from '@/types/response/book.response'
-import { toast } from 'sonner'
 import { Plus } from 'lucide-react'
 import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
 
@@ -47,6 +48,7 @@ export function CreatePurchaseOrderModal({ open, onOpenChange, onSuccess }: Crea
   const [isLoading, setIsLoading] = useState(false)
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
   const [books, setBooks] = useState<Book[]>([])
+  const { currentUser } = useAuthStore()
   const [selectedSupplierId, setSelectedSupplierId] = useState<string>('')
   const [note, setNote] = useState('')
   const [items, setItems] = useState<OrderItem[]>([
@@ -114,10 +116,11 @@ export function CreatePurchaseOrderModal({ open, onOpenChange, onSuccess }: Crea
       const book = books.find(b => b.id === newItems[index].bookId)
       const variantFormats = book?.variantFormats || []
       const variantId = Number(value)
+      const selectedFormat = variantFormats.find(f => f.variantId === variantId)
       newItems[index] = {
         ...newItems[index],
         variantId: variantId > 0 ? variantId : null,
-        variantFormat: variantId > 0 && variantFormats[variantId - 1] ? variantFormats[variantId - 1] : ''
+        variantFormat: selectedFormat?.formatName || ''
       }
     } else if (field === 'quantity' || field === 'importPrice') {
       newItems[index] = {
@@ -154,11 +157,12 @@ export function CreatePurchaseOrderModal({ open, onOpenChange, onSuccess }: Crea
     try {
       setIsLoading(true)
       const payload: CreatePurchaseOrderRequest = {
+        createdById: currentUser?.id,
         supplierId: Number(selectedSupplierId),
         note: note || undefined,
         items: validItems.map(item => ({
           bookId: item.bookId,
-          variantId: item.variantId || undefined,
+          variantId: item.variantId ?? undefined,
           quantity: item.quantity,
           importPrice: item.importPrice
         }))
@@ -279,9 +283,9 @@ export function CreatePurchaseOrderModal({ open, onOpenChange, onSuccess }: Crea
                               <SelectValue placeholder="Chọn định dạng" />
                             </SelectTrigger>
                             <SelectContent position="popper">
-                              {variantFormats.map((format: string, idx: number) => (
-                                <SelectItem key={idx} value={(idx + 1).toString()}>
-                                  {format}
+                              {variantFormats.map((format) => (
+                                <SelectItem key={format.variantId} value={format.variantId?.toString() || ''}>
+                                  {format.formatName}
                                 </SelectItem>
                               ))}
                             </SelectContent>

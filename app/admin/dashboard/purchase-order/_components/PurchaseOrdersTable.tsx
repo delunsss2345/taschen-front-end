@@ -435,7 +435,7 @@ function OrderActions({
       </div>
 
       <Dialog open={showViewModal} onOpenChange={setShowViewModal}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="min-w-[800px] max-w-[800px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Chi tiết đơn đặt hàng #{selectedOrder?.id}</DialogTitle>
           </DialogHeader>
@@ -488,6 +488,7 @@ function OrderActions({
                     <thead className="bg-gray-50">
                       <tr>
                         <TableHeaderCell className="text-left">Tên sách</TableHeaderCell>
+                        <TableHeaderCell className="text-center">Định dạng</TableHeaderCell>
                         <TableHeaderCell className="text-right">Số lượng</TableHeaderCell>
                         <TableHeaderCell className="text-right">Giá nhập</TableHeaderCell>
                         <TableHeaderCell className="text-right">Thành tiền</TableHeaderCell>
@@ -497,6 +498,7 @@ function OrderActions({
                       {selectedOrder.items.map((item) => (
                         <tr key={item.id}>
                           <TableCell>{item.bookTitle}</TableCell>
+                          <TableCell className="text-center">{item.variantFormat || '-'}</TableCell>
                           <TableCell className="text-right">{item.quantity}</TableCell>
                           <TableCell className="text-right">{formatCurrency(item.importPrice)}</TableCell>
                           <TableCell className="text-right">{formatCurrency(item.quantity * item.importPrice)}</TableCell>
@@ -505,7 +507,7 @@ function OrderActions({
                     </tbody>
                     <tfoot className="bg-gray-50 font-medium">
                       <tr>
-                        <TableCell colSpan={3}>Tổng cộng</TableCell>
+                        <TableCell colSpan={4}>Tổng cộng</TableCell>
                         <TableCell className="text-right">{formatCurrency(calculateTotal(selectedOrder.items))}</TableCell>
                       </tr>
                     </tfoot>

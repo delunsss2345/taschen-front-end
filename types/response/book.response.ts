@@ -26,6 +26,7 @@ export type Book = {
   imageUrl: string;
   isActive: boolean;
   variantFormats?: {
+    variantId?: number;
     formatCode: string;
     formatName: string;
     price: number;
