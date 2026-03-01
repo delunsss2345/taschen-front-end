@@ -24,16 +24,18 @@ export interface CreateImportStockFromPORequest {
 
 export interface ImportStock {
   id: number;
-  code: string;
+  code?: string;
   supplierId: number;
   supplierName: string;
   createdById: number;
   createdByName: string;
   purchaseOrderId: number;
   importDate: string;
-  status: string;
-  totalAmount: number;
-  items: ImportStockItem[];
+  received: boolean;
+  status?: string;
+  totalAmount?: number;
+  details?: ImportStockItem[];
+  items?: ImportStockItem[];
 }
 
 export interface ImportStockItem {
@@ -41,10 +43,29 @@ export interface ImportStockItem {
   bookId: number;
   bookTitle: string;
   variantId: number;
-  variantFormat: string;
+  variantFormat?: string;
+  variantName?: string;
   quantity: number;
   importPrice: number;
   totalPrice: number;
+}
+
+export interface BatchResult {
+  batchId: number;
+  batchCode: string;
+  bookId: number;
+  bookTitle: string;
+  variantId: number;
+  variantName: string;
+  quantity: number;
+  importPrice: number;
+  isNew: boolean;
+}
+
+export interface ReceiveImportStockResponse {
+  importStockId: number;
+  received: boolean;
+  batchResults: BatchResult[];
 }
 
 async function createImportStockFromPOSafe(
@@ -66,10 +87,30 @@ async function getImportStocksSafe(filter?: ImportStockFilter): Promise<ImportSt
     url += `?purchaseOrderId=${filter.purchaseOrderId}`;
   }
   const response = await http.get<ApiResponseEnvelope<ImportStock[]>>(url);
-  return getResponseData(response) ?? [];
+  const data = getResponseData(response) ?? [];
+  // Map details to items for compatibility
+  return data.map(stock => ({
+    ...stock,
+    items: stock.items || stock.details || []
+  }));
+}
+
+async function receiveImportStockSafe(
+  importStockId: number,
+  userId: number
+): Promise<ReceiveImportStockResponse> {
+  const response = await http.post<ApiResponseEnvelope<ReceiveImportStockResponse>>(
+    `import-stocks/${importStockId}/receive?userId=${userId}`,
+    {}
+  );
+  return requireResponseData(
+    response,
+    "Receive import stock response is missing data"
+  );
 }
 
 export const importStockService = {
   createFromPO: createImportStockFromPOSafe,
   getAll: getImportStocksSafe,
+  receive: receiveImportStockSafe,
 };

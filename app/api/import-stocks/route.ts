@@ -36,7 +36,7 @@ type ImportStockItem = {
 
 type ImportStock = {
   id: number;
-  code: string;
+  code?: string;
   importDate: string;
   received: boolean;
   supplierId: number;
@@ -44,9 +44,10 @@ type ImportStock = {
   purchaseOrderId: number;
   createdById: number;
   createdByName: string;
-  status: string;
-  totalAmount: number;
-  items: ImportStockItem[];
+  status?: string;
+  totalAmount?: number;
+  details?: ImportStockItem[];
+  items?: ImportStockItem[];
 };
 
 type ImportStockApiResponse = {
