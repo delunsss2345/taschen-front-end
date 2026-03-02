@@ -5,6 +5,7 @@ import { ImportReceiptsHeader } from './ImportReceiptsHeader'
 import { ImportReceiptsTable } from './ImportReceiptsTable'
 import { importStockService, ImportStock } from '@/services/import-stock.service'
 import { toast } from 'sonner'
+import { LoadingSpinner } from '@/components/ui/loading'
 
 export function ImportReceiptsPage() {
   const [importReceipts, setImportReceipts] = useState<ImportStock[]>([])
@@ -30,7 +31,7 @@ export function ImportReceiptsPage() {
     <div className="space-y-6">
       <ImportReceiptsHeader />
       {isLoading ? (
-        <div className="text-center py-10 text-gray-500">Đang tải...</div>
+        <LoadingSpinner />
       ) : (
         <ImportReceiptsTable importReceipts={importReceipts} onRefresh={fetchImportReceipts} />
       )}

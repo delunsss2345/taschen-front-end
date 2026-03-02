@@ -141,7 +141,7 @@ export function ImportReceiptsTable({ importReceipts, onRefresh }: ImportReceipt
 
       {/* View Modal */}
       <Dialog open={showViewModal} onOpenChange={setShowViewModal}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Chi tiết phiếu nhập kho #{selectedReceipt?.id}</DialogTitle>
           </DialogHeader>
@@ -216,7 +216,7 @@ export function ImportReceiptsTable({ importReceipts, onRefresh }: ImportReceipt
 
       {/* Receive Result Modal */}
       <Dialog open={showReceiveModal} onOpenChange={setShowReceiveModal}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[100vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Kết quả nhập kho</DialogTitle>
           </DialogHeader>
