@@ -28,7 +28,7 @@ export function BatchTable({ batches }: BatchTableProps) {
             <TableHeaderCell>ID</TableHeaderCell>
             <TableHeaderCell>Mã lô</TableHeaderCell>
             <TableHeaderCell className="min-w-[200px]">Tên sách</TableHeaderCell>
-            <TableHeaderCell className="text-right w-28">Số lượng</TableHeaderCell>
+            <TableHeaderCell className="text-right w-32">Số lượng</TableHeaderCell>
             <TableHeaderCell className="text-right w-32">SL còn lại</TableHeaderCell>
             <TableHeaderCell className="text-right w-32">Giá nhập</TableHeaderCell>
             <TableHeaderCell className="text-right w-32">Giá bán</TableHeaderCell>
@@ -89,7 +89,7 @@ function BatchRow({ batch }: { batch: Batch }) {
       </TableRow>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[600px]">  
           <DialogHeader>
             <DialogTitle>Chi tiết Lô hàng</DialogTitle>
           </DialogHeader>
