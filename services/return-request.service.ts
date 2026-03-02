@@ -26,6 +26,7 @@ export interface ReturnRequest {
   createdByName: string;
   processedById: number | null;
   processedByName: string | null;
+  responseNote: string | null;
   items: ReturnRequestItem[];
 }
 
