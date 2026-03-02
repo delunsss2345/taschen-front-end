@@ -90,12 +90,12 @@ export function PromotionTable({ promotions, onView, onApprove, onReject, onPaus
           <tr className="text-gray-500 font-medium">
             <TableHeaderCell className="w-16">ID</TableHeaderCell>
             <TableHeaderCell>Tên khuyến mãi</TableHeaderCell>
-            <TableHeaderCell>Mã khuyến mãi</TableHeaderCell>
+            <TableHeaderCell className='w-40'>Mã khuyến mãi</TableHeaderCell>
             <TableHeaderCell className="text-center">Giảm giá</TableHeaderCell>
             <TableHeaderCell className="text-center">Số lượng</TableHeaderCell>
-            <TableHeaderCell>Đơn tối thiểu</TableHeaderCell>
-            <TableHeaderCell>Ngày bắt đầu</TableHeaderCell>
-            <TableHeaderCell>Ngày kết thúc</TableHeaderCell>
+            <TableHeaderCell >Đơn tối thiểu</TableHeaderCell>
+            <TableHeaderCell >Ngày bắt đầu</TableHeaderCell>
+            <TableHeaderCell >Ngày kết thúc</TableHeaderCell>
             <TableHeaderCell className="text-center">Trạng thái</TableHeaderCell>
             <TableHeaderCell className="text-center w-[240px]">Thao tác</TableHeaderCell>
           </tr>
