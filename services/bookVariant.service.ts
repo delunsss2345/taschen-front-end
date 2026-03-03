@@ -17,16 +17,24 @@ export type BookVariant = {
   variantFormatName?: string;
 };
 
+export type VariantOption = {
+  variantId: number;
+  variantFormatName: string | undefined;
+};
+
 export type BookVariantListResponse = BookVariant[];
 
 export const bookVariantService = {
-  async getVariantsByBookId(bookId: number | string): Promise<BookVariant[]> {
+  async getVariantsByBookId(bookId: number | string): Promise<VariantOption[]> {
     try {
       const response = await http.get<ApiResponseEnvelope<BookVariantListResponse>>(
         `book-variants/book/${bookId}`
       );
       const data = getResponseData<BookVariant[]>(response);
-      return data ?? [];
+      return (data ?? []).map(v => ({
+        variantId: v.variantId,
+        variantFormatName: v.variantFormatName
+      }));
     } catch {
       return [];
     }
