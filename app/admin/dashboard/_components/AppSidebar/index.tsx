@@ -6,6 +6,14 @@ import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
+import { LucideIcon } from 'lucide-react'
+
+type SidebarItem = {
+  title: string
+  url?: string
+  icon?: LucideIcon
+  items?: SidebarItem[]
+}
 
 export function AppSidebar() {
   const pathname = usePathname()
@@ -13,6 +21,46 @@ export function AppSidebar() {
 
   const toggleMenu = (title: string) => {
     setOpenMenus((prev) => ({ ...prev, [title]: !prev[title] }))
+  }
+
+  const renderItem = (item: SidebarItem) => {
+    const Icon = item.icon
+    const isActive = item.url ? pathname === item.url : false
+    const hasSubmenu = !!item.items?.length
+    const isOpen = !!openMenus[item.title]
+
+    const baseClass = cn(
+      'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
+      isActive ? 'bg-[#E8F2FF] text-[#3B82F6] font-medium' : 'text-gray-600 hover:bg-gray-50',
+    )
+
+    const iconClass = cn('h-4 w-4', isActive ? 'text-[#3B82F6]' : 'text-gray-400')
+
+    // Nếu có submenu và không có url -> dùng button để toggle
+    if (hasSubmenu && !item.url) {
+      return (
+        <div key={item.title}>
+          <button type="button" onClick={() => toggleMenu(item.title)} className={cn(baseClass, 'w-full')}>
+            {Icon ? <Icon className={iconClass} /> : null}
+            <span className="truncate">{item.title}</span>
+          </button>
+
+          {isOpen ? (
+            <div className="mt-1 ml-6 space-y-1">
+              {item.items!.map((sub) => renderItem(sub))}
+            </div>
+          ) : null}
+        </div>
+      )
+    }
+
+    // Item thường (có url)
+    return (
+      <Link key={item.title} href={item.url || '#'} className={baseClass}>
+        {Icon ? <Icon className={iconClass} /> : null}
+        <span className="truncate">{item.title}</span>
+      </Link>
+    )
   }
 
   return (
@@ -27,59 +75,7 @@ export function AppSidebar() {
         </div>
 
         <div className="px-3 space-y-1">
-          {adminSidebarData.items.map((item) => {
-            const Icon = item.icon
-            const isActive = item.url ? pathname === item.url : false
-            const hasSubmenu = !!item.items?.length
-            const isOpen = !!openMenus[item.title]
-
-            const baseClass = cn(
-              'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
-              isActive ? 'bg-[#E8F2FF] text-[#3B82F6] font-medium' : 'text-gray-600 hover:bg-gray-50',
-            )
-
-            const iconClass = cn('h-4 w-4', isActive ? 'text-[#3B82F6]' : 'text-gray-400')
-
-            // Nếu có submenu và không có url -> dùng button để toggle
-            if (hasSubmenu && !item.url) {
-              return (
-                <div key={item.title}>
-                  <button type="button" onClick={() => toggleMenu(item.title)} className={cn(baseClass, 'w-full')}>
-                    {Icon ? <Icon className={iconClass} /> : null}
-                    <span className="truncate">{item.title}</span>
-                  </button>
-
-                  {isOpen ? (
-                    <div className="mt-1 ml-6 space-y-1">
-                      {item.items!.map((sub) => {
-                        const subActive = sub.url ? pathname === sub.url : false
-                        return (
-                          <Link
-                            key={sub.title}
-                            href={sub.url || '#'}
-                            className={cn(
-                              'block px-3 py-2 rounded-lg text-sm',
-                              subActive ? 'bg-[#E8F2FF] text-[#3B82F6] font-medium' : 'text-gray-600 hover:bg-gray-50',
-                            )}
-                          >
-                            {sub.title}
-                          </Link>
-                        )
-                      })}
-                    </div>
-                  ) : null}
-                </div>
-              )
-            }
-
-            // Item thường (có url)
-            return (
-              <Link key={item.title} href={item.url || '#'} className={baseClass}>
-                {Icon ? <Icon className={iconClass} /> : null}
-                <span className="truncate">{item.title}</span>
-              </Link>
-            )
-          })}
+          {adminSidebarData.items.map((item) => renderItem(item))}
         </div>
       </SidebarContent>
 
