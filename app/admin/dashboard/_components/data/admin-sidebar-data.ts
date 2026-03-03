@@ -51,6 +51,11 @@ export const adminSidebarData = {
       icon: Users,
     },
     {
+      title: 'Quản lý Khách hàng',
+      url: '/admin/dashboard/customers',
+      icon: UserRound,
+    },
+    {
       title: 'Quản lý Đơn hàng',
       url: '/admin/dashboard/orders',
       icon: ShoppingCart,
@@ -81,14 +86,9 @@ export const adminSidebarData = {
       icon: Warehouse,
     },
     {
-      title: 'Quản lý Khách hàng',
-      url: '/admin/dashboard/customers',
-      icon: UserRound,
-    },
-    {
-      title: 'Yêu cầu Hoàn/Đổi',
-      url: '/admin/dashboard/returns',
-      icon: RotateCcw,
+      title: 'Yêu cầu Nhập kho',
+      url: '/admin/dashboard/import-requests',
+      icon: PackagePlus,
     },
     {
       title: 'Trả về Kho',
@@ -96,22 +96,9 @@ export const adminSidebarData = {
       icon: RotateCw,
     },
     {
-      title: 'Yêu cầu Nhập kho',
-      icon: PackagePlus,
-      items: [
-        {
-          title: 'Đang chờ',
-          url: '/admin/dashboard/import-requests/pending',
-        },
-        {
-          title: 'Đã duyệt',
-          url: '/admin/dashboard/import-requests/approved',
-        },
-        {
-          title: 'Từ chối',
-          url: '/admin/dashboard/import-requests/rejected',
-        },
-      ],
+      title: 'Yêu cầu Hoàn/Đổi',
+      url: '/admin/dashboard/returns',
+      icon: RotateCcw,
     },
   ],
 }
