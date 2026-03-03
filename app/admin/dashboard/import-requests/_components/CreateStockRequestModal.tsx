@@ -30,11 +30,6 @@ type BookOption = {
   title: string
 }
 
-type VariantOption = {
-  variantId: number
-  variantFormatName: string | undefined
-}
-
 interface CreateStockRequestModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void

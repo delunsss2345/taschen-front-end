@@ -40,6 +40,18 @@ export const bookVariantService = {
     }
   },
 
+  async getFullVariantsByBookId(bookId: number | string): Promise<BookVariant[]> {
+    try {
+      const response = await http.get<ApiResponseEnvelope<BookVariantListResponse>>(
+        `book-variants/book/${bookId}`
+      );
+      const data = getResponseData<BookVariant[]>(response);
+      return data ?? [];
+    } catch {
+      return [];
+    }
+  },
+
   async getVariantById(variantId: number | string): Promise<BookVariant> {
     const response = await http.get<ApiResponseEnvelope<BookVariant>>(
       `book-variants/${variantId}`

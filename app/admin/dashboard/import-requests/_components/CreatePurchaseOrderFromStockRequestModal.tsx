@@ -25,7 +25,7 @@ import { supplierService } from '@/services/supplier.service'
 import type { Supplier } from '@/types/response/supplier.response'
 import type { StockRequest } from '@/services/stock-request.service'
 import { http } from '@/utils/http'
-import { getResponseData } from '@/services/helpers/response'
+import { getResponseData, type ApiResponseEnvelope } from '@/services/helpers/response'
 import { Textarea } from '@/components/ui/textarea'
 
 interface CreatePurchaseOrderFromStockRequestModalProps {
@@ -111,7 +111,7 @@ export function CreatePurchaseOrderFromStockRequestModal({
     try {
       setIsLoading(true)
       
-      const response = await http.post<{ result: PurchaseOrderResponse }>(
+      const response = await http.post<ApiResponseEnvelope<PurchaseOrderResponse>>(
         'purchase-orders/from-stock-request',
         {
           stockRequestId: stockRequest.id,

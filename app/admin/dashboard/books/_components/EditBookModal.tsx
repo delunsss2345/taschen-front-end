@@ -135,15 +135,14 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
         // gọi song song 2 api để lấy book và variants
         Promise.all([
           bookService.getBookById(book.id),
-          bookVariantService.getVariantsByBookId(book.id)
+          bookVariantService.getFullVariantsByBookId(book.id)
         ]).then(([bookData, variants]) => {
           // Lấy variantId từ variant đầu tiên (dùng để cập nhật giá và số lượng)
           const firstVariant = variants[0]
-          const variantId = firstVariant?.id || null
+          const variantId = firstVariant?.variantId || null
           
           // Lấy format code từ variant đầu tiên, hoặc dùng format từ props nếu không có variant
-          const currentFormat = firstVariant?.variantFormatCode 
-            || firstVariant?.variantFormatName 
+          const currentFormat = firstVariant?.variantFormatName 
             || bookData.variantFormats?.[0]?.formatCode
             || bookData.variantFormats?.[0]?.formatName
             || book.formatCode 
