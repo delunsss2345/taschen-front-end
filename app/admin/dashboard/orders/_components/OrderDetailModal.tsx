@@ -88,6 +88,12 @@ export function OrderDetailModal({ orderId, open, onOpenChange }: OrderDetailMod
             Đã hoàn thành
           </Badge>
         )
+      case 'RETURNED':
+        return (
+          <Badge className="bg-blue-50 text-blue-600 hover:bg-blue-50 border-blue-100 shadow-none font-normal">
+            Đã trả
+          </Badge>
+        )
       default:
         return <Badge variant="outline">{status}</Badge>
     }

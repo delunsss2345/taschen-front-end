@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState, useEffect } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -23,12 +23,7 @@ import {
 import { MultiSelectCombobox } from './MultiSelectCombobox'
 import { ImagePlus } from 'lucide-react'
 import { toast } from 'sonner'
-
-const mockFormats = [
-  { value: 'Bìa cứng', label: 'Bìa cứng' },
-  { value: 'Bìa mềm', label: 'Bìa mềm' },
-  { value: 'E-book', label: 'E-book' },
-]
+import { formatService } from '@/services/format.service'
 
 const mockCategories = [
   { value: 1, label: 'Kinh dị' },
@@ -103,7 +98,16 @@ export function AddBookModal({ trigger }: { trigger: React.ReactNode }) {
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState<BookCreateModel>(defaultValues)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [formats, setFormats] = useState<{ value: string; label: string }[]>([])
   const fileInputRef = useRef<HTMLInputElement | null>(null)
+
+  useEffect(() => {
+    if (open) {
+      formatService.getAllFormats().then((fmts) => {
+        setFormats(fmts.map((f) => ({ value: f.formatCode, label: f.formatName })))
+      })
+    }
+  }, [open])
 
   const canSubmit = useMemo(() => {
     return form.tenSach.trim().length > 0 && form.tacGia.trim().length > 0
@@ -328,7 +332,7 @@ export function AddBookModal({ trigger }: { trigger: React.ReactNode }) {
                       <SelectValue placeholder="Chọn định dạng" />
                     </SelectTrigger>
                     <SelectContent>
-                      {mockFormats.map((fmt) => (
+                      {formats.map((fmt) => (
                         <SelectItem key={fmt.value} value={fmt.value}>
                           {fmt.label}
                         </SelectItem>

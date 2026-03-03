@@ -13,22 +13,7 @@ import {
 } from '@/components/ui/dialog'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-interface Batch {
-  id: number
-  batchCode: string
-  quantity: number
-  remainingQuantity: number
-  importPrice: number
-  productionDate: string
-  manufacturer: string
-  createdAt: string
-  bookId: number
-  bookTitle: string
-  createdById: number
-  createdByName: string
-  importStockDetailId: number
-}
+import { type Batch } from '@/services/batch.service'
 
 interface BatchTableProps {
   batches: Batch[]
@@ -43,11 +28,13 @@ export function BatchTable({ batches }: BatchTableProps) {
             <TableHeaderCell>ID</TableHeaderCell>
             <TableHeaderCell>Mã lô</TableHeaderCell>
             <TableHeaderCell className="min-w-[200px]">Tên sách</TableHeaderCell>
-            <TableHeaderCell className="text-right w-28">Số lượng</TableHeaderCell>
+            <TableHeaderCell className="text-right w-32">Số lượng</TableHeaderCell>
             <TableHeaderCell className="text-right w-32">SL còn lại</TableHeaderCell>
             <TableHeaderCell className="text-right w-32">Giá nhập</TableHeaderCell>
+            <TableHeaderCell className="text-right w-32">Giá bán</TableHeaderCell>
+            <TableHeaderCell className="w-32">Định dạng</TableHeaderCell>
             <TableHeaderCell className="w-40">Ngày sản xuất</TableHeaderCell>
-            <TableHeaderCell className="min-w-[160px]">Nhà sản xuất</TableHeaderCell>
+            <TableHeaderCell className="min-w-[160px]">Nhà cung cấp</TableHeaderCell>
             <TableHeaderCell className="min-w-[140px]">Người tạo</TableHeaderCell>
             <TableHeaderCell className="text-center w-32">Thao tác</TableHeaderCell>
           </tr>
@@ -83,8 +70,10 @@ function BatchRow({ batch }: { batch: Batch }) {
         <TableCell className="text-right">{batch.quantity}</TableCell>
         <TableCell className="text-right">{batch.remainingQuantity}</TableCell>
         <TableCell className="text-right text-red-500">{formatPrice(batch.importPrice)}</TableCell>
+        <TableCell className="text-right text-green-600">{batch.sellingPrice ? formatPrice(batch.sellingPrice) : '-'}</TableCell>
+        <TableCell>{batch.variant?.formatName || '-'}</TableCell>
         <TableCell>{formatDate(batch.productionDate)}</TableCell>
-        <TableCell>{batch.manufacturer}</TableCell>
+        <TableCell>{batch.supplierName}</TableCell>
         <TableCell>{batch.createdByName}</TableCell>
         <TableCell className="text-center">
           <Button
@@ -100,7 +89,7 @@ function BatchRow({ batch }: { batch: Batch }) {
       </TableRow>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[600px]">  
           <DialogHeader>
             <DialogTitle>Chi tiết Lô hàng</DialogTitle>
           </DialogHeader>
@@ -135,13 +124,23 @@ function BatchRow({ batch }: { batch: Batch }) {
                 <p className="font-medium text-red-500">{formatPrice(batch.importPrice)}</p>
               </div>
               <div className="space-y-1">
+                <p className="text-sm text-gray-500">Giá bán</p>
+                <p className="font-medium text-green-600">{batch.sellingPrice ? formatPrice(batch.sellingPrice) : '-'}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <p className="text-sm text-gray-500">Định dạng</p>
+                <p className="font-medium">{batch.variant?.formatName || '-'}</p>
+              </div>
+              <div className="space-y-1">
                 <p className="text-sm text-gray-500">Ngày sản xuất</p>
                 <p className="font-medium">{formatDate(batch.productionDate)}</p>
               </div>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Nhà sản xuất</p>
-              <p className="font-medium">{batch.manufacturer}</p>
+              <p className="text-sm text-gray-500">Nhà cung cấp</p>
+              <p className="font-medium">{batch.supplierName}</p>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">

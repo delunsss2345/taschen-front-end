@@ -1,14 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { ImportRequestsPage } from './_components/ImportRequestsPage'
 
 export default function ImportRequests() {
-  const router = useRouter()
-
-  useEffect(() => {
-    router.push('/admin/dashboard/import-requests/pending')
-  }, [router])
-
-  return null
+  return <ImportRequestsPage />
 }

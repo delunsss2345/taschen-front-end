@@ -12,9 +12,9 @@ import {
   BarChart3,
   PackagePlus,
   Warehouse,
-  History,
   RotateCw,
-  LayoutGrid
+  LayoutGrid,
+  FileText
 } from 'lucide-react'
 
 export const adminSidebarData = {
@@ -41,9 +41,19 @@ export const adminSidebarData = {
       icon: Tags,
     },
     {
+      title: 'Quản lý Định dạng',
+      url: '/admin/dashboard/formats',
+      icon: FileText,
+    },
+    {
       title: 'Quản lý Tài khoản',
       url: '/admin/dashboard/accounts',
       icon: Users,
+    },
+    {
+      title: 'Quản lý Khách hàng',
+      url: '/admin/dashboard/customers',
+      icon: UserRound,
     },
     {
       title: 'Quản lý Đơn hàng',
@@ -66,9 +76,9 @@ export const adminSidebarData = {
       icon: PackageCheck,
     },
     {
-      title: 'Quản lý Khách hàng',
-      url: '/admin/dashboard/customers',
-      icon: UserRound,
+      title: 'Phiếu Nhập kho',
+      url: '/admin/dashboard/import',
+      icon: LayoutGrid,
     },
     {
       title: 'Quản lý lô hàng',
@@ -76,9 +86,9 @@ export const adminSidebarData = {
       icon: Warehouse,
     },
     {
-      title: 'Yêu cầu Hoàn/Đổi',
-      url: '/admin/dashboard/returns',
-      icon: RotateCcw,
+      title: 'Yêu cầu Nhập kho',
+      url: '/admin/dashboard/import-requests',
+      icon: PackagePlus,
     },
     {
       title: 'Trả về Kho',
@@ -86,32 +96,9 @@ export const adminSidebarData = {
       icon: RotateCw,
     },
     {
-      title: 'Phiếu Nhập kho',
-      url: '/admin/dashboard/import',
-      icon: LayoutGrid,
-    },
-    {
-      title: 'Yêu cầu Nhập kho',
-      icon: PackagePlus,
-      items: [
-        {
-          title: 'Đang chờ',
-          url: '/admin/dashboard/import-requests/pending',
-        },
-        {
-          title: 'Đã duyệt',
-          url: '/admin/dashboard/import-requests/approved',
-        },
-        {
-          title: 'Từ chối',
-          url: '/admin/dashboard/import-requests/rejected',
-        },
-      ],
-    },
-    {
-      title: 'Lịch sử Hoạt động',
-      url: '/admin/dashboard/activities',
-      icon: History,
+      title: 'Yêu cầu Hoàn/Đổi',
+      url: '/admin/dashboard/returns',
+      icon: RotateCcw,
     },
   ],
 }

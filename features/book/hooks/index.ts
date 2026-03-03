@@ -3,7 +3,7 @@
 import { bookService } from "@/services/book.service";
 import type {
   CreateBookRequest,
-  UpdateBookRequest,
+  UpdateBookInfoRequest,
 } from "@/types/request/book.request";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -68,7 +68,7 @@ export const useUpdateBookMutation = () => {
       payload,
     }: {
       bookId: number | string;
-      payload: UpdateBookRequest;
+      payload: UpdateBookInfoRequest;
     }) => bookService.updateBook(bookId, payload),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: bookQueryKeys.all });

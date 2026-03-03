@@ -58,24 +58,6 @@ export function MultiSelectCombobox<TValue extends ComboboxValue = ComboboxValue
 
   return (
     <div className="space-y-2">
-      {selectedOptions.length > 0 ? (
-        <div className="flex flex-wrap gap-2">
-          {selectedOptions.map((opt) => (
-            <Badge key={String(opt.value)} variant="secondary" className="gap-1">
-              {opt.label}
-              <button
-                type="button"
-                className="cursor-pointer"
-                onClick={() => remove(opt.value)}
-                aria-label={`Bỏ ${opt.label}`}
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </Badge>
-          ))}
-        </div>
-      ) : null}
-
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
@@ -118,6 +100,24 @@ export function MultiSelectCombobox<TValue extends ComboboxValue = ComboboxValue
           </Command>
         </PopoverContent>
       </Popover>
+
+      {selectedOptions.length > 0 ? (
+        <div className="flex flex-wrap gap-2">
+          {selectedOptions.map((opt) => (
+            <Badge key={String(opt.value)} variant="secondary" className="gap-1">
+              {opt.label}
+              <button
+                type="button"
+                className="cursor-pointer"
+                onClick={() => remove(opt.value)}
+                aria-label={`Bỏ ${opt.label}`}
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          ))}
+        </div>
+      ) : null}
     </div>
   )
 }

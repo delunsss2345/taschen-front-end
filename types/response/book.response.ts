@@ -1,4 +1,5 @@
 import type { Category } from "./category.response";
+import type { Supplier } from "./supplier.response";
 
 export type BackendApiResponse<T> = {
   error: string | null;
@@ -24,9 +25,17 @@ export type Book = {
   stockQuantity: number;
   imageUrl: string;
   isActive: boolean;
-  variantFormats: string[];
+  variantFormats?: {
+    variantId?: number;
+    formatCode: string;
+    formatName: string;
+    price: number;
+    stockQuantity: number;
+  }[];
   categoryIds: number[];
   categories?: Category[];
+  supplierId?: number;
+  supplier?: Supplier;
 };
 
 export type BookListMeta = {

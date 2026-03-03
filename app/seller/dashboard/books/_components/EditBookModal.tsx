@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState, useEffect } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -23,12 +23,7 @@ import {
 import { MultiSelectCombobox } from './MultiSelectCombobox'
 import { ImagePlus } from 'lucide-react'
 import { toast } from 'sonner'
-
-const mockFormats = [
-  { value: 'Bìa cứng', label: 'Bìa cứng' },
-  { value: 'Bìa mềm', label: 'Bìa mềm' },
-  { value: 'E-book', label: 'E-book' },
-]
+import { formatService } from '@/services/format.service'
 
 const mockCategories = [
   { value: 1, label: 'Kinh dị' },
@@ -92,7 +87,16 @@ function Section({ title, children }: { title?: string; children: React.ReactNod
 
 export function EditBookModal({ trigger, book }: EditBookModalProps) {
   const [open, setOpen] = useState(false)
+  const [formats, setFormats] = useState<{ value: string; label: string }[]>([])
   const fileInputRef = useRef<HTMLInputElement | null>(null)
+
+  useEffect(() => {
+    if (open) {
+      formatService.getAllFormats().then((fmts) => {
+        setFormats(fmts.map((f) => ({ value: f.formatCode, label: f.formatName })))
+      })
+    }
+  }, [open])
 
   const [form, setForm] = useState<BookEditModel>({
     id: book.id,
@@ -308,7 +312,7 @@ export function EditBookModal({ trigger, book }: EditBookModalProps) {
                       <SelectValue placeholder="Chọn định dạng" />
                     </SelectTrigger>
                     <SelectContent>
-                      {mockFormats.map((fmt) => (
+                      {formats.map((fmt) => (
                         <SelectItem key={fmt.value} value={fmt.value}>
                           {fmt.label}
                         </SelectItem>

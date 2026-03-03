@@ -25,13 +25,9 @@ import { ImagePlus } from 'lucide-react'
 import { toast } from 'sonner'
 import { bookService } from '@/services/book.service'
 import { categoryService } from '@/services/category.service'
-import { uploadService } from '@/services/upload.service'
-
-const mockFormats = [
-  { value: 'Bìa cứng', label: 'Bìa cứng' },
-  { value: 'Bìa mềm', label: 'Bìa mềm' },
-  { value: 'E-book', label: 'E-book' },
-]
+import { supplierService } from '@/services/supplier.service'
+import { formatService } from '@/services/format.service'
+import { bookVariantService } from '@/services/bookVariant.service'
 
 export type BookEditModel = {
   id: number
@@ -47,6 +43,8 @@ export type BookEditModel = {
   kinhDoanh: boolean
   maTheLoai: number[]
   dinhDang: string
+  variantId: number | null  
+  maNhaCungCap?: number
 }
 
 type BooksTableRow = {
@@ -57,6 +55,10 @@ type BooksTableRow = {
   price: number
   quantity: number
   category: string
+  supplierId?: number
+  supplierName?: string
+  formatCode?: string
+  variantId?: number
 }
 
 interface EditBookModalProps {
@@ -89,6 +91,8 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [categories, setCategories] = useState<{ value: number; label: string }[]>([])
+  const [suppliers, setSuppliers] = useState<{ value: number; label: string }[]>([])
+  const [formats, setFormats] = useState<{ value: string; label: string; formatCode?: string }[]>([])
 
   const [form, setForm] = useState<BookEditModel>({
     id: book.id,
@@ -103,7 +107,9 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
     hinhAnh: null,
     kinhDoanh: true,
     maTheLoai: [],
-    dinhDang: '',
+    dinhDang: book.formatCode || '',
+    variantId: book.variantId || null,
+    maNhaCungCap: book.supplierId,
   })
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(book.image || null)
@@ -113,8 +119,64 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
       categoryService.getAllCategories().then((cats) => {
         setCategories(cats.map((c) => ({ value: c.id, label: c.name })))
       })
+      supplierService.getAllSuppliers().then((sups) => {
+        setSuppliers(sups.map((s) => ({ value: s.id, label: s.name })))
+      })
+      
+      
+      formatService.getAllFormats().then((fmts) => {
+        const formatOptions = fmts.map((f) => ({ 
+          value: f.id.toString(), 
+          label: f.formatName,    
+          formatCode: f.formatCode 
+        }))
+        setFormats(formatOptions)
+        
+        // gọi song song 2 api để lấy book và variants
+        Promise.all([
+          bookService.getBookById(book.id),
+          bookVariantService.getFullVariantsByBookId(book.id)
+        ]).then(([bookData, variants]) => {
+          // Lấy variantId từ variant đầu tiên (dùng để cập nhật giá và số lượng)
+          const firstVariant = variants[0]
+          const variantId = firstVariant?.variantId || null
+          
+          // Lấy format code từ variant đầu tiên, hoặc dùng format từ props nếu không có variant
+          const currentFormat = firstVariant?.variantFormatName 
+            || bookData.variantFormats?.[0]?.formatCode
+            || bookData.variantFormats?.[0]?.formatName
+            || book.formatCode 
+            || ''
+          
+          const matchedOption = formatOptions.find(f => f.formatCode === currentFormat)
+          const matchedFormat = matchedOption?.value || ''
+          
+          setForm((p) => ({
+            ...p,
+            tenSach: bookData.title,
+            tacGia: bookData.author,
+            moTa: bookData.description || '',
+            namXuatBan: bookData.publicationYear,
+            khoiLuongGram: bookData.weightGrams,
+            soTrang: bookData.pageCount,
+            gia: firstVariant?.price || bookData.price,
+            soLuongTon: firstVariant?.stockQuantity || bookData.stockQuantity,
+            kinhDoanh: bookData.isActive,
+            maTheLoai: bookData.categoryIds || [],
+            dinhDang: matchedFormat,
+            variantId: variantId || book.variantId || null,
+            maNhaCungCap: bookData.supplierId,
+          }))
+          setPreviewUrl(bookData.imageUrl || null)
+        }).catch(() => {
+          setForm((p) => ({
+            ...p,
+            maNhaCungCap: book.supplierId,
+          }))
+        })
+      })
     }
-  }, [open])
+  }, [open, book.id, book.supplierId])
 
   const canSubmit = useMemo(() => {
     return form.tenSach.trim() && form.tacGia.trim()
@@ -142,14 +204,7 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
     setIsSubmitting(true)
 
     try {
-      let imageUrl = book.image || ''
-
-      // Upload new image to Cloudinary if a new file is selected
-      if (form.hinhAnh) {
-        imageUrl = await uploadService.uploadImage(form.hinhAnh, 'books')
-      }
-
-      const payload = {
+      const bookPayload = {
         title: form.tenSach,
         author: form.tacGia,
         description: form.moTa,
@@ -158,19 +213,24 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
         pageCount: form.soTrang,
         price: form.gia,
         stockQuantity: form.soLuongTon,
-        imageUrl: imageUrl,
+        imageUrl: book.image || '',
         isActive: form.kinhDoanh,
         categoryIds: form.maTheLoai,
-        variantFormats: form.dinhDang ? [form.dinhDang] : [],
+        variantIds: form.dinhDang ? [parseInt(form.dinhDang)] : [],
+        supplierId: form.maNhaCungCap || 0,
       }
 
-      await bookService.updateBook(book.id, payload)
+      console.log('Update book payload:', JSON.stringify(bookPayload, null, 2))
+
+      // Chỉ gọi API update book (đã bao gồm variantIds)
+      await bookService.updateBook(book.id, bookPayload)
       
       toast.dismiss(loadingToast)
       toast.success('Thông tin sách đã được cập nhật.')
       setOpen(false)
       onSuccess?.()
     } catch (error) {
+      console.error('Update error:', error)
       toast.dismiss(loadingToast)
       toast.error('Có lỗi xảy ra khi cập nhật sách.')
     } finally {
@@ -183,24 +243,6 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
       open={open}
       onOpenChange={(value) => {
         setOpen(value)
-        if (value) {
-          setForm({
-            id: book.id,
-            tenSach: book.title,
-            tacGia: book.author,
-            moTa: '',
-            namXuatBan: new Date().getFullYear(),
-            khoiLuongGram: 0,
-            soTrang: 0,
-            gia: book.price,
-            soLuongTon: book.quantity,
-            hinhAnh: null,
-            kinhDoanh: true,
-            maTheLoai: [],
-            dinhDang: '',
-          })
-          setPreviewUrl(book.image || null)
-        }
       }}
     >
       <DialogTrigger asChild>{trigger}</DialogTrigger>
@@ -324,7 +366,7 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
             </Section>
 
             <Section>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Field label="Thể loại">
                   <MultiSelectCombobox
                     options={categories}
@@ -335,13 +377,35 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
                     emptyText="Không có thể loại"
                   />
                 </Field>
+                <Field label="Nhà cung cấp">
+                  <Select
+                    value={form.maNhaCungCap?.toString() || ''}
+                    onValueChange={(value) => setForm((p) => ({ ...p, maNhaCungCap: value ? Number(value) : undefined }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Chọn nhà cung cấp" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {suppliers.map((supplier) => (
+                        <SelectItem key={supplier.value} value={supplier.value.toString()}>
+                          {supplier.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
                 <Field label="Định dạng">
-                  <Select value={form.dinhDang} onValueChange={(value) => setForm((p) => ({ ...p, dinhDang: value }))}>
+                  <Select 
+                    value={form.dinhDang} 
+                    onValueChange={(value) => {
+                      setForm((p) => ({ ...p, dinhDang: value }))
+                    }}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Chọn định dạng" />
                     </SelectTrigger>
                     <SelectContent>
-                      {mockFormats.map((fmt) => (
+                      {formats.map((fmt) => (
                         <SelectItem key={fmt.value} value={fmt.value}>
                           {fmt.label}
                         </SelectItem>
@@ -349,7 +413,7 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
                     </SelectContent>
                   </Select>
                 </Field>
-                <div className="flex items-center gap-2 md:col-span-2">
+                <div className="flex items-center gap-2">
                   <Checkbox
                     id={`edit-kinh-doanh-${book.id}`}
                     checked={form.kinhDoanh}
