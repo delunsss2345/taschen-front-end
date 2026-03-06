@@ -31,6 +31,7 @@ export interface DisposalRequestItem {
   id: number;
   batchId: number;
   quantity: number;
+  remainingQuantityAfter: number | null;
   batch?: BatchInfo | null;
 }
 
