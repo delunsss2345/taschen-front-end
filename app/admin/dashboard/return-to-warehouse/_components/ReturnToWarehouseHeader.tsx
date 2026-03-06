@@ -11,12 +11,30 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-export function ReturnToWarehouseHeader() {
+interface ReturnToWarehouseHeaderProps {
+  searchTerm: string
+  onSearchChange: (value: string) => void
+  statusFilter: string
+  onStatusChange: (value: string) => void
+  onOpenCreateModal?: () => void
+}
+
+export function ReturnToWarehouseHeader({ 
+  searchTerm, 
+  onSearchChange,
+  statusFilter,
+  onStatusChange,
+  onOpenCreateModal 
+}: ReturnToWarehouseHeaderProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Yêu cầu trả hàng về kho</h1>
-        <Button variant="default" className="h-9 gap-1 px-3 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white">
+        <Button 
+          variant="default" 
+          className="h-9 gap-1 px-3 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white"
+          onClick={onOpenCreateModal}
+        >
           <Plus className="h-4 w-4" />
           Tạo yêu cầu
         </Button>
@@ -26,20 +44,21 @@ export function ReturnToWarehouseHeader() {
         <div className="relative w-80">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
-            placeholder="Tìm kiếm theo mã đơn, khách hàng..."
+            placeholder="Tìm kiếm theo mã, lý do..."
             className="pl-10 h-10 bg-white border-gray-200"
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
-        <Select>
+        <Select value={statusFilter} onValueChange={onStatusChange}>
           <SelectTrigger className="w-40 h-10 bg-white border-gray-200 cursor-pointer">
             <SelectValue placeholder="Trạng thái" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Tất cả</SelectItem>
-            <SelectItem value="pending">Chờ duyệt</SelectItem>
-            <SelectItem value="approved">Đã duyệt</SelectItem>
-            <SelectItem value="rejected">Từ chối</SelectItem>
-            <SelectItem value="completed">Hoàn thành</SelectItem>
+            <SelectItem value="PENDING">Chờ duyệt</SelectItem>
+            <SelectItem value="APPROVED">Đã duyệt</SelectItem>
+            <SelectItem value="REJECTED">Từ chối</SelectItem>
           </SelectContent>
         </Select>
       </div>
