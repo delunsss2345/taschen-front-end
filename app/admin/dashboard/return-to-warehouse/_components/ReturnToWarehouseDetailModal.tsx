@@ -142,6 +142,7 @@ export function ReturnToWarehouseDetailModal({
                       <TableHeaderCell>Mã lô</TableHeaderCell>
                       <TableHeaderCell>Tên sách</TableHeaderCell>
                       <TableHeaderCell className="text-right">Số lượng</TableHeaderCell>
+                      <TableHeaderCell className="text-right">Còn lại sau xuất hủy</TableHeaderCell>
                       <TableHeaderCell className="text-center">Thao tác</TableHeaderCell>
                     </tr>
                   </thead>
@@ -152,6 +153,13 @@ export function ReturnToWarehouseDetailModal({
                         <TableCell>#{item.batchId}</TableCell>
                         <TableCell>{item.batch?.bookTitle || '-'}</TableCell>
                         <TableCell className="text-right">{item.quantity}</TableCell>
+                        <TableCell className="text-right">
+                          {item.remainingQuantityAfter !== null ? (
+                            <span className="text-green-600 font-medium">{item.remainingQuantityAfter}</span>
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
                         <TableCell className="text-center">
                           <Button
                             variant="default"

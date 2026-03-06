@@ -12,6 +12,7 @@ type DisposalRequestItem = {
   id: number;
   batchId: number;
   quantity: number;
+  remainingQuantityAfter: number | null;
 };
 
 type DisposalRequest = {
