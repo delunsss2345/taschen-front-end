@@ -1,10 +1,10 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Pencil, Trash2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
-import { LoadingSpinner } from '@/components/ui/loading'
+import { useState } from "react";
+import { Pencil, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { TableCell, TableHeaderCell, TableRow } from "@/components/table";
+import { LoadingSpinner } from "@/components/ui/loading";
 import {
   Dialog,
   DialogContent,
@@ -12,9 +12,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { toast } from 'sonner'
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,52 +24,40 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
-import type { Format } from '@/types/response/format.response'
-import { formatService } from '@/services/format.service'
+} from "@/components/ui/alert-dialog";
+import type { Format } from "@/types/response/format.response";
+import { formatService } from "@/services/format.service";
+import { useDeleteFormatMutation } from "@/features/format";
 
 interface FormatTableProps {
-  formats: Format[]
-  isLoading?: boolean
-  onEditSuccess?: () => void
-  onDeleteSuccess?: () => void
+  formats: Format[];
+  isLoading?: boolean;
+  onEditSuccess?: () => void;
+  onDeleteSuccess?: () => void;
 }
 
-export function FormatTable({ formats, isLoading, onEditSuccess, onDeleteSuccess }: FormatTableProps) {
-  const handleDelete = async (fmt: Format) => {
-    const loadingToast = toast.loading('Đang xóa...', {
-      duration: Infinity,
-    })
+export function FormatTable({
+  formats,
+  isLoading,
+  onEditSuccess,
+  onDeleteSuccess,
+}: FormatTableProps) {
+  const deleteMutation = useDeleteFormatMutation();
 
-    try {
-      await formatService.deleteFormat(fmt.id)
-      toast.dismiss(loadingToast)
-      toast.success(`Định dạng "${fmt.formatName}" đã được xóa.`)
-      onDeleteSuccess?.()
-    } catch (error: unknown) {
-      toast.dismiss(loadingToast)
-      let errorMessage = 'Đã xảy ra lỗi không xác định'
-      
-      if (typeof error === 'object' && error !== null && 'response' in error) {
-        const axiosError = error as { response?: { data?: { message?: string; error?: string } } }
-        const backendMsg = axiosError.response?.data?.message || axiosError.response?.data?.error
-        if (backendMsg) {
-          errorMessage = backendMsg
-        }
-      } else if (error instanceof Error) {
-        errorMessage = error.message
-      }
-      
-      toast.error('Lỗi khi xóa định dạng: ' + errorMessage)
-    }
-  }
+  const handleDelete = (fmt: Format) => {
+    deleteMutation.mutate(fmt.id, {
+      onSuccess: () => {
+        onDeleteSuccess?.();
+      },
+    });
+  };
 
   if (isLoading) {
     return (
       <div className="rounded-md bg-white border border-gray-100 overflow-hidden shadow-sm">
         <LoadingSpinner />
       </div>
-    )
+    );
   }
 
   if (formats.length === 0) {
@@ -79,7 +67,7 @@ export function FormatTable({ formats, isLoading, onEditSuccess, onDeleteSuccess
           <span className="text-gray-500">Chưa có định dạng nào</span>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -90,7 +78,9 @@ export function FormatTable({ formats, isLoading, onEditSuccess, onDeleteSuccess
             <TableHeaderCell className="w-24">ID</TableHeaderCell>
             <TableHeaderCell>Mã định dạng</TableHeaderCell>
             <TableHeaderCell>Tên định dạng</TableHeaderCell>
-            <TableHeaderCell className="text-center w-48">Thao tác</TableHeaderCell>
+            <TableHeaderCell className="text-center w-48">
+              Thao tác
+            </TableHeaderCell>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-50 bg-white">
@@ -131,16 +121,26 @@ export function FormatTable({ formats, isLoading, onEditSuccess, onDeleteSuccess
                         <AlertDialogTitle>Xác nhận xóa</AlertDialogTitle>
                       </AlertDialogHeader>
                       <p className="text-sm text-gray-600">
-                        Bạn có chắc chắn muốn xóa định dạng <span className="font-medium">{fmt.formatName}</span>? 
+                        Bạn có chắc chắn muốn xóa định dạng{" "}
+                        <span className="font-medium">{fmt.formatName}</span>?
                         Hành động này không thể hoàn tác.
                       </p>
                       <AlertDialogFooter>
-                        <AlertDialogCancel className="cursor-pointer">Hủy</AlertDialogCancel>
+                        <AlertDialogCancel
+                          className="cursor-pointer"
+                          disabled={deleteMutation.isPending}
+                        >
+                          Hủy
+                        </AlertDialogCancel>
                         <AlertDialogAction
                           className="bg-red-600 hover:bg-red-700 cursor-pointer"
-                          onClick={() => handleDelete(fmt)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleDelete(fmt);
+                          }}
+                          disabled={deleteMutation.isPending}
                         >
-                          Xóa
+                          {deleteMutation.isPending ? "Đang xóa..." : "Xóa"}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -152,47 +152,55 @@ export function FormatTable({ formats, isLoading, onEditSuccess, onDeleteSuccess
         </tbody>
       </table>
     </div>
-  )
+  );
 }
 
-function EditFormatModal({ trigger, format, onSuccess }: { trigger: React.ReactNode; format: Format; onSuccess?: () => void }) {
-  const [open, setOpen] = useState(false)
-  const [formatCode, setFormatCode] = useState(format.formatCode)
-  const [formatName, setFormatName] = useState(format.formatName)
-  const [isLoading, setIsLoading] = useState(false)
+function EditFormatModal({
+  trigger,
+  format,
+  onSuccess,
+}: {
+  trigger: React.ReactNode;
+  format: Format;
+  onSuccess?: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [formatCode, setFormatCode] = useState(format.formatCode);
+  const [formatName, setFormatName] = useState(format.formatName);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleOpen = (val: boolean) => {
-    setOpen(val)
+    setOpen(val);
     if (val) {
-      setFormatCode(format.formatCode)
-      setFormatName(format.formatName)
+      setFormatCode(format.formatCode);
+      setFormatName(format.formatName);
     }
-  }
+  };
 
   const onSubmit = async () => {
-    if (!formatCode.trim() || !formatName.trim()) return
+    if (!formatCode.trim() || !formatName.trim()) return;
 
-    const loadingToast = toast.loading('Đang lưu...', {
+    const loadingToast = toast.loading("Đang lưu...", {
       duration: Infinity,
-    })
+    });
 
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       await formatService.updateFormat(format.id, {
         formatCode: formatCode.trim(),
         formatName: formatName.trim(),
-      })
-      toast.dismiss(loadingToast)
-      toast.success('Thông tin định dạng đã được cập nhật.')
-      setOpen(false)
-      onSuccess?.()
+      });
+      toast.dismiss(loadingToast);
+      toast.success("Thông tin định dạng đã được cập nhật.");
+      setOpen(false);
+      onSuccess?.();
     } catch (error) {
-      toast.dismiss(loadingToast)
-      toast.error('Không thể cập nhật định dạng')
+      toast.dismiss(loadingToast);
+      toast.error("Không thể cập nhật định dạng");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={handleOpen}>
@@ -204,26 +212,42 @@ function EditFormatModal({ trigger, format, onSuccess }: { trigger: React.ReactN
         <div className="grid gap-4 py-4 text-left">
           <div className="space-y-2">
             <label className="text-sm font-medium">Mã định dạng</label>
-            <Input value={formatCode} onChange={(e) => setFormatCode(e.target.value)} />
+            <Input
+              value={formatCode}
+              onChange={(e) => setFormatCode(e.target.value)}
+            />
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">Tên định dạng</label>
-            <Input value={formatName} onChange={(e) => setFormatName(e.target.value)} />
+            <Input
+              value={formatName}
+              onChange={(e) => setFormatName(e.target.value)}
+            />
           </div>
         </div>
         <DialogFooter className="gap-2 border-t pt-4">
-          <Button variant="outline" className="cursor-pointer" onClick={() => setOpen(false)}>
+          <Button
+            variant="outline"
+            className="cursor-pointer"
+            onClick={() => setOpen(false)}
+          >
             Hủy
           </Button>
           <Button
             className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
             onClick={onSubmit}
-            disabled={!formatCode.trim() || !formatName.trim() || isLoading || (formatCode === format.formatCode && formatName === format.formatName)}
+            disabled={
+              !formatCode.trim() ||
+              !formatName.trim() ||
+              isLoading ||
+              (formatCode === format.formatCode &&
+                formatName === format.formatName)
+            }
           >
-            {isLoading ? 'Đang lưu...' : 'Lưu'}
+            {isLoading ? "Đang lưu..." : "Lưu"}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
