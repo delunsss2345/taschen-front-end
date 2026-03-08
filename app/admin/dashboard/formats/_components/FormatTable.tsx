@@ -14,7 +14,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,8 +25,10 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import type { Format } from "@/types/response/format.response";
-import { formatService } from "@/services/format.service";
-import { useDeleteFormatMutation } from "@/features/format";
+import {
+  useDeleteFormatMutation,
+  useEditFormatMutation,
+} from "@/features/format";
 
 interface FormatTableProps {
   formats: Format[];
@@ -167,7 +168,7 @@ function EditFormatModal({
   const [open, setOpen] = useState(false);
   const [formatCode, setFormatCode] = useState(format.formatCode);
   const [formatName, setFormatName] = useState(format.formatName);
-  const [isLoading, setIsLoading] = useState(false);
+  const editMutation = useEditFormatMutation();
 
   const handleOpen = (val: boolean) => {
     setOpen(val);
@@ -177,29 +178,24 @@ function EditFormatModal({
     }
   };
 
-  const onSubmit = async () => {
+  const onSubmit = () => {
     if (!formatCode.trim() || !formatName.trim()) return;
 
-    const loadingToast = toast.loading("Đang lưu...", {
-      duration: Infinity,
-    });
-
-    try {
-      setIsLoading(true);
-      await formatService.updateFormat(format.id, {
-        formatCode: formatCode.trim(),
-        formatName: formatName.trim(),
-      });
-      toast.dismiss(loadingToast);
-      toast.success("Thông tin định dạng đã được cập nhật.");
-      setOpen(false);
-      onSuccess?.();
-    } catch (error) {
-      toast.dismiss(loadingToast);
-      toast.error("Không thể cập nhật định dạng");
-    } finally {
-      setIsLoading(false);
-    }
+    editMutation.mutate(
+      {
+        id: format.id,
+        payload: {
+          formatCode: formatCode.trim(),
+          formatName: formatName.trim(),
+        },
+      },
+      {
+        onSuccess: () => {
+          setOpen(false);
+          onSuccess?.();
+        },
+      },
+    );
   };
 
   return (
@@ -239,12 +235,12 @@ function EditFormatModal({
             disabled={
               !formatCode.trim() ||
               !formatName.trim() ||
-              isLoading ||
+              editMutation.isPending ||
               (formatCode === format.formatCode &&
                 formatName === format.formatName)
             }
           >
-            {isLoading ? "Đang lưu..." : "Lưu"}
+            {editMutation.isPending ? "Đang lưu..." : "Lưu"}
           </Button>
         </DialogFooter>
       </DialogContent>

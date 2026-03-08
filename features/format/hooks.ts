@@ -1,8 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { formatService } from "@/services/format.service";
+import {
+  formatService,
+  type UpdateFormatRequest,
+} from "@/services/format.service";
 import { useFormatStore } from "./store";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import { getErrorMessage } from "@/utils/error";
 
 export const FORMAT_QUERY_KEYS = {
   all: ["formats"] as const,
@@ -39,19 +43,36 @@ export function useDeleteFormatMutation() {
         loading: "Đang xóa...",
         success: "Đã xóa định dạng thành công.",
         error: (err: unknown) => {
-          let errorMessage = "Đã xảy ra lỗi không xác định";
-          if (typeof err === "object" && err !== null && "response" in err) {
-            const axiosError = err as {
-              response?: { data?: { message?: string; error?: string } };
-            };
-            const backendMsg =
-              axiosError.response?.data?.message ||
-              axiosError.response?.data?.error;
-            if (backendMsg) errorMessage = backendMsg;
-          } else if (err instanceof Error) {
-            errorMessage = err.message;
-          }
-          return `Lỗi khi xóa định dạng: ${errorMessage}`;
+          return `Lỗi khi xóa định dạng: ${getErrorMessage(err)}`;
+        },
+      });
+
+      return await promise;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: FORMAT_QUERY_KEYS.all });
+    },
+  });
+}
+
+export function useEditFormatMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      payload,
+    }: {
+      id: number;
+      payload: UpdateFormatRequest;
+    }) => {
+      const promise = formatService.updateFormat(id, payload);
+
+      toast.promise(promise, {
+        loading: "Đang lưu...",
+        success: "Thông tin định dạng đã được cập nhật.",
+        error: (err: unknown) => {
+          return `Không thể cập nhật định dạng: ${getErrorMessage(err)}`;
         },
       });
 
