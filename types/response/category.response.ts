@@ -1,3 +1,5 @@
+import { BaseResponse } from "./base.response";
+
 export interface Category {
   id: number;
   name: string;
@@ -5,23 +7,14 @@ export interface Category {
   description?: string;
 }
 
-export type CategoryApiResponse = {
-  error: string | null;
-  message: string;
-  statusCode: number;
-  data: Category;
-};
+export type CategoryApiResponse = BaseResponse<Category>;
 
 export type CategoryResponseWrapper = {
   success: boolean;
   data: CategoryApiResponse;
 };
-export type CategoriesApiResponse = {
-  error: string | null;
-  message: string;
-  statusCode: number;
-  data: Category[];
-};
+
+export type CategoriesApiResponse = BaseResponse<Category[]>;
 
 export type CategoriesResponseWrapper = {
   success: boolean;
