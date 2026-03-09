@@ -1,4 +1,4 @@
-import { useFormatStore } from "./store";
+import { useFormatStore } from "../store";
 
 export const useFormats = () => useFormatStore((state) => state.formats);
 export const useFormatsActions = () =>
