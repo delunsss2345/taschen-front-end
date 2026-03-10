@@ -10,7 +10,6 @@ import type {
 } from "@/types/response/book.response";
 import { http } from "@/utils/http";
 import { categoryService } from "./category.service";
-import { supplierService } from "./supplier.service";
 import {
   getListData,
   getArrayData,
@@ -18,11 +17,7 @@ import {
   requireResponseData,
   type ApiResponseEnvelope,
 } from "./helpers/response";
-import {
-  mapBooksWithCategories,
-  mapBookCategories,
-  mapBooksWithSuppliers,
-} from "./helpers/books";
+import { mapBookCategories } from "./helpers/books";
 
 export const bookService = {
   async getAllBooks(params?: {
@@ -44,16 +39,8 @@ export const bookService = {
       response,
     );
 
-    const categories = await categoryService.getCategoriesSafe();
-    const suppliers = await supplierService.getSuppliersSafe();
-    const booksWithCategories = mapBooksWithCategories(booksResult, categories);
-    const booksWithSuppliers = mapBooksWithSuppliers(
-      booksWithCategories,
-      suppliers,
-    );
-
     return {
-      result: booksWithSuppliers,
+      result: booksResult,
       meta: meta ?? { page: 1, pageSize: 10, total: 0, pages: 0 },
     };
   },

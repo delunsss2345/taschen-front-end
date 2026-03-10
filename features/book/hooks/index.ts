@@ -6,6 +6,12 @@ import type {
   UpdateBookInfoRequest,
 } from "@/types/request/book.request";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCategories } from "@/features/category/hooks";
+import { useSuppliers } from "@/features/supplier/hooks";
+import {
+  mapBooksWithCategories,
+  mapBooksWithSuppliers,
+} from "@/services/helpers/books";
 
 export const bookQueryKeys = {
   all: ["books"] as const,
@@ -16,13 +22,32 @@ export const bookQueryKeys = {
 };
 
 export const useBooksQuery = () => {
+  const { data: categories = [] } = useCategories();
+  const { data: suppliers = [] } = useSuppliers();
+
   return useQuery({
     queryKey: bookQueryKeys.all,
     queryFn: () => bookService.getAllBooks(),
+    select: (data) => {
+      const booksWithCategories = mapBooksWithCategories(
+        data.result,
+        categories,
+      );
+      const booksWithSuppliers = mapBooksWithSuppliers(
+        booksWithCategories,
+        suppliers,
+      );
+      return {
+        ...data,
+        result: booksWithSuppliers,
+      };
+    },
   });
 };
 
-export const useBookByIdQuery = (bookId: number | string | null | undefined) => {
+export const useBookByIdQuery = (
+  bookId: number | string | null | undefined,
+) => {
   return useQuery({
     queryKey: bookQueryKeys.detail(bookId ?? "unknown"),
     queryFn: () => bookService.getBookById(bookId as number | string),
@@ -42,7 +67,8 @@ export const useBooksByCategoryQuery = (
 ) => {
   return useQuery({
     queryKey: bookQueryKeys.byCategory(categoryId ?? "unknown"),
-    queryFn: () => bookService.getBooksByCategory(categoryId as number | string),
+    queryFn: () =>
+      bookService.getBooksByCategory(categoryId as number | string),
     enabled: Boolean(categoryId),
   });
 };
