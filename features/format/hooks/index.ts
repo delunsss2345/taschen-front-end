@@ -2,41 +2,66 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   formatService,
   type UpdateFormatRequest,
+  type CreateFormatRequest,
 } from "@/services/format.service";
-import { useEffect } from "react";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/utils/error";
-import { useFormatStore } from "../store";
 
-export const FORMAT_QUERY_KEYS = {
+export const formatKeys = {
   all: ["formats"] as const,
+  lists: () => [...formatKeys.all, "list"] as const,
+  details: () => [...formatKeys.all, "detail"] as const,
+  detail: (formatId: number | string) =>
+    [...formatKeys.details(), formatId] as const,
 };
 
-export function useQueryFormat() {
-  const setFormats = useFormatStore((state) => state.setFormats);
-
-  const query = useQuery({
-    queryKey: FORMAT_QUERY_KEYS.all,
-    queryFn: async () => {
-      const data = await formatService.getAllFormats();
-      return data;
-    },
+export const useFormatsQuery = () => {
+  return useQuery({
+    queryKey: formatKeys.lists(),
+    queryFn: () => formatService.getAllFormats(),
   });
+};
 
-  useEffect(() => {
-    if (query.data) {
-      setFormats(query.data);
-    }
-  }, [query.data, setFormats]);
+export const useFormatByIdQuery = (
+  formatId: number | string | null | undefined,
+) => {
+  return useQuery({
+    queryKey: formatKeys.detail(formatId ?? "unknown"),
+    queryFn: () => formatService.getFormatById(formatId as number | string),
+    enabled: Boolean(formatId),
+  });
+};
 
-  return query;
-}
-
-export function useDeleteFormatMutation() {
+export const useCreateFormatMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (payload: Omit<UpdateFormatRequest, "id">) => {
+      const promise = formatService.createFormat(
+        payload as CreateFormatRequest,
+      );
+
+      toast.promise(promise, {
+        loading: "Đang thêm...",
+        success: "Đã thêm định dạng thành công.",
+        error: (err: unknown) => {
+          return `Lỗi khi thêm định dạng: ${getErrorMessage(err)}`;
+        },
+      });
+
+      return await promise;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: formatKeys.all });
+    },
+  });
+};
+
+export const useDeleteFormatMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: number | string) => {
       const promise = formatService.deleteFormat(id);
 
       toast.promise(promise, {
@@ -50,12 +75,12 @@ export function useDeleteFormatMutation() {
       return await promise;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: FORMAT_QUERY_KEYS.all });
+      queryClient.invalidateQueries({ queryKey: formatKeys.all });
     },
   });
-}
+};
 
-export function useEditFormatMutation() {
+export const useEditFormatMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -63,7 +88,7 @@ export function useEditFormatMutation() {
       id,
       payload,
     }: {
-      id: number;
+      id: number | string;
       payload: UpdateFormatRequest;
     }) => {
       const promise = formatService.updateFormat(id, payload);
@@ -78,8 +103,11 @@ export function useEditFormatMutation() {
 
       return await promise;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: FORMAT_QUERY_KEYS.all });
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: formatKeys.all });
+      queryClient.invalidateQueries({
+        queryKey: formatKeys.detail(variables.id),
+      });
     },
   });
-}
+};

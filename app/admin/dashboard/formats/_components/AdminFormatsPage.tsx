@@ -2,13 +2,14 @@
 
 import { FormatHeader } from "./FormatHeader";
 import { FormatTable } from "./FormatTable";
-import { useQueryFormat, useFormats } from "@/features/format";
+import { useFormatsQuery } from "@/features/format";
 
 export function AdminFormatsPage() {
-  const { isPending: isLoading, refetch } = useQueryFormat();
-  const storeFormats = useFormats();
-
-  const formats = storeFormats ?? [];
+  const {
+    data: formats = [],
+    isPending: isLoading,
+    refetch,
+  } = useFormatsQuery();
 
   const handleAddSuccess = () => {
     refetch();

@@ -1,8 +1,8 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Plus, Search } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { useState } from "react";
+import { Plus, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -10,20 +10,21 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { toast } from 'sonner'
-import { formatService } from '@/services/format.service'
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { useCreateFormatMutation } from "@/features/format/hooks";
 
 interface FormatHeaderProps {
-  onSuccess?: () => void
+  onSuccess?: () => void;
 }
 
 export function FormatHeader({ onSuccess }: FormatHeaderProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">Quản lý Định dạng</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+          Quản lý Định dạng
+        </h1>
         <AddFormatModal
           onSuccess={onSuccess}
           trigger={
@@ -43,41 +44,39 @@ export function FormatHeader({ onSuccess }: FormatHeaderProps) {
         />
       </div>
     </div>
-  )
+  );
 }
 
-function AddFormatModal({ trigger, onSuccess }: { trigger: React.ReactNode; onSuccess?: () => void }) {
-  const [open, setOpen] = useState(false)
-  const [formatCode, setFormatCode] = useState('')
-  const [formatName, setFormatName] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+function AddFormatModal({
+  trigger,
+  onSuccess,
+}: {
+  trigger: React.ReactNode;
+  onSuccess?: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [formatCode, setFormatCode] = useState("");
+  const [formatName, setFormatName] = useState("");
+  const createMutation = useCreateFormatMutation();
 
-  const onSubmit = async () => {
-    if (!formatCode.trim() || !formatName.trim()) return
+  const onSubmit = () => {
+    if (!formatCode.trim() || !formatName.trim()) return;
 
-    const loadingToast = toast.loading('Đang lưu...', {
-      duration: Infinity,
-    })
-
-    try {
-      setIsLoading(true)
-      await formatService.createFormat({
+    createMutation.mutate(
+      {
         formatCode: formatCode.trim(),
         formatName: formatName.trim(),
-      })
-      toast.dismiss(loadingToast)
-      toast.success('Định dạng mới đã được thêm.')
-      setOpen(false)
-      setFormatCode('')
-      setFormatName('')
-      onSuccess?.()
-    } catch (error) {
-      toast.dismiss(loadingToast)
-      toast.error('Không thể thêm định dạng')
-    } finally {
-      setIsLoading(false)
-    }
-  }
+      },
+      {
+        onSuccess: () => {
+          setOpen(false);
+          setFormatCode("");
+          setFormatName("");
+          onSuccess?.();
+        },
+      },
+    );
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -105,18 +104,26 @@ function AddFormatModal({ trigger, onSuccess }: { trigger: React.ReactNode; onSu
           </div>
         </div>
         <DialogFooter className="gap-2 border-t pt-4">
-          <Button variant="outline" className="cursor-pointer" onClick={() => setOpen(false)}>
+          <Button
+            variant="outline"
+            className="cursor-pointer"
+            onClick={() => setOpen(false)}
+          >
             Hủy
           </Button>
           <Button
             className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
             onClick={onSubmit}
-            disabled={!formatCode.trim() || !formatName.trim() || isLoading}
+            disabled={
+              !formatCode.trim() ||
+              !formatName.trim() ||
+              createMutation.isPending
+            }
           >
-            {isLoading ? 'Đang lưu...' : 'Lưu'}
+            {createMutation.isPending ? "Đang thêm..." : "Thêm"}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
