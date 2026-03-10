@@ -11,6 +11,7 @@ import { useSuppliers } from "@/features/supplier/hooks";
 import {
   mapBooksWithCategories,
   mapBooksWithSuppliers,
+  mapBookCategories,
 } from "@/services/helpers/books";
 
 export const bookQueryKeys = {
@@ -48,10 +49,16 @@ export const useBooksQuery = () => {
 export const useBookByIdQuery = (
   bookId: number | string | null | undefined,
 ) => {
+  const { data: categories = [] } = useCategories();
+
   return useQuery({
     queryKey: bookQueryKeys.detail(bookId ?? "unknown"),
     queryFn: () => bookService.getBookById(bookId as number | string),
     enabled: Boolean(bookId),
+    select: (book) => {
+      const bookCategories = mapBookCategories(book, categories);
+      return { ...book, categories: bookCategories };
+    },
   });
 };
 

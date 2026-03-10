@@ -9,7 +9,6 @@ import type {
   BookListMeta,
 } from "@/types/response/book.response";
 import { http } from "@/utils/http";
-import { categoryService } from "./category.service";
 import {
   getListData,
   getArrayData,
@@ -17,7 +16,6 @@ import {
   requireResponseData,
   type ApiResponseEnvelope,
 } from "./helpers/response";
-import { mapBookCategories } from "./helpers/books";
 
 export const bookService = {
   async getAllBooks(params?: {
@@ -55,13 +53,7 @@ export const bookService = {
       throw new Error("Book not found");
     }
 
-    try {
-      const categories = await categoryService.getCategoriesSafe();
-      const bookCategories = mapBookCategories(book, categories);
-      return { ...book, categories: bookCategories };
-    } catch {
-      return book;
-    }
+    return book;
   },
 
   async createBook(payload: CreateBookRequest): Promise<Book> {
