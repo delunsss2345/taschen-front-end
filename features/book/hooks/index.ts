@@ -22,13 +22,17 @@ export const bookQueryKeys = {
     ["books", "category", categoryId] as const,
 };
 
-export const useBooksQuery = () => {
+export const useBooksQuery = (params?: {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+}) => {
   const { data: categories = [] } = useCategories();
   const { data: suppliers = [] } = useSuppliers();
 
   return useQuery({
-    queryKey: bookQueryKeys.all,
-    queryFn: () => bookService.getAllBooks(),
+    queryKey: [...bookQueryKeys.all, "list", params],
+    queryFn: () => bookService.getAllBooks(params),
     select: (data) => {
       const booksWithCategories = mapBooksWithCategories(
         data.result,

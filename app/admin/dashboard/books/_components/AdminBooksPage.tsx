@@ -1,67 +1,51 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { BooksHeader } from './BooksHeader'
-import { BooksTable } from './BooksTable'
-import { Pagination } from '@/components/ui/pagination'
-import { bookService } from '@/services/book.service'
-import { toast } from 'sonner'
-import type { Book, BookListMeta } from '@/types/response/book.response'
+import { useState } from "react";
+import { BooksHeader } from "./BooksHeader";
+import { BooksTable } from "./BooksTable";
+import { Pagination } from "@/components/ui/pagination";
+import { useBooksQuery } from "@/features/book/hooks";
 
 export function AdminBooksPage() {
-  const [books, setBooks] = useState<Book[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [meta, setMeta] = useState<BookListMeta | null>(null)
-  const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(5)
-  const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+  const [search, setSearch] = useState("");
 
-  const fetchBooks = async () => {
-    try {
-      setIsLoading(true)
-      const response = await bookService.getAllBooks({ page, pageSize, search: search || undefined })
-      setBooks(response.result)
-      setMeta(response.meta)
-    } catch (error) {
-      toast.error('Không thể tải danh sách sách')
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const { data, isPending, refetch } = useBooksQuery({
+    page,
+    pageSize,
+    search: search || undefined,
+  });
 
-  useEffect(() => {
-    fetchBooks()
-  }, [page, pageSize, search])
+  const books = data?.result || [];
+  const meta = data?.meta || null;
 
   const handleSearch = (searchTerm: string) => {
-    setSearch(searchTerm)
-    setPage(1)
-  }
+    setSearch(searchTerm);
+    setPage(1);
+  };
 
   const handlePageChange = (newPage: number) => {
-    setPage(newPage)
-  }
+    setPage(newPage);
+  };
 
   const handlePageSizeChange = (newPageSize: number) => {
-    setPageSize(newPageSize)
-    setPage(1)
-  }
+    setPageSize(newPageSize);
+    setPage(1);
+  };
 
-  const handleDeleteSuccess = (bookId: number) => {
-    setBooks((prev) => prev.filter((book) => book.id !== bookId))
-    if (meta) {
-      setMeta((prev) => prev ? { ...prev, total: prev.total - 1 } : null)
-    }
-  }
+  const handleDeleteSuccess = () => {
+    refetch();
+  };
 
   return (
     <div className="space-y-4">
-      <BooksHeader onSuccess={fetchBooks} onSearch={handleSearch} />
-      <BooksTable 
-        books={books} 
-        isLoading={isLoading}
+      <BooksHeader onSuccess={refetch} onSearch={handleSearch} />
+      <BooksTable
+        books={books}
+        isLoading={isPending}
         onDeleteSuccess={handleDeleteSuccess}
-        onEditSuccess={fetchBooks}
+        onEditSuccess={refetch}
       />
       {meta && (
         <Pagination
@@ -74,5 +58,5 @@ export function AdminBooksPage() {
         />
       )}
     </div>
-  )
+  );
 }
