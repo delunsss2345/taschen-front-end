@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { toast } from 'sonner'
-import { supplierService } from '@/services/supplier.service'
+import { useCreateSupplierMutation } from '@/features/supplier/hooks'
 
 interface SupplierHeaderProps {
   onSuccess?: () => void
@@ -80,35 +80,34 @@ function AddSupplierModal({ trigger, onSuccess }: { trigger: React.ReactNode; on
     address: '',
     active: true,
   })
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const onSubmit = async () => {
+  const { mutate: createSupplier, isPending: isSubmitting } = useCreateSupplierMutation()
+
+  const onSubmit = () => {
     if (!form.name.trim()) return
 
-    const loadingToast = toast.loading('Đang lưu...', {
-      duration: Infinity,
-    })
-
-    try {
-      setIsSubmitting(true)
-      await supplierService.createSupplier({
+    createSupplier(
+      {
         name: form.name,
         email: form.email,
         phone: form.phone,
         address: form.address,
         active: form.active,
-      })
-      toast.dismiss(loadingToast)
-      toast.success('Nhà cung cấp mới đã được thêm.')
-      setOpen(false)
-      setForm({ name: '', email: '', phone: '', address: '', active: true })
-      onSuccess?.()
-    } catch (error) {
-      toast.dismiss(loadingToast)
-      toast.error('Không thể thêm nhà cung cấp')
-    } finally {
-      setIsSubmitting(false)
-    }
+      },
+      {
+        onSuccess: () => {
+          toast.success('Nhà cung cấp mới đã được thêm.')
+          setOpen(false)
+          setForm({ name: '', email: '', phone: '', address: '', active: true })
+          onSuccess?.()
+        },
+        onError: (error: unknown) => {
+          const axiosError = error as { response?: { data?: { message?: string } } }
+          const errorMessage = axiosError?.response?.data?.message || 'Không thể thêm nhà cung cấp'
+          toast.error(errorMessage)
+        },
+      }
+    )
   }
 
   const handleOpenChange = (isOpen: boolean) => {
@@ -121,7 +120,7 @@ function AddSupplierModal({ trigger, onSuccess }: { trigger: React.ReactNode; on
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-150">
         <DialogHeader>
           <DialogTitle>Thêm nhà cung cấp mới</DialogTitle>
         </DialogHeader>

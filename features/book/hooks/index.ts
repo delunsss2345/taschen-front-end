@@ -7,7 +7,7 @@ import type {
 } from "@/types/request/book.request";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCategories } from "@/features/category/hooks";
-import { useSuppliers } from "@/features/supplier/hooks";
+import { useSuppliersQuery } from "@/features/supplier/hooks";
 import {
   mapBooksWithCategories,
   mapBooksWithSuppliers,
@@ -28,7 +28,7 @@ export const useBooksQuery = (params?: {
   search?: string;
 }) => {
   const { data: categories = [] } = useCategories();
-  const { data: suppliers = [] } = useSuppliers();
+  const { data: suppliers = [] } = useSuppliersQuery();
 
   return useQuery({
     queryKey: [...bookQueryKeys.all, "list", params],

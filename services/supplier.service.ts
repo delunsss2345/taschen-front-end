@@ -88,8 +88,31 @@ export const supplierService = {
       return [];
     }
   },
+  getAllSuppliersStrict: async function (): Promise<Supplier[]> {
+    const response = await http.get<ApiResponseEnvelope<Supplier[]>>("suppliers");
+    const suppliersData = getResponseData<Supplier[]>(response);
+    return suppliersData ?? [];
+  },
+
   getSupplierById: getSupplierByIdSafe,
+  getSupplierByIdStrict: async function (supplierId: number | string): Promise<Supplier | null> {
+    const response = await http.get<ApiResponseEnvelope<Supplier>>(`suppliers/${supplierId}`);
+    return getResponseData<Supplier>(response);
+  },
+
   createSupplier: createSupplierSafe,
+  createSupplierStrict: async function (payload: CreateSupplierRequest): Promise<Supplier> {
+    return this.createSupplier(payload); // safe method above doesn't catch errors internally
+  },
+
   updateSupplier: updateSupplierSafe,
+  updateSupplierStrict: async function (supplierId: number | string, payload: UpdateSupplierRequest): Promise<Supplier> {
+    return this.updateSupplier(supplierId, payload); // safe method above doesn't catch errors internally
+  },
+
   deleteSupplier: deleteSupplierSafe,
+  deleteSupplierStrict: async function (supplierId: number | string): Promise<boolean> {
+    await http.del<ApiResponseEnvelope<null>>(`suppliers/${supplierId}`);
+    return true;
+  },
 };

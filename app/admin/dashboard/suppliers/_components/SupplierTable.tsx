@@ -1,6 +1,6 @@
 'use client'
 
-import { Pencil, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/select'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { supplierService } from '@/services/supplier.service'
+import { useUpdateSupplierMutation } from '@/features/supplier/hooks'
 import type { Supplier } from '@/types/response/supplier.response'
 
 interface SupplierTableProps {
@@ -120,7 +120,6 @@ function UpdateSupplierModal({
   onSuccess?: () => void;
 }) {
   const [open, setOpen] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [form, setForm] = useState({
     name: supplier.name,
     email: supplier.email,
@@ -129,32 +128,26 @@ function UpdateSupplierModal({
     active: supplier.active,
   })
 
-  const onSubmit = async () => {
+  const { mutate: updateSupplier, isPending: isSubmitting } = useUpdateSupplierMutation()
+
+  const onSubmit = () => {
     if (!form.name.trim()) return
 
-    const loadingToast = toast.loading('Đang lưu...', {
-      duration: Infinity,
-    })
-
-    try {
-      setIsSubmitting(true)
-      await supplierService.updateSupplier(supplier.id, {
-        name: form.name,
-        email: form.email,
-        phone: form.phone,
-        address: form.address,
-        active: form.active,
-      })
-      toast.dismiss(loadingToast)
-      toast.success('Thông tin nhà cung cấp đã được cập nhật.')
-      setOpen(false)
-      onSuccess?.()
-    } catch {
-      toast.dismiss(loadingToast)
-      toast.error('Không thể cập nhật thông tin nhà cung cấp')
-    } finally {
-      setIsSubmitting(false)
-    }
+    updateSupplier(
+      { supplierId: supplier.id, payload: form },
+      {
+        onSuccess: () => {
+          toast.success('Thông tin nhà cung cấp đã được cập nhật.')
+          setOpen(false)
+          onSuccess?.()
+        },
+        onError: (error: unknown) => {
+          const axiosError = error as { response?: { data?: { message?: string } } }
+          const errorMessage = axiosError?.response?.data?.message || 'Không thể cập nhật thông tin nhà cung cấp'
+          toast.error(errorMessage)
+        },
+      }
+    )
   }
 
   const handleOpenChange = (isOpen: boolean) => {
@@ -174,7 +167,7 @@ function UpdateSupplierModal({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-150">
         <DialogHeader>
           <DialogTitle>Cập nhật nhà cung cấp</DialogTitle>
         </DialogHeader>

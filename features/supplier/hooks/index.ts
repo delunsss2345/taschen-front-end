@@ -1,19 +1,26 @@
-import { useQuery, queryOptions } from "@tanstack/react-query";
-import { supplierService } from "@/services/supplier.service";
+"use client";
 
-export const supplierKeys = {
-  all: ["suppliers"] as const,
-  lists: () => [...supplierKeys.all, "list"] as const,
+import { supplierService, type CreateSupplierRequest, type UpdateSupplierRequest } from "@/services/supplier.service";
+import { useMutation, useQuery } from "@tanstack/react-query";
+
+export const SUPPLIER_QUERY_KEY = ["suppliers"] as const;
+
+export const useSuppliersQuery = () => {
+  return useQuery({
+    queryKey: SUPPLIER_QUERY_KEY,
+    queryFn: () => supplierService.getAllSuppliersStrict(),
+  });
 };
 
-export const supplierOptions = {
-  all: () =>
-    queryOptions({
-      queryKey: supplierKeys.lists(),
-      queryFn: () => supplierService.getSuppliersSafe(),
-    }),
+export const useCreateSupplierMutation = () => {
+  return useMutation({
+    mutationFn: (payload: CreateSupplierRequest) => supplierService.createSupplierStrict(payload),
+  });
 };
 
-export const useSuppliers = () => {
-  return useQuery(supplierOptions.all());
+export const useUpdateSupplierMutation = () => {
+  return useMutation({
+    mutationFn: ({ supplierId, payload }: { supplierId: number | string; payload: UpdateSupplierRequest }) =>
+      supplierService.updateSupplierStrict(supplierId, payload),
+  });
 };
