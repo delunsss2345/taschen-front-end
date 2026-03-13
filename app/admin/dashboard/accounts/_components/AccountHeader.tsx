@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/select'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { userService } from '@/services/user.service'
+import { useCreateUserMutation } from '@/features/user/hooks'
 
 interface AccountHeaderProps {
   onRefresh?: () => void
@@ -62,7 +62,6 @@ function CreateAccountModal({
   onSuccess?: () => void 
 }) {
   const [open, setOpen] = useState(false)
-  const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({
     email: '',
     password: '',
@@ -72,49 +71,42 @@ function CreateAccountModal({
     role: 'USER',
   })
 
-  const onSubmit = async () => {
+  const { mutate: createUser, isPending: saving } = useCreateUserMutation()
+
+  const onSubmit = () => {
     if (!form.email || !form.password || !form.firstName) {
       toast.error('Vui lòng nhập đầy đủ thông tin bắt buộc')
       return
     }
 
-    const loadingToast = toast.loading('Đang tạo tài khoản...', {
-      duration: Infinity,
-    })
-
-    setSaving(true)
-    try {
-      const result = await userService.createUser({
+    createUser(
+      {
         email: form.email,
         password: form.password,
         firstName: form.firstName,
         lastName: form.lastName || undefined,
         phoneNumber: form.phone || undefined,
-      })
-
-      if (!result) {
-        toast.dismiss(loadingToast)
-        toast.error('Không thể tạo tài khoản. Vui lòng thử lại.')
-        return
+      },
+      {
+        onSuccess: () => {
+          toast.success('Tài khoản đã được tạo thành công.')
+          setOpen(false)
+          setForm({ email: '', password: '', firstName: '', lastName: '', phone: '', role: 'USER' })
+          onSuccess?.()
+        },
+        onError: (error: unknown) => {
+          const axiosError = error as { response?: { data?: { message?: string } } }
+          const errorMessage = axiosError?.response?.data?.message || 'Có lỗi xảy ra khi tạo tài khoản.'
+          toast.error(errorMessage)
+        },
       }
-
-      toast.dismiss(loadingToast)
-      toast.success('Tài khoản đã được tạo thành công.')
-      setOpen(false)
-      setForm({ email: '', password: '', firstName: '', lastName: '', phone: '', role: 'USER' })
-      onSuccess?.()
-    } catch {
-      toast.dismiss(loadingToast)
-      toast.error('Có lỗi xảy ra khi tạo tài khoản.')
-    } finally {
-      setSaving(false)
-    }
+    )
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[700px]">
+      <DialogContent className="sm:max-w-175">
         <DialogHeader>
           <DialogTitle>Tạo tài khoản nhân viên</DialogTitle>
         </DialogHeader>

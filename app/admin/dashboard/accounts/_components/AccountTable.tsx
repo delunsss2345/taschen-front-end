@@ -22,7 +22,8 @@ import {
 } from '@/components/ui/select'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { userService, type Address } from '@/services/user.service'
+import { type Address } from '@/services/user.service'
+import { useUpdateUserMutation } from '@/features/user/hooks'
 
 export interface Account {
   id: number
@@ -171,7 +172,6 @@ function UpdateAccountModal({
   onRefresh?: () => void
 }) {
   const [open, setOpen] = useState(false)
-  const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({
     fullName: account.fullName === '-' ? '' : account.fullName,
     phone: account.phone === '-' ? '' : account.phone,
@@ -179,56 +179,43 @@ function UpdateAccountModal({
     status: account.status ? 'ACTIVE' : 'INACTIVE',
   })
 
-  const onSubmit = async () => {
-    setSaving(true)
-    
-    const loadingToast = toast.loading('Đang cập nhật...', {
-      duration: Infinity,
-    })
-    
+  const { mutate: updateUser, isPending: saving } = useUpdateUserMutation()
+
+  const onSubmit = () => {
     const nameParts = form.fullName.trim().split(' ')
     const firstName = nameParts[0] || ''
     const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : undefined
 
     const updatePayload: Record<string, unknown> = {}
-    
     if (firstName) updatePayload.firstName = firstName
     if (lastName) updatePayload.lastName = lastName
     if (form.phone) updatePayload.phoneNumber = form.phone
     if (form.role) updatePayload.roles = [form.role]
     if (form.status) updatePayload.active = form.status === 'ACTIVE'
 
-    try {
-      const result = await userService.updateUser(account.id, updatePayload)
-
-      if (!result) {
-        toast.dismiss(loadingToast)
-        toast.error('Không thể cập nhật tài khoản. Vui lòng thử lại.')
-        setSaving(false)
-        return
+    updateUser(
+      { userId: account.id, payload: updatePayload },
+      {
+        onSuccess: () => {
+          const updatedAccount: Account = {
+            ...account,
+            fullName: form.fullName,
+            phone: form.phone,
+            role: form.role,
+            status: form.status === 'ACTIVE',
+          }
+          onUpdate?.(updatedAccount)
+          onRefresh?.()
+          toast.success('Thông tin tài khoản đã được cập nhật.')
+          setOpen(false)
+        },
+        onError: (error: unknown) => {
+          const axiosError = error as { response?: { data?: { message?: string } } }
+          const errorMessage = axiosError?.response?.data?.message || 'Có lỗi xảy ra khi cập nhật tài khoản.'
+          toast.error(errorMessage)
+        },
       }
-
-      const updatedAccount: Account = {
-        ...account,
-        fullName: form.fullName,
-        phone: form.phone,
-        role: form.role,
-        status: form.status === 'ACTIVE',
-      }
-
-      onUpdate?.(updatedAccount)
-      onRefresh?.()
-      toast.dismiss(loadingToast)
-      toast.success('Thông tin tài khoản đã được cập nhật.')
-      setOpen(false)
-    } catch (error: unknown) {
-      toast.dismiss(loadingToast)
-      const axiosError = error as { response?: { data?: { message?: string } } }
-      const errorMessage = axiosError?.response?.data?.message || 'Có lỗi xảy ra khi cập nhật tài khoản.'
-      toast.error(errorMessage)
-    } finally {
-      setSaving(false)
-    }
+    )
   }
 
   return (

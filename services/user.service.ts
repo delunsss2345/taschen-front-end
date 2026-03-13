@@ -63,6 +63,11 @@ export const userService = {
     }
   },
 
+  async getAllUsersStrict(): Promise<User[]> {
+    const response = await http.get<ApiResponseEnvelope<User[] | { result: User[] }>>("users");
+    return getArrayData<User>(response);
+  },
+
   async getUserById(userId: number | string): Promise<User | null> {
     try {
       const response = await http.get<ApiResponseEnvelope<User | User[]>>(`users/${userId}`);
@@ -81,6 +86,13 @@ export const userService = {
     }
   },
 
+  async createUserStrict(payload: CreateUserRequest): Promise<User> {
+    const response = await http.post<ApiResponseEnvelope<User | User[]>>("users", payload);
+    const user = getFirstUserFromResponse(response);
+    if (!user) throw new Error("Không thể tạo tài khoản");
+    return user;
+  },
+
   async updateUser(userId: number | string, payload: UpdateUserRequest): Promise<User | null> {
     try {
       const response = await http.put<ApiResponseEnvelope<User | User[]>>(`users/${userId}`, payload);
@@ -88,6 +100,13 @@ export const userService = {
     } catch {
       return null;
     }
+  },
+
+  async updateUserStrict(userId: number | string, payload: UpdateUserRequest): Promise<User> {
+    const response = await http.put<ApiResponseEnvelope<User | User[]>>(`users/${userId}`, payload);
+    const user = getFirstUserFromResponse(response);
+    if (!user) throw new Error("Không thể cập nhật tài khoản");
+    return user;
   },
 
   async deleteUser(userId: number | string): Promise<boolean> {
