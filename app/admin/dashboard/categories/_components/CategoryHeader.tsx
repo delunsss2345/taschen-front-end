@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
-import { categoryService } from '@/services/category.service'
+import { useCreateCategoryMutation } from '@/features/category/hooks'
 
 interface CategoryHeaderProps {
   onSuccess?: () => void
@@ -50,37 +50,34 @@ function AddCategoryModal({ trigger, onSuccess }: { trigger: React.ReactNode; on
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
   const [code, setCode] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { mutate: createCategory, isPending } = useCreateCategoryMutation()
 
-  const onSubmit = async () => {
+  const onSubmit = () => {
     if (!name.trim()) return
 
-    const loadingToast = toast.loading('Đang lưu...', {
-      duration: Infinity,
-    })
-
-    try {
-      setIsSubmitting(true)
-      const categoryCode = code.trim() || name.trim().toUpperCase().replace(/[^A-Z0-9]/g, '_')
-      await categoryService.createCategory({ name, code: categoryCode })
-      toast.dismiss(loadingToast)
-      toast.success('Thể loại mới đã được thêm.')
-      setOpen(false)
-      setName('')
-      setCode('')
-      onSuccess?.()
-    } catch (error) {
-      toast.dismiss(loadingToast)
-      toast.error('Không thể thêm thể loại')
-    } finally {
-      setIsSubmitting(false)
-    }
+    const categoryCode = code.trim() || name.trim().toUpperCase().replace(/[^A-Z0-9]/g, '_')
+    
+    createCategory(
+      { name, code: categoryCode },
+      {
+        onSuccess: () => {
+          toast.success('Thể loại mới đã được thêm.')
+          setOpen(false)
+          setName('')
+          setCode('')
+          onSuccess?.()
+        },
+        onError: () => {
+          toast.error('Không thể thêm thể loại')
+        }
+      }
+    )
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
           <DialogTitle>Thêm thể loại mới</DialogTitle>
         </DialogHeader>
@@ -109,9 +106,9 @@ function AddCategoryModal({ trigger, onSuccess }: { trigger: React.ReactNode; on
           <Button
             className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
             onClick={onSubmit}
-            disabled={!name.trim() || isSubmitting}
+            disabled={!name.trim() || isPending}
           >
-            {isSubmitting ? 'Đang lưu...' : 'Lưu'}
+            {isPending ? 'Đang lưu...' : 'Lưu'}
           </Button>
         </DialogFooter>
       </DialogContent>

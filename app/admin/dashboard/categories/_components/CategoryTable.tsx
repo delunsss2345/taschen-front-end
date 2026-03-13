@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Pencil, Trash2 } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
 import { LoadingSpinner } from '@/components/ui/loading'
@@ -26,7 +26,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import type { Category } from '@/types/response/category.response'
-import { categoryService } from '@/services/category.service'
+import { useUpdateCategoryMutation, useDeleteCategoryMutation } from '@/features/category/hooks'
 
 interface CategoryTableProps {
   categories: Category[]
@@ -37,43 +37,40 @@ interface CategoryTableProps {
 
 export function CategoryTable({ categories, isLoading, onEditSuccess, onDeleteSuccess }: CategoryTableProps) {
   
-  const handleDelete = async (cat: Category) => {
-    const loadingToast = toast.loading('Đang xóa...', {
-      duration: Infinity,
-    })
+  const { mutate: deleteCategory } = useDeleteCategoryMutation()
 
-    try {
-      await categoryService.deleteCategory(cat.id)
-      toast.dismiss(loadingToast)
-      toast.success(`Thể loại "${cat.name}" đã được xóa.`)
-      onDeleteSuccess?.()
-    } catch (error: unknown) {
-      toast.dismiss(loadingToast)
-      
-      // Handle AxiosError
-      let errorMessage = 'Đã xảy ra lỗi không xác định'
-      
-      if (typeof error === 'object' && error !== null && 'response' in error) {
-        // AxiosError - try to get backend message
-        const axiosError = error as { response?: { data?: { message?: string; error?: string } } }
-        const backendMsg = axiosError.response?.data?.message || axiosError.response?.data?.error
-        if (backendMsg) {
-          errorMessage = backendMsg
-        } else {
-          errorMessage = 'Lỗi HTTP 400 - Yêu cầu không hợp lệ'
+  const handleDelete = (cat: Category) => {
+    deleteCategory(cat.id, {
+      onSuccess: () => {
+        toast.success(`Thể loại "${cat.name}" đã được xóa.`)
+        onDeleteSuccess?.()
+      },
+      onError: (error: unknown) => {
+        // Handle AxiosError
+        let errorMessage = 'Đã xảy ra lỗi không xác định'
+        
+        if (typeof error === 'object' && error !== null && 'response' in error) {
+          // AxiosError - try to get backend message
+          const axiosError = error as { response?: { data?: { message?: string; error?: string } } }
+          const backendMsg = axiosError.response?.data?.message || axiosError.response?.data?.error
+          if (backendMsg) {
+            errorMessage = backendMsg
+          } else {
+            errorMessage = 'Lỗi HTTP 400 - Yêu cầu không hợp lệ'
+          }
+        } else if (error instanceof Error) {
+          errorMessage = error.message
         }
-      } else if (error instanceof Error) {
-        errorMessage = error.message
+        
+        // Check for associated books error
+        const errMsg = String(error)
+        if (errMsg.includes('associated book') || errMsg.includes('Cannot delete category') || errorMessage.includes('associated book') || errorMessage.includes('Cannot delete category')) {
+          toast.error('Không thể xóa thể loại!\nThể loại này đang gắn với một sách.')
+        } else {
+          toast.error('Lỗi khi xóa thể loại: ' + errorMessage)
+        }
       }
-      
-      // Check for associated books error
-      const errMsg = String(error)
-      if (errMsg.includes('associated book') || errMsg.includes('Cannot delete category') || errorMessage.includes('associated book') || errorMessage.includes('Cannot delete category')) {
-        toast.error('Không thể xóa thể loại!\nThể loại này đang gắn với một sách.')
-      } else {
-        toast.error('Lỗi khi xóa thể loại: ' + errorMessage)
-      }
-    }
+    })
   }
 
   if (isLoading) {
@@ -122,7 +119,6 @@ export function CategoryTable({ categories, isLoading, onEditSuccess, onDeleteSu
                         size="sm"
                         className="h-8 gap-1 px-3 bg-blue-600 hover:bg-blue-700 cursor-pointer"
                       >
-                        <Pencil className="h-3 w-3" />
                         Sửa
                       </Button>
                     }
@@ -170,28 +166,24 @@ export function CategoryTable({ categories, isLoading, onEditSuccess, onDeleteSu
 function EditCategoryModal({ trigger, category, onSuccess }: { trigger: React.ReactNode; category: Category; onSuccess?: () => void }) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState(category.name)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { mutate: updateCategory, isPending } = useUpdateCategoryMutation()
 
-  const onSubmit = async () => {
+  const onSubmit = () => {
     if (!name.trim()) return
 
-    const loadingToast = toast.loading('Đang lưu...', {
-      duration: Infinity,
-    })
-
-    try {
-      setIsSubmitting(true)
-      await categoryService.updateCategory(category.id, { name })
-      toast.dismiss(loadingToast)
-      toast.success('Thông tin thể loại đã được cập nhật.')
-      setOpen(false)
-      onSuccess?.()
-    } catch (error) {
-      toast.dismiss(loadingToast)
-      toast.error('Không thể cập nhật thể loại')
-    } finally {
-      setIsSubmitting(false)
-    }
+    updateCategory(
+      { categoryId: category.id, payload: { name } },
+      {
+        onSuccess: () => {
+          toast.success('Thông tin thể loại đã được cập nhật.')
+          setOpen(false)
+          onSuccess?.()
+        },
+        onError: () => {
+          toast.error('Không thể cập nhật thể loại')
+        }
+      }
+    )
   }
 
   return (
@@ -203,7 +195,7 @@ function EditCategoryModal({ trigger, category, onSuccess }: { trigger: React.Re
       }}
     >
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
           <DialogTitle>Chỉnh sửa thể loại</DialogTitle>
         </DialogHeader>
@@ -220,9 +212,9 @@ function EditCategoryModal({ trigger, category, onSuccess }: { trigger: React.Re
           <Button
             className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
             onClick={onSubmit}
-            disabled={!name.trim() || name === category.name || isSubmitting}
+            disabled={!name.trim() || name === category.name || isPending}
           >
-            {isSubmitting ? 'Đang lưu...' : 'Lưu'}
+            {isPending ? 'Đang lưu...' : 'Lưu'}
           </Button>
         </DialogFooter>
       </DialogContent>

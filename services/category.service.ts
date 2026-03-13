@@ -35,6 +35,12 @@ export const categoryService = {
     }
   },
 
+  async getAllCategoriesStrict(): Promise<Category[]> {
+    const response = await http.get<ApiResponseEnvelope<Category[]>>("categories");
+    const categoriesData = getResponseData<Category[]>(response);
+    return categoriesData ?? [];
+  },
+
   async getCategoryById(categoryId: number | string): Promise<Category> {
     const response = await http.get<ApiResponseEnvelope<Category>>(
       `categories/${categoryId}`,
