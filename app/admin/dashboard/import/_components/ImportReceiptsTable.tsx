@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ImportStock, importStockService, BatchResult } from '@/services/import-stock.service'
+import { ImportStock, BatchResult } from '@/services/import-stock.service'
+import { useReceiveImportStockMutation } from '@/features/import-stock/hooks'
 import { useAuthStore } from '@/features/auth/store/auth.store'
 import { toast } from 'sonner'
 import {
@@ -31,6 +32,7 @@ export function ImportReceiptsTable({ importReceipts, onRefresh }: ImportReceipt
   const [receiveResult, setReceiveResult] = useState<BatchResult[]>([])
   const [showReceiveModal, setShowReceiveModal] = useState(false)
   const { currentUser } = useAuthStore()
+  const { mutate: receiveImportStock } = useReceiveImportStockMutation()
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN').format(amount) + ' đ'
@@ -45,7 +47,7 @@ export function ImportReceiptsTable({ importReceipts, onRefresh }: ImportReceipt
     setShowViewModal(true)
   }
 
-  const handleReceive = async (receipt: ImportStock) => {
+  const handleReceive = (receipt: ImportStock) => {
     if (!currentUser) {
       toast.error('Vui lòng đăng nhập')
       return
@@ -58,19 +60,25 @@ export function ImportReceiptsTable({ importReceipts, onRefresh }: ImportReceipt
 
     const loadingToast = toast.loading('Đang nhập kho...')
     setReceivingId(receipt.id)
-    try {
-      const result = await importStockService.receive(receipt.id, currentUser.id)
-      setReceiveResult(result.batchResults)
-      setShowReceiveModal(true)
-      toast.success('Nhập kho thành công')
-      onRefresh?.()
-    } catch (error) {
-      const err = error as { response?: { data?: { error?: string; message?: string } } }
-      toast.error(err?.response?.data?.message || err?.response?.data?.error || 'Nhập kho thất bại')
-    } finally {
-      setReceivingId(null)
-      toast.dismiss(loadingToast)
-    }
+    receiveImportStock(
+      { importStockId: receipt.id, userId: currentUser.id },
+      {
+        onSuccess: (result) => {
+          setReceiveResult(result.batchResults)
+          setShowReceiveModal(true)
+          toast.success('Nhập kho thành công')
+          onRefresh?.()
+        },
+        onError: (error) => {
+          const err = error as { response?: { data?: { error?: string; message?: string } } }
+          toast.error(err?.response?.data?.message || err?.response?.data?.error || 'Nhập kho thất bại')
+        },
+        onSettled: () => {
+          setReceivingId(null)
+          toast.dismiss(loadingToast)
+        },
+      },
+    )
   }
 
   const items = selectedReceipt?.details || selectedReceipt?.items || []
