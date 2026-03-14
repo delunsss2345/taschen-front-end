@@ -10,12 +10,19 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { useAuthStore } from '@/features/auth/store/auth.store'
+import {
+  useApprovePurchaseOrderMutation,
+  useCancelPurchaseOrderMutation,
+  usePayPurchaseOrderMutation,
+  usePurchaseOrderDetailQuery,
+  useRejectPurchaseOrderMutation,
+} from '@/features/purchase-order/hooks'
 import { selectorPurchaseOrderActions } from '@/features/purchase-order/selectors'
 import { usePurchaseOrderStore } from '@/features/purchase-order/store/purchase-order.store'
-import { purchaseOrderService } from '@/services/purchase-order.service'
 import type { PurchaseOrder, PurchaseOrderItem } from '@/types/response/purchase-order.response'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { useShallow } from 'zustand/shallow'
 
 interface OrderActionsProps {
   order: PurchaseOrder
@@ -46,9 +53,16 @@ export function OrderActions({
     setIsProcessingReject,
     setIsProcessingCancel,
     setRejectReason,
-  } = usePurchaseOrderStore(selectorPurchaseOrderActions)
+  } = usePurchaseOrderStore(useShallow(selectorPurchaseOrderActions))
 
   const { currentUser } = useAuthStore()
+  const { refetch: refetchOrderDetail } = usePurchaseOrderDetailQuery(order.id, {
+    enabled: false,
+  })
+  const { mutate: approveOrder } = useApprovePurchaseOrderMutation()
+  const { mutate: rejectOrder } = useRejectPurchaseOrderMutation()
+  const { mutate: cancelOrder } = useCancelPurchaseOrderMutation()
+  const { mutate: payOrder } = usePayPurchaseOrderMutation()
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN').format(amount) + ' đ'
@@ -63,11 +77,13 @@ export function OrderActions({
   }
 
   const handleViewOrder = async () => {
-    try {
-      const orderDetail = await purchaseOrderService.getPurchaseOrderById(order.id)
-      setSelectedOrder(orderDetail)
+    const result = await refetchOrderDetail()
+    if (result.data) {
+      setSelectedOrder(result.data)
       setShowViewModal(true)
-    } catch {
+      return
+    }
+    if (result.error) {
       toast.error('Không thể tải chi tiết đơn')
     }
   }
@@ -75,68 +91,92 @@ export function OrderActions({
   const handleApproveOrder = async () => {
     if (!currentUser) return
     const loadingToast = toast.loading('Đang duyệt đơn...')
-    try {
-      await purchaseOrderService.approvePurchaseOrder(order.id, currentUser.id)
-      toast.success('Duyệt đơn thành công')
-      onStatusChange?.()
-    } catch {
-      toast.error('Duyệt đơn thất bại')
-    } finally {
-      toast.dismiss(loadingToast)
-    }
+    approveOrder(
+      { orderId: order.id, userId: currentUser.id },
+      {
+        onSuccess: () => {
+          toast.success('Duyệt đơn thành công')
+          onStatusChange?.()
+        },
+        onError: () => {
+          toast.error('Duyệt đơn thất bại')
+        },
+        onSettled: () => {
+          toast.dismiss(loadingToast)
+        },
+      },
+    )
   }
 
   const handleRejectOrder = async () => {
     if (!currentUser) return
     const loadingToast = toast.loading('Đang từ chối đơn...')
     setIsProcessingReject(true)
-    try {
-      await purchaseOrderService.rejectPurchaseOrder(order.id, currentUser.id, rejectReason)
-      toast.success('Từ chối đơn thành công')
-      setShowRejectModal(false)
-      setRejectReason('')
-      onStatusChange?.()
-    } catch {
-      toast.error('Từ chối đơn thất bại')
-    } finally {
-      setIsProcessingReject(false)
-      toast.dismiss(loadingToast)
-    }
+    rejectOrder(
+      { orderId: order.id, userId: currentUser.id, reason: rejectReason },
+      {
+        onSuccess: () => {
+          toast.success('Từ chối đơn thành công')
+          setShowRejectModal(false)
+          setRejectReason('')
+          onStatusChange?.()
+        },
+        onError: () => {
+          toast.error('Từ chối đơn thất bại')
+        },
+        onSettled: () => {
+          setIsProcessingReject(false)
+          toast.dismiss(loadingToast)
+        },
+      },
+    )
   }
 
   const handleCancelOrder = async () => {
     if (!currentUser) return
     const loadingToast = toast.loading('Đang hủy đơn...')
     setIsProcessingCancel(true)
-    try {
-      await purchaseOrderService.cancelPurchaseOrder(order.id, rejectReason, currentUser.id)
-      toast.success('Hủy đơn thành công')
-      setShowCancelModal(false)
-      setRejectReason('')
-      onStatusChange?.()
-    } catch {
-      toast.error('Hủy đơn thất bại')
-    } finally {
-      setIsProcessingCancel(false)
-      toast.dismiss(loadingToast)
-    }
+    cancelOrder(
+      { orderId: order.id, reason: rejectReason, userId: currentUser.id },
+      {
+        onSuccess: () => {
+          toast.success('Hủy đơn thành công')
+          setShowCancelModal(false)
+          setRejectReason('')
+          onStatusChange?.()
+        },
+        onError: () => {
+          toast.error('Hủy đơn thất bại')
+        },
+        onSettled: () => {
+          setIsProcessingCancel(false)
+          toast.dismiss(loadingToast)
+        },
+      },
+    )
   }
 
   const handlePayOrder = async () => {
     if (!currentUser) return
     const loadingToast = toast.loading('Đang thanh toán...')
     setIsProcessingPayment(true)
-    try {
-      await purchaseOrderService.payPurchaseOrder(order.id, currentUser.id)
-      toast.success('Thanh toán thành công')
-      setShowPaymentModal(false)
-      onStatusChange?.()
-    } catch {
-      toast.error('Thanh toán thất bại')
-    } finally {
-      setIsProcessingPayment(false)
-      toast.dismiss(loadingToast)
-    }
+    payOrder(
+      { orderId: order.id, userId: currentUser.id },
+      {
+        onSuccess: () => {
+          toast.success('Thanh toán thành công')
+          setShowPaymentModal(false)
+          onStatusChange?.()
+        },
+        onError: () => {
+          toast.error('Thanh toán thất bại')
+        },
+        onSettled: () => {
+          setIsProcessingPayment(false)
+          toast.dismiss(loadingToast)
+        },
+      },
+    )
   }
 
   return (
