@@ -7,6 +7,7 @@ import type { PurchaseOrder, PurchaseOrderItem } from '@/types/response/purchase
 import { toast } from 'sonner'
 import { purchaseOrderService } from '@/services/purchase-order.service'
 import { useAuthStore } from '@/features/auth/store/auth.store'
+import { usePurchaseOrderStore } from '@/features/purchase-order/store/purchase-order.store'
 import {
   Dialog,
   DialogContent,
@@ -35,10 +36,14 @@ export function OrderActions({
   const [showRejectModal, setShowRejectModal] = useState(false)
   const [showCancelModal, setShowCancelModal] = useState(false)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false)
-  const [isProcessingReject, setIsProcessingReject] = useState(false)
-  const [isProcessingCancel, setIsProcessingCancel] = useState(false)
-  const [rejectReason, setRejectReason] = useState('')
+  const isProcessingPayment = usePurchaseOrderStore((state) => state.isProcessingPayment)
+  const isProcessingReject = usePurchaseOrderStore((state) => state.isProcessingReject)
+  const isProcessingCancel = usePurchaseOrderStore((state) => state.isProcessingCancel)
+  const rejectReason = usePurchaseOrderStore((state) => state.rejectReason)
+  const setIsProcessingPayment = usePurchaseOrderStore((state) => state.setIsProcessingPayment)
+  const setIsProcessingReject = usePurchaseOrderStore((state) => state.setIsProcessingReject)
+  const setIsProcessingCancel = usePurchaseOrderStore((state) => state.setIsProcessingCancel)
+  const setRejectReason = usePurchaseOrderStore((state) => state.setRejectReason)
   const { currentUser } = useAuthStore()
 
   const formatCurrency = (amount: number) => {
@@ -53,21 +58,90 @@ export function OrderActions({
     return (items || []).reduce((sum: number, item: PurchaseOrderItem) => sum + (item.importPrice || 0) * (item.quantity || 0), 0)
   }
 
+  const handleViewOrder = async () => {
+    try {
+      const orderDetail = await purchaseOrderService.getPurchaseOrderById(order.id)
+      setSelectedOrder(orderDetail)
+      setShowViewModal(true)
+    } catch {
+      toast.error('Không thể tải chi tiết đơn')
+    }
+  }
+
+  const handleApproveOrder = async () => {
+    if (!currentUser) return
+    const loadingToast = toast.loading('Đang duyệt đơn...')
+    try {
+      await purchaseOrderService.approvePurchaseOrder(order.id, currentUser.id)
+      toast.success('Duyệt đơn thành công')
+      onStatusChange?.()
+    } catch {
+      toast.error('Duyệt đơn thất bại')
+    } finally {
+      toast.dismiss(loadingToast)
+    }
+  }
+
+  const handleRejectOrder = async () => {
+    if (!currentUser) return
+    const loadingToast = toast.loading('Đang từ chối đơn...')
+    setIsProcessingReject(true)
+    try {
+      await purchaseOrderService.rejectPurchaseOrder(order.id, currentUser.id, rejectReason)
+      toast.success('Từ chối đơn thành công')
+      setShowRejectModal(false)
+      setRejectReason('')
+      onStatusChange?.()
+    } catch {
+      toast.error('Từ chối đơn thất bại')
+    } finally {
+      setIsProcessingReject(false)
+      toast.dismiss(loadingToast)
+    }
+  }
+
+  const handleCancelOrder = async () => {
+    if (!currentUser) return
+    const loadingToast = toast.loading('Đang hủy đơn...')
+    setIsProcessingCancel(true)
+    try {
+      await purchaseOrderService.cancelPurchaseOrder(order.id, rejectReason, currentUser.id)
+      toast.success('Hủy đơn thành công')
+      setShowCancelModal(false)
+      setRejectReason('')
+      onStatusChange?.()
+    } catch {
+      toast.error('Hủy đơn thất bại')
+    } finally {
+      setIsProcessingCancel(false)
+      toast.dismiss(loadingToast)
+    }
+  }
+
+  const handlePayOrder = async () => {
+    if (!currentUser) return
+    const loadingToast = toast.loading('Đang thanh toán...')
+    setIsProcessingPayment(true)
+    try {
+      await purchaseOrderService.payPurchaseOrder(order.id, currentUser.id)
+      toast.success('Thanh toán thành công')
+      setShowPaymentModal(false)
+      onStatusChange?.()
+    } catch {
+      toast.error('Thanh toán thất bại')
+    } finally {
+      setIsProcessingPayment(false)
+      toast.dismiss(loadingToast)
+    }
+  }
+
   return (
     <>
       <div className="flex items-center justify-center gap-2">
         <Button
           size="sm"
           className="bg-blue-600 hover:bg-blue-700 h-8 px-4 cursor-pointer text-[13px]"
-          onClick={async () => {
-            try {
-              const orderDetail = await purchaseOrderService.getPurchaseOrderById(order.id)
-              setSelectedOrder(orderDetail)
-              setShowViewModal(true)
-            } catch {
-              toast.error('Không thể tải chi tiết đơn')
-            }
-          }}
+          onClick={handleViewOrder}
         >
           Xem
         </Button>
@@ -77,19 +151,7 @@ export function OrderActions({
             <Button
               size="sm"
               className="bg-green-600 hover:bg-green-700 h-8 px-3 cursor-pointer text-[13px]"
-              onClick={async () => {
-                if (!currentUser) return
-                const loadingToast = toast.loading('Đang duyệt đơn...')
-                try {
-                  await purchaseOrderService.approvePurchaseOrder(order.id, currentUser.id)
-                  toast.success('Duyệt đơn thành công')
-                  onStatusChange?.()
-                } catch {
-                  toast.error('Duyệt đơn thất bại')
-                } finally {
-                  toast.dismiss(loadingToast)
-                }
-              }}
+              onClick={handleApproveOrder}
             >
               Duyệt
             </Button>
@@ -247,23 +309,7 @@ export function OrderActions({
               <Button 
                 className="bg-red-600 hover:bg-red-700 cursor-pointer"
                 disabled={!rejectReason.trim() || isProcessingReject}
-                onClick={async () => {
-                  if (!currentUser) return
-                  const loadingToast = toast.loading('Đang từ chối đơn...')
-                  setIsProcessingReject(true)
-                  try {
-                    await purchaseOrderService.rejectPurchaseOrder(order.id, currentUser.id, rejectReason)
-                    toast.success('Từ chối đơn thành công')
-                    setShowRejectModal(false)
-                    setRejectReason('')
-                    onStatusChange?.()
-                  } catch {
-                    toast.error('Từ chối đơn thất bại')
-                  } finally {
-                    setIsProcessingReject(false)
-                    toast.dismiss(loadingToast)
-                  }
-                }}
+                onClick={handleRejectOrder}
               >
                 {isProcessingReject ? 'Đang xử lý...' : 'Xác nhận'}
               </Button>
@@ -299,23 +345,7 @@ export function OrderActions({
               <Button 
                 className="bg-red-600 hover:bg-red-700 cursor-pointer"
                 disabled={!rejectReason.trim() || isProcessingCancel}
-                onClick={async () => {
-                  if (!currentUser) return
-                  const loadingToast = toast.loading('Đang hủy đơn...')
-                  setIsProcessingCancel(true)
-                  try {
-                    await purchaseOrderService.cancelPurchaseOrder(order.id, rejectReason, currentUser.id)
-                    toast.success('Hủy đơn thành công')
-                    setShowCancelModal(false)
-                    setRejectReason('')
-                    onStatusChange?.()
-                  } catch {
-                    toast.error('Hủy đơn thất bại')
-                  } finally {
-                    setIsProcessingCancel(false)
-                    toast.dismiss(loadingToast)
-                  }
-                }}
+                onClick={handleCancelOrder}
               >
                 {isProcessingCancel ? 'Đang xử lý...' : 'Xác nhận'}
               </Button>
@@ -382,22 +412,7 @@ export function OrderActions({
               <Button 
                 className="bg-purple-600 hover:bg-purple-700 cursor-pointer"
                 disabled={isProcessingPayment}
-                onClick={async () => {
-                  if (!currentUser) return
-                  const loadingToast = toast.loading('Đang thanh toán...')
-                  setIsProcessingPayment(true)
-                  try {
-                    await purchaseOrderService.payPurchaseOrder(order.id, currentUser.id)
-                    toast.success('Thanh toán thành công')
-                    setShowPaymentModal(false)
-                    onStatusChange?.()
-                  } catch {
-                    toast.error('Thanh toán thất bại')
-                  } finally {
-                    setIsProcessingPayment(false)
-                    toast.dismiss(loadingToast)
-                  }
-                }}
+                onClick={handlePayOrder}
               >
                 {isProcessingPayment ? 'Đang xử lý...' : 'Xác nhận thanh toán'}
               </Button>
