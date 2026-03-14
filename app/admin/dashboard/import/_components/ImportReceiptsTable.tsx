@@ -3,17 +3,13 @@
 import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import { useAuthStore } from '@/features/auth/store/auth.store'
 import { useReceiveImportStockMutation } from '@/features/import-stock/hooks'
 import { BatchResult, ImportStock } from '@/services/import-stock.service'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { ImportReceiptViewModal } from './ImportReceiptViewModal'
+import { ImportReceiptResultModal } from './ImportReceiptResultModal'
 
 interface ImportReceiptsTableProps {
   importReceipts: ImportStock[]
@@ -81,8 +77,6 @@ export function ImportReceiptsTable({ importReceipts, onRefresh }: ImportReceipt
     )
   }
 
-  const items = selectedReceipt?.details || selectedReceipt?.items || []
-
   return (
     <>
       <div className="rounded-md bg-white border border-gray-100 overflow-hidden shadow-sm text-left font-sans">
@@ -147,129 +141,21 @@ export function ImportReceiptsTable({ importReceipts, onRefresh }: ImportReceipt
         </table>
       </div>
 
-      {/* View Modal */}
-      <Dialog open={showViewModal} onOpenChange={setShowViewModal}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Chi tiết phiếu nhập kho #{selectedReceipt?.id}</DialogTitle>
-          </DialogHeader>
-          {selectedReceipt && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Nhà cung cấp</p>
-                  <p className="font-medium">{selectedReceipt.supplierName}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Người tạo</p>
-                  <p>{selectedReceipt.createdByName}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Ngày nhập</p>
-                  <p>{formatDate(selectedReceipt.importDate)}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Trạng thái</p>
-                  <Badge className={statusConfig[selectedReceipt.received ? 'RECEIVED' : 'PENDING']?.className}>
-                    {statusConfig[selectedReceipt.received ? 'RECEIVED' : 'PENDING']?.label}
-                  </Badge>
-                </div>
-                {selectedReceipt.purchaseOrderId && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Mã đơn đặt hàng</p>
-                    <p>#{selectedReceipt.purchaseOrderId}</p>
-                  </div>
-                )}
-              </div>
+      <ImportReceiptViewModal
+        open={showViewModal}
+        onOpenChange={setShowViewModal}
+        selectedReceipt={selectedReceipt}
+        statusConfig={statusConfig}
+        formatDate={formatDate}
+        formatCurrency={formatCurrency}
+      />
 
-              <div>
-                <p className="text-sm font-medium text-gray-500 mb-2">Danh sách sách</p>
-                <div className="border rounded-md">
-                  <table className="w-full text-sm">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <TableHeaderCell className="text-left">Tên sách</TableHeaderCell>
-                        <TableHeaderCell className="text-center">Variant</TableHeaderCell>
-                        <TableHeaderCell className="text-right">Số lượng</TableHeaderCell>
-                        <TableHeaderCell className="text-right">Giá nhập</TableHeaderCell>
-                        <TableHeaderCell className="text-right">Thành tiền</TableHeaderCell>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                      {items.map((item, idx) => (
-                        <TableRow key={idx}>
-                          <TableCell>{item.bookTitle}</TableCell>
-                          <TableCell className="text-center">{item.variantName || item.variantFormat || '-'}</TableCell>
-                          <TableCell className="text-right">{item.quantity}</TableCell>
-                          <TableCell className="text-right">{formatCurrency(item.importPrice)}</TableCell>
-                          <TableCell className="text-right">{formatCurrency(item.quantity * item.importPrice)}</TableCell>
-                        </TableRow>
-                      ))}
-                    </tbody>
-                    <tfoot className="bg-gray-50 font-medium">
-                      <tr>
-                        <TableCell colSpan={4} className="text-right">Tổng cộng</TableCell>
-                        <TableCell className="text-right">
-                          {formatCurrency(items.reduce((sum, item) => sum + item.quantity * item.importPrice, 0))}
-                        </TableCell>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Receive Result Modal */}
-      <Dialog open={showReceiveModal} onOpenChange={setShowReceiveModal}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Kết quả nhập kho</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <p className="text-green-600 font-medium">Nhập kho thành công!</p>
-
-            <div className="border rounded-md">
-              <table className="w-full text-sm">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <TableHeaderCell className="text-left">Mã lô</TableHeaderCell>
-                    <TableHeaderCell className="text-left">Tên sách</TableHeaderCell>
-                    <TableHeaderCell className="text-center">Variant</TableHeaderCell>
-                    <TableHeaderCell className="text-right">Số lượng</TableHeaderCell>
-                    <TableHeaderCell className="text-right">Giá nhập</TableHeaderCell>
-                    <TableHeaderCell className="text-center">Loại</TableHeaderCell>
-                  </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {receiveResult.map((batch, idx) => (
-                    <TableRow key={idx}>
-                      <TableCell className="font-medium">{batch.batchCode}</TableCell>
-                      <TableCell>{batch.bookTitle}</TableCell>
-                      <TableCell className="text-center">{batch.variantName || '-'}</TableCell>
-                      <TableCell className="text-right">{batch.quantity}</TableCell>
-                      <TableCell className="text-right">{formatCurrency(batch.importPrice)}</TableCell>
-                      <TableCell className="text-center">
-                        <Badge className={batch.isNew ? 'bg-blue-100 text-blue-800' : 'bg-orange-100 text-orange-800'}>
-                          {batch.isNew ? 'Mới' : 'Cộng dồn'}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="flex justify-end">
-              <Button onClick={() => setShowReceiveModal(false)}>
-                Đóng
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ImportReceiptResultModal
+        open={showReceiveModal}
+        onOpenChange={setShowReceiveModal}
+        receiveResult={receiveResult}
+        formatCurrency={formatCurrency}
+      />
     </>
   )
 }
