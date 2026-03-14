@@ -1,14 +1,6 @@
 'use client'
 
-import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import { useAuthStore } from '@/features/auth/store/auth.store'
 import {
   useApprovePurchaseOrderMutation,
@@ -22,7 +14,10 @@ import { usePurchaseOrderStore } from '@/features/purchase-order/store/purchase-
 import type { PurchaseOrder, PurchaseOrderItem } from '@/types/response/purchase-order.response'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { useShallow } from 'zustand/shallow'
+import { PurchaseOrderViewModal } from './PurchaseOrderViewModal'
+import { RejectOrderModal } from './RejectOrderModal'
+import { CancelOrderModal } from './CancelOrderModal'
+import { PaymentOrderModal } from './PaymentOrderModal'
 
 interface OrderActionsProps {
   order: PurchaseOrder
@@ -53,7 +48,7 @@ export function OrderActions({
     setIsProcessingReject,
     setIsProcessingCancel,
     setRejectReason,
-  } = usePurchaseOrderStore(useShallow(selectorPurchaseOrderActions))
+  } = usePurchaseOrderStore(selectorPurchaseOrderActions)
 
   const { currentUser } = useAuthStore()
   const { refetch: refetchOrderDetail } = usePurchaseOrderDetailQuery(order.id, {
@@ -241,229 +236,52 @@ export function OrderActions({
         )}
       </div>
 
-      <Dialog open={showViewModal} onOpenChange={setShowViewModal}>
-        <DialogContent className="min-w-[800px] max-w-[800px] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Chi tiết đơn đặt hàng #{selectedOrder?.id}</DialogTitle>
-          </DialogHeader>
-          {selectedOrder && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Nhà cung cấp</p>
-                  <p className="font-medium">{selectedOrder.supplierName}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Trạng thái</p>
-                  <Badge className={statusConfig[selectedOrder.status]?.className || 'bg-gray-100'}>
-                    {statusConfig[selectedOrder.status]?.label || selectedOrder.status}
-                  </Badge>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Người tạo</p>
-                  <p>{selectedOrder.createdByName}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Người duyệt</p>
-                  <p>{selectedOrder.approvedByName || '-'}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Ngày tạo</p>
-                  <p>{formatDate(selectedOrder.createdAt)}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Ngày duyệt</p>
-                  <p>{selectedOrder.approvedAt ? formatDate(selectedOrder.approvedAt) : '-'}</p>
-                </div>
-                {selectedOrder.note && (
-                  <div className="col-span-2">
-                    <p className="text-sm font-medium text-gray-500">Ghi chú</p>
-                    <p>{selectedOrder.note}</p>
-                  </div>
-                )}
-                {selectedOrder.cancelReason && (
-                  <div className="col-span-2">
-                    <p className="text-sm font-medium text-gray-500">Lý do hủy</p>
-                    <p className="text-red-600">{selectedOrder.cancelReason}</p>
-                  </div>
-                )}
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500 mb-2">Danh sách sách</p>
-                <div className="border rounded-md">
-                  <table className="w-full text-sm">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <TableHeaderCell className="text-left">Tên sách</TableHeaderCell>
-                        <TableHeaderCell className="text-center">Định dạng</TableHeaderCell>
-                        <TableHeaderCell className="text-right">Số lượng</TableHeaderCell>
-                        <TableHeaderCell className="text-right">Giá nhập</TableHeaderCell>
-                        <TableHeaderCell className="text-right">Thành tiền</TableHeaderCell>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                      {selectedOrder.items.map((item) => (
-                        <tr key={item.id}>
-                          <TableCell>{item.bookTitle}</TableCell>
-                          <TableCell className="text-center">{item.variantFormat || '-'}</TableCell>
-                          <TableCell className="text-right">{item.quantity}</TableCell>
-                          <TableCell className="text-right">{formatCurrency(item.importPrice)}</TableCell>
-                          <TableCell className="text-right">{formatCurrency(item.quantity * item.importPrice)}</TableCell>
-                        </tr>
-                      ))}
-                    </tbody>
-                    <tfoot className="bg-gray-50 font-medium">
-                      <tr>
-                        <TableCell colSpan={4}>Tổng cộng</TableCell>
-                        <TableCell className="text-right">{formatCurrency(calculateTotal(selectedOrder.items))}</TableCell>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      <PurchaseOrderViewModal
+        open={showViewModal}
+        onOpenChange={setShowViewModal}
+        selectedOrder={selectedOrder}
+        statusConfig={statusConfig}
+        formatDate={formatDate}
+        formatCurrency={formatCurrency}
+        calculateTotal={calculateTotal}
+      />
 
-      {/* Reject Modal */}
-      <Dialog open={showRejectModal} onOpenChange={setShowRejectModal}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Từ chối đơn hàng</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium">Lý do từ chối</label>
-              <textarea
-                className="w-full mt-1 px-3 py-2 border rounded-md"
-                rows={3}
-                value={rejectReason}
-                onChange={(e) => setRejectReason(e.target.value)}
-                placeholder="Nhập lý do từ chối..."
-              />
-            </div>
-            <div className="flex justify-end gap-3">
-              <Button variant="outline" onClick={() => {
-                setShowRejectModal(false)
-                setRejectReason('')
-              }}>
-                Hủy
-              </Button>
-              <Button
-                className="bg-red-600 hover:bg-red-700 cursor-pointer"
-                disabled={!rejectReason.trim() || isProcessingReject}
-                onClick={handleRejectOrder}
-              >
-                {isProcessingReject ? 'Đang xử lý...' : 'Xác nhận'}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <RejectOrderModal
+        open={showRejectModal}
+        onOpenChange={setShowRejectModal}
+        rejectReason={rejectReason}
+        setRejectReason={setRejectReason}
+        isProcessingReject={isProcessingReject}
+        onReject={handleRejectOrder}
+        onCancel={() => {
+          setShowRejectModal(false)
+          setRejectReason('')
+        }}
+      />
 
-      {/* Cancel Modal */}
-      <Dialog open={showCancelModal} onOpenChange={setShowCancelModal}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Hủy đơn hàng</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium">Lý do hủy</label>
-              <textarea
-                className="w-full mt-1 px-3 py-2 border rounded-md"
-                rows={3}
-                value={rejectReason}
-                onChange={(e) => setRejectReason(e.target.value)}
-                placeholder="Nhập lý do hủy..."
-              />
-            </div>
-            <div className="flex justify-end gap-3">
-              <Button variant="outline" onClick={() => {
-                setShowCancelModal(false)
-                setRejectReason('')
-              }}>
-                Hủy
-              </Button>
-              <Button
-                className="bg-red-600 hover:bg-red-700 cursor-pointer"
-                disabled={!rejectReason.trim() || isProcessingCancel}
-                onClick={handleCancelOrder}
-              >
-                {isProcessingCancel ? 'Đang xử lý...' : 'Xác nhận'}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <CancelOrderModal
+        open={showCancelModal}
+        onOpenChange={setShowCancelModal}
+        rejectReason={rejectReason}
+        setRejectReason={setRejectReason}
+        isProcessingCancel={isProcessingCancel}
+        onCancelOrder={handleCancelOrder}
+        onClose={() => {
+          setShowCancelModal(false)
+          setRejectReason('')
+        }}
+      />
 
-      {/* Payment Modal */}
-      <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
-        <DialogContent className="min-w-[900px] max-w-[900px] max-h-[95vh] overflow-auto">
-          <DialogHeader>
-            <DialogTitle>Thanh toán đơn hàng #{order.id}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="p-4 bg-gray-50 rounded space-y-2">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Nhà cung cấp:</span>
-                <span className="font-medium">{order.supplierName}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Ngày tạo:</span>
-                <span className="font-medium">{order.createdAt ? new Date(order.createdAt).toLocaleDateString('vi-VN') : '-'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Tổng tiền:</span>
-                <span className="font-medium text-purple-600">{formatCurrency(calculateTotal(order.items || []))}</span>
-              </div>
-            </div>
-
-            <div className="border rounded-md">
-              <table className="w-full text-sm">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <TableHeaderCell className="text-center w-16">STT</TableHeaderCell>
-                    <TableHeaderCell>Tên sách</TableHeaderCell>
-                    <TableHeaderCell className="text-center">Variant</TableHeaderCell>
-                    <TableHeaderCell className="text-right">Số lượng</TableHeaderCell>
-                    <TableHeaderCell className="text-right">Giá nhập</TableHeaderCell>
-                    <TableHeaderCell className="text-right">Thành tiền</TableHeaderCell>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(order.items || []).map((item, index) => (
-                    <TableRow key={item.id || index}>
-                      <TableCell className="text-center">{index + 1}</TableCell>
-                      <TableCell>{item.bookTitle}</TableCell>
-                      <TableCell className="text-center">{item.variantFormat || '-'}</TableCell>
-                      <TableCell className="text-right">{item.quantity}</TableCell>
-                      <TableCell className="text-right">{formatCurrency(item.importPrice)}</TableCell>
-                      <TableCell className="text-right font-medium">
-                        {formatCurrency(item.quantity * item.importPrice)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="flex justify-end gap-3 pt-4 border-t">
-              <Button variant="outline" onClick={() => setShowPaymentModal(false)}>
-                Hủy
-              </Button>
-              <Button
-                className="bg-purple-600 hover:bg-purple-700 cursor-pointer"
-                disabled={isProcessingPayment}
-                onClick={handlePayOrder}
-              >
-                {isProcessingPayment ? 'Đang xử lý...' : 'Xác nhận thanh toán'}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <PaymentOrderModal
+        open={showPaymentModal}
+        onOpenChange={setShowPaymentModal}
+        order={order}
+        isProcessingPayment={isProcessingPayment}
+        onPay={handlePayOrder}
+        onClose={() => setShowPaymentModal(false)}
+        formatCurrency={formatCurrency}
+        calculateTotal={calculateTotal}
+      />
     </>
   )
 }
