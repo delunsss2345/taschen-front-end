@@ -1,19 +1,19 @@
 'use client'
 
-import { useState } from 'react'
 import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ImportStock, BatchResult } from '@/services/import-stock.service'
-import { useReceiveImportStockMutation } from '@/features/import-stock/hooks'
-import { useAuthStore } from '@/features/auth/store/auth.store'
-import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { useAuthStore } from '@/features/auth/store/auth.store'
+import { useReceiveImportStockMutation } from '@/features/import-stock/hooks'
+import { BatchResult, ImportStock } from '@/services/import-stock.service'
+import { useState } from 'react'
+import { toast } from 'sonner'
 
 interface ImportReceiptsTableProps {
   importReceipts: ImportStock[]
@@ -124,7 +124,7 @@ export function ImportReceiptsTable({ importReceipts, onRefresh }: ImportReceipt
                   <TableCell className="text-center">
                     <div className="flex items-center justify-center gap-1">
                       {!receipt.received && (
-                        <Button 
+                        <Button
                           className="h-8 px-2 cursor-pointer bg-green-600 hover:bg-green-700 text-white text-xs"
                           onClick={() => handleReceive(receipt)}
                           disabled={receivingId !== null}
@@ -132,7 +132,7 @@ export function ImportReceiptsTable({ importReceipts, onRefresh }: ImportReceipt
                           {receivingId === receipt.id ? 'Đang...' : 'Nhập kho'}
                         </Button>
                       )}
-                      <Button 
+                      <Button
                         className="h-8 px-2 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white text-xs"
                         onClick={() => handleView(receipt)}
                       >
@@ -181,7 +181,7 @@ export function ImportReceiptsTable({ importReceipts, onRefresh }: ImportReceipt
                   </div>
                 )}
               </div>
-              
+
               <div>
                 <p className="text-sm font-medium text-gray-500 mb-2">Danh sách sách</p>
                 <div className="border rounded-md">
@@ -230,7 +230,7 @@ export function ImportReceiptsTable({ importReceipts, onRefresh }: ImportReceipt
           </DialogHeader>
           <div className="space-y-4">
             <p className="text-green-600 font-medium">Nhập kho thành công!</p>
-            
+
             <div className="border rounded-md">
               <table className="w-full text-sm">
                 <thead className="bg-gray-50">
