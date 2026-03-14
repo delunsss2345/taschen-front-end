@@ -1,20 +1,21 @@
 'use client'
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
+import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
 import { Badge } from '@/components/ui/badge'
-import type { PurchaseOrder, PurchaseOrderItem } from '@/types/response/purchase-order.response'
-import { toast } from 'sonner'
-import { purchaseOrderService } from '@/services/purchase-order.service'
-import { useAuthStore } from '@/features/auth/store/auth.store'
-import { usePurchaseOrderStore } from '@/features/purchase-order/store/purchase-order.store'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
+import { useAuthStore } from '@/features/auth/store/auth.store'
+import { selectorPurchaseOrderActions } from '@/features/purchase-order/selectors'
+import { usePurchaseOrderStore } from '@/features/purchase-order/store/purchase-order.store'
+import { purchaseOrderService } from '@/services/purchase-order.service'
+import type { PurchaseOrder, PurchaseOrderItem } from '@/types/response/purchase-order.response'
+import { useState } from 'react'
+import { toast } from 'sonner'
 
 interface OrderActionsProps {
   order: PurchaseOrder
@@ -36,14 +37,17 @@ export function OrderActions({
   const [showRejectModal, setShowRejectModal] = useState(false)
   const [showCancelModal, setShowCancelModal] = useState(false)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
-  const isProcessingPayment = usePurchaseOrderStore((state) => state.isProcessingPayment)
-  const isProcessingReject = usePurchaseOrderStore((state) => state.isProcessingReject)
-  const isProcessingCancel = usePurchaseOrderStore((state) => state.isProcessingCancel)
-  const rejectReason = usePurchaseOrderStore((state) => state.rejectReason)
-  const setIsProcessingPayment = usePurchaseOrderStore((state) => state.setIsProcessingPayment)
-  const setIsProcessingReject = usePurchaseOrderStore((state) => state.setIsProcessingReject)
-  const setIsProcessingCancel = usePurchaseOrderStore((state) => state.setIsProcessingCancel)
-  const setRejectReason = usePurchaseOrderStore((state) => state.setRejectReason)
+  const {
+    isProcessingPayment,
+    isProcessingReject,
+    isProcessingCancel,
+    rejectReason,
+    setIsProcessingPayment,
+    setIsProcessingReject,
+    setIsProcessingCancel,
+    setRejectReason,
+  } = usePurchaseOrderStore(selectorPurchaseOrderActions)
+
   const { currentUser } = useAuthStore()
 
   const formatCurrency = (amount: number) => {
@@ -306,7 +310,7 @@ export function OrderActions({
               }}>
                 Hủy
               </Button>
-              <Button 
+              <Button
                 className="bg-red-600 hover:bg-red-700 cursor-pointer"
                 disabled={!rejectReason.trim() || isProcessingReject}
                 onClick={handleRejectOrder}
@@ -342,7 +346,7 @@ export function OrderActions({
               }}>
                 Hủy
               </Button>
-              <Button 
+              <Button
                 className="bg-red-600 hover:bg-red-700 cursor-pointer"
                 disabled={!rejectReason.trim() || isProcessingCancel}
                 onClick={handleCancelOrder}
@@ -409,7 +413,7 @@ export function OrderActions({
               <Button variant="outline" onClick={() => setShowPaymentModal(false)}>
                 Hủy
               </Button>
-              <Button 
+              <Button
                 className="bg-purple-600 hover:bg-purple-700 cursor-pointer"
                 disabled={isProcessingPayment}
                 onClick={handlePayOrder}
