@@ -1,19 +1,9 @@
 'use client'
 
-import { useState } from 'react'
 import { Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
 import { LoadingSpinner } from '@/components/ui/loading'
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
 import {
   AlertDialog,
@@ -26,7 +16,8 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import type { Category } from '@/types/response/category.response'
-import { useUpdateCategoryMutation, useDeleteCategoryMutation } from '@/features/category/hooks'
+import { useDeleteCategoryMutation } from '@/features/category/hooks'
+import { EditCategoryModal } from './EditCategoryModal'
 
 interface CategoryTableProps {
   categories: Category[]
@@ -160,64 +151,5 @@ export function CategoryTable({ categories, isLoading, onEditSuccess, onDeleteSu
         </tbody>
       </table>
     </div>
-  )
-}
-
-function EditCategoryModal({ trigger, category, onSuccess }: { trigger: React.ReactNode; category: Category; onSuccess?: () => void }) {
-  const [open, setOpen] = useState(false)
-  const [name, setName] = useState(category.name)
-  const { mutate: updateCategory, isPending } = useUpdateCategoryMutation()
-
-  const onSubmit = () => {
-    if (!name.trim()) return
-
-    updateCategory(
-      { categoryId: category.id, payload: { name } },
-      {
-        onSuccess: () => {
-          toast.success('Thông tin thể loại đã được cập nhật.')
-          setOpen(false)
-          onSuccess?.()
-        },
-        onError: () => {
-          toast.error('Không thể cập nhật thể loại')
-        }
-      }
-    )
-  }
-
-  return (
-    <Dialog
-      open={open}
-      onOpenChange={(val) => {
-        setOpen(val)
-        if (val) setName(category.name)
-      }}
-    >
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="sm:max-w-106.25">
-        <DialogHeader>
-          <DialogTitle>Chỉnh sửa thể loại</DialogTitle>
-        </DialogHeader>
-        <div className="grid gap-4 py-4 text-left">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Tên thể loại</label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} />
-          </div>
-        </div>
-        <DialogFooter className="gap-2 border-t pt-4">
-          <Button variant="outline" className="cursor-pointer" onClick={() => setOpen(false)}>
-            Hủy
-          </Button>
-          <Button
-            className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
-            onClick={onSubmit}
-            disabled={!name.trim() || name === category.name || isPending}
-          >
-            {isPending ? 'Đang lưu...' : 'Lưu'}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
   )
 }
