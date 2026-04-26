@@ -1,9 +1,4 @@
-export type BackendApiResponse<T> = {
-  error: string | null;
-  message: string;
-  statusCode: number;
-  data: T;
-};
+import type { BaseResponse } from "./base.response";
 
 export type RouteSuccessResponse<T> = {
   success: true;
@@ -29,7 +24,7 @@ export type Cart = {
 
 export type CheckoutPreview = Cart | Record<string, unknown> | null;
 
-export type CartApiResponse = BackendApiResponse<Cart>;
-export type CartItemApiResponse = BackendApiResponse<CartItem>;
-export type CheckoutApiResponse = BackendApiResponse<CheckoutPreview>;
-export type EmptyApiResponse = BackendApiResponse<null>;
+export type CartApiResponse = BaseResponse<Cart>;
+export type CartItemApiResponse = BaseResponse<CartItem>;
+export type CheckoutApiResponse = BaseResponse<CheckoutPreview>;
+export type EmptyApiResponse = BaseResponse<null>;

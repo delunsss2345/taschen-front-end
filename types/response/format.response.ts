@@ -1,4 +1,4 @@
-import type { BackendApiResponse } from "./book.response";
+import type { BaseResponse } from "./base.response";
 
 export type Format = {
   id: number;
@@ -8,4 +8,4 @@ export type Format = {
 
 export type FormatListData = Format[];
 
-export type FormatApiResponse = BackendApiResponse<FormatListData>;
+export type FormatApiResponse = BaseResponse<FormatListData>;

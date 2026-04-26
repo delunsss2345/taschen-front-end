@@ -7,7 +7,7 @@ import { CreatePurchaseOrderModal } from './CreatePurchaseOrderModal'
 import { purchaseOrderService, type PurchaseOrder } from '@/services/purchase-order.service'
 import { LoadingSpinner } from '@/components/ui/loading'
 import { toast } from 'sonner'
-import { PromotionTabs } from '@/app/admin/dashboard/promotions/_components/PromotionTabs'
+import { PromotionTabs } from '@/app/(dashboard)/_features/promotions/PromotionTabs'
 
 const TAB_STATUS_MAP: Record<string, string | null> = {
   all: null,

@@ -1,44 +1,25 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { SupplierHeader } from './SupplierHeader'
 import { SupplierTable } from './SupplierTable'
-import { supplierService } from '@/services/supplier.service'
-import type { Supplier } from '@/types/response/supplier.response'
+import { useSuppliersQuery } from '@/features/supplier/hooks'
 import { toast } from 'sonner'
 
 export function AdminSuppliersPage() {
-  const [suppliers, setSuppliers] = useState<Supplier[]>([])
-  const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
 
-  const fetchSuppliers = async () => {
-    try {
-      setIsLoading(true)
-      const data = await supplierService.getAllSuppliers()
-      setSuppliers(data)
-    } catch (error) {
-      toast.error('Không thể tải danh sách nhà cung cấp')
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const { data: suppliers, isPending, isError, refetch } = useSuppliersQuery()
 
   useEffect(() => {
-    fetchSuppliers()
-  }, [])
-
-  const handleAddSuccess = () => {
-    fetchSuppliers()
-  }
-
-  const handleEditSuccess = () => {
-    fetchSuppliers()
-  }
+    if (isError) {
+      toast.error('Không thể tải danh sách nhà cung cấp')
+    }
+  }, [isError])
 
   const filteredSuppliers = useMemo(() => {
-    let result = suppliers
+    let result = suppliers ?? []
 
     // Filter by status
     if (statusFilter !== 'all') {
@@ -62,17 +43,17 @@ export function AdminSuppliersPage() {
 
   return (
     <div className="space-y-4">
-      <SupplierHeader 
-        onSuccess={handleAddSuccess}
+      <SupplierHeader
+        onSuccess={refetch}
         searchValue={searchQuery}
         onSearchChange={setSearchQuery}
         statusFilter={statusFilter}
         onStatusChange={setStatusFilter}
       />
-      <SupplierTable 
-        suppliers={filteredSuppliers} 
-        isLoading={isLoading}
-        onEditSuccess={handleEditSuccess}
+      <SupplierTable
+        suppliers={filteredSuppliers}
+        isLoading={isPending}
+        onEditSuccess={refetch}
       />
     </div>
   )

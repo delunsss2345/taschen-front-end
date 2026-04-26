@@ -1,12 +1,6 @@
 import type { Category } from "./category.response";
 import type { Supplier } from "./supplier.response";
-
-export type BackendApiResponse<T> = {
-  error: string | null;
-  message: string;
-  statusCode: number;
-  data: T;
-};
+import type { BaseResponse } from "./base.response";
 
 export type RouteSuccessResponse<T> = {
   success: true;
@@ -50,6 +44,6 @@ export type BookListData = {
   result: Book[];
 };
 
-export type BooksApiResponse = BackendApiResponse<BookListData>;
-export type BookApiResponse = BackendApiResponse<Book>;
-export type DeleteBookApiResponse = BackendApiResponse<null>;
+export type BooksApiResponse = BaseResponse<BookListData>;
+export type BookApiResponse = BaseResponse<Book>;
+export type DeleteBookApiResponse = BaseResponse<null>;

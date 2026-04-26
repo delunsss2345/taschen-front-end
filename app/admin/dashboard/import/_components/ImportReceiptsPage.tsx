@@ -3,36 +3,27 @@
 import { useEffect, useState, useMemo } from 'react'
 import { ImportReceiptsHeader } from './ImportReceiptsHeader'
 import { ImportReceiptsTable } from './ImportReceiptsTable'
-import { importStockService, ImportStock } from '@/services/import-stock.service'
+import { useImportReceiptsQuery } from '@/features/import-stock/hooks'
 import { toast } from 'sonner'
 import { LoadingSpinner } from '@/components/ui/loading'
 
 export function ImportReceiptsPage() {
-  const [importReceipts, setImportReceipts] = useState<ImportStock[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const { data: importReceipts, isPending, error, refetch } = useImportReceiptsQuery({
+    select: (data) => data,
+  })
   const [searchQuery, setSearchQuery] = useState('')
 
-  const fetchImportReceipts = async () => {
-    try {
-      setIsLoading(true)
-      const data = await importStockService.getAll()
-      setImportReceipts(data)
-    } catch (error) {
-      toast.error('Không thể tải danh sách phiếu nhập')
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   useEffect(() => {
-    fetchImportReceipts()
-  }, [])
+    if (error) {
+      toast.error('Không thể tải danh sách phiếu nhập')
+    }
+  }, [error])
 
   const filteredReceipts = useMemo(() => {
-    if (!searchQuery.trim()) return importReceipts
+    if (!searchQuery.trim()) return importReceipts ?? []
 
     const query = searchQuery.toLowerCase().trim()
-    return importReceipts.filter((receipt) => {
+    return (importReceipts ?? []).filter((receipt) => {
       const totalQuantity = (receipt.details || receipt.items || []).reduce((sum, item) => sum + item.quantity, 0)
       return (
         receipt.id.toString().includes(query) ||
@@ -49,10 +40,15 @@ export function ImportReceiptsPage() {
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
       />
-      {isLoading ? (
+      {isPending ? (
         <LoadingSpinner />
       ) : (
-        <ImportReceiptsTable importReceipts={filteredReceipts} onRefresh={fetchImportReceipts} />
+        <ImportReceiptsTable
+          importReceipts={filteredReceipts}
+          onRefresh={() => {
+            void refetch()
+          }}
+        />
       )}
     </div>
   )
