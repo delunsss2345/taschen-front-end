@@ -22,7 +22,7 @@ import {
 import { batchService, type CreateBatchRequest } from '@/services/batch.service'
 import { bookService } from '@/services/book.service'
 import type { Book } from '@/types/response/book.response'
-import { bookVariantService, type BookVariant } from '@/services/bookVariant.service'
+import { bookVariantService, type VariantOption } from '@/services/bookVariant.service'
 import { supplierService } from '@/services/supplier.service'
 import type { Supplier } from '@/types/response/supplier.response'
 import { useAuthStore } from '@/features/auth/store/auth.store'
@@ -51,7 +51,7 @@ interface BookWithVariants extends Book {
 export function AddBatchDialog({ open, onOpenChange, onSuccess }: AddBatchDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [books, setBooks] = useState<BookWithVariants[]>([])
-  const [variants, setVariants] = useState<BookVariant[]>([])
+  const [variants, setVariants] = useState<VariantOption[]>([])
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
   const [isLoadingBooks, setIsLoadingBooks] = useState(false)
   const [isLoadingVariants, setIsLoadingVariants] = useState(false)
@@ -115,7 +115,6 @@ export function AddBatchDialog({ open, onOpenChange, onSuccess }: AddBatchDialog
     setIsLoadingVariants(true)
     try {
       const data = await bookVariantService.getVariantsByBookId(bookId)
-      console.log('Variants loaded:', JSON.stringify(data, null, 2))
       setVariants(data)
     } catch {
       setVariants([])
@@ -133,7 +132,6 @@ export function AddBatchDialog({ open, onOpenChange, onSuccess }: AddBatchDialog
     setIsSubmitting(true)
     try {
       const variantIdValue = data.variantId && data.variantId !== 'none' ? Number(data.variantId) : null
-      console.log('Submitting variantId:', data.variantId, '->', variantIdValue)
       
       const payload: CreateBatchRequest = {
         bookId: Number(data.bookId),
@@ -200,7 +198,7 @@ export function AddBatchDialog({ open, onOpenChange, onSuccess }: AddBatchDialog
                   <SelectItem value="none">Không có</SelectItem>
                   {variants.map((variant) => (
                     <SelectItem key={variant.variantId} value={String(variant.variantId)}>
-                      {variant.variantFormatName || variant.variantFormatCode || `Variant ${variant.variantId}`}
+                      {variant.variantFormatName || `Variant ${variant.variantId}`}
                     </SelectItem>
                   ))}
                 </SelectContent>

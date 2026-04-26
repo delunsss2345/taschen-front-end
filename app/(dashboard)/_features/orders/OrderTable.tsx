@@ -17,6 +17,7 @@ interface OrderTableProps {
 export function OrderTable({ orders, onStatusChange }: OrderTableProps) {
   const [approvingId, setApprovingId] = useState<number | null>(null)
   const [shippingId, setShippingId] = useState<number | null>(null)
+  const [deliveredId, setDeliveredId] = useState<number | null>(null)
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -69,6 +70,12 @@ export function OrderTable({ orders, onStatusChange }: OrderTableProps) {
             Đã hoàn thành
           </Badge>
         )
+      case 'RETURNED':
+        return (
+          <Badge className="bg-blue-50 text-blue-600 hover:bg-blue-50 border-blue-100 shadow-none font-normal">
+            Đã trả
+          </Badge>
+        )
       default:
         return <Badge variant="outline">{status}</Badge>
     }
@@ -109,6 +116,25 @@ export function OrderTable({ orders, onStatusChange }: OrderTableProps) {
       toast.error('Không thể chuyển sang giao hàng')
     } finally {
       setShippingId(null)
+    }
+  }
+
+  const handleDelivered = async (orderId: number) => {
+    const loadingToast = toast.loading('Đang cập nhật...', {
+      duration: Infinity,
+    })
+
+    try {
+      setDeliveredId(orderId)
+      await orderService.updateOrderStatus(orderId, 'COMPLETED')
+      toast.dismiss(loadingToast)
+      toast.success('Đơn hàng đã được giao thành công')
+      onStatusChange?.()
+    } catch {
+      toast.dismiss(loadingToast)
+      toast.error('Không thể cập nhật trạng thái')
+    } finally {
+      setDeliveredId(null)
     }
   }
 
@@ -171,6 +197,17 @@ export function OrderTable({ orders, onStatusChange }: OrderTableProps) {
                         disabled={shippingId === order.id}
                       >
                         {shippingId === order.id ? 'Đang giao...' : 'Giao hàng'}
+                      </Button>
+                    )}
+                    {order.status === 'DELIVERING' && (
+                      <Button
+                        variant="default"
+                        size="sm"
+                        className="bg-green-600 hover:bg-green-700 h-8 px-3 cursor-pointer text-[13px]"
+                        onClick={() => handleDelivered(order.id)}
+                        disabled={deliveredId === order.id}
+                      >
+                        {deliveredId === order.id ? 'Đang cập nhật...' : 'Đã giao'}
                       </Button>
                     )}
                     <Button

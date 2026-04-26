@@ -130,7 +130,7 @@ export function ImportReceiptsTable({ importReceipts, onRefresh }: ImportReceipt
                         className="h-8 px-2 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white text-xs"
                         onClick={() => handleView(receipt)}
                       >
-                        Xem
+                        Xem chi tiết
                       </Button>
                     </div>
                   </TableCell>

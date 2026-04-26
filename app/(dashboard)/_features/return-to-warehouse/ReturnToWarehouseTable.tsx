@@ -5,46 +5,39 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
 import { ReturnToWarehouseDetailModal } from './ReturnToWarehouseDetailModal'
-
-// Interface cho dữ liệu
-interface ReturnRequest {
-  id: string
-  bookName: string
-  quantity: number
-  notes: string
-  status: 'pending' | 'approved' | 'rejected'
-  createdBy: string | null
-  processedBy: string | null
-  createdAt: string
-  processedAt: string | null
-}
+import type { DisposalRequest } from '@/services/disposal-request.service'
 
 interface ReturnToWarehouseTableProps {
-  data: ReturnRequest[]
+  data: DisposalRequest[]
+  onRefresh?: () => void
 }
 
 const statusConfig = {
-  pending: {
+  PENDING: {
     label: 'Chờ duyệt',
     className: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100',
   },
-  approved: {
+  APPROVED: {
     label: 'Đã duyệt',
     className: 'bg-green-100 text-green-800 hover:bg-green-100',
   },
-  rejected: {
+  REJECTED: {
     label: 'Từ chối',
     className: 'bg-red-100 text-red-800 hover:bg-red-100',
   },
 }
 
-export function ReturnToWarehouseTable({ data }: ReturnToWarehouseTableProps) {
-  const [selectedRequest, setSelectedRequest] = useState<ReturnRequest | null>(null)
+export function ReturnToWarehouseTable({ data, onRefresh }: ReturnToWarehouseTableProps) {
+  const [selectedRequest, setSelectedRequest] = useState<DisposalRequest | null>(null)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
 
-  const handleViewDetail = (request: ReturnRequest) => {
+  const handleViewDetail = (request: DisposalRequest) => {
     setSelectedRequest(request)
     setIsDetailModalOpen(true)
+  }
+
+  const getTotalQuantity = (request: DisposalRequest) => {
+    return request.items.reduce((sum, item) => sum + item.quantity, 0)
   }
 
   return (
@@ -53,13 +46,13 @@ export function ReturnToWarehouseTable({ data }: ReturnToWarehouseTableProps) {
         <table className="w-full text-sm">
           <thead className="bg-[#fcfcfc] border-b border-gray-50">
             <tr className="text-gray-500 font-medium">
-              <TableHeaderCell className="w-24">ID</TableHeaderCell>
-              <TableHeaderCell>Sách</TableHeaderCell>
-              <TableHeaderCell className="text-center w-28">Số lượng</TableHeaderCell>
-              <TableHeaderCell>Ghi chú</TableHeaderCell>
+              <TableHeaderCell className="w-16">ID</TableHeaderCell>
+              <TableHeaderCell>Lý do</TableHeaderCell>
+              <TableHeaderCell className="text-center w-20">Số lượng</TableHeaderCell>
               <TableHeaderCell className="w-28">Trạng thái</TableHeaderCell>
-              <TableHeaderCell className="w-28">Người tạo</TableHeaderCell>
-              <TableHeaderCell className="w-32">Người xử lý</TableHeaderCell>
+              <TableHeaderCell className="w-40">Người tạo</TableHeaderCell>
+              <TableHeaderCell className="w-40">Người xử lý</TableHeaderCell>
+              <TableHeaderCell className="w-32">Ngày tạo</TableHeaderCell>
               <TableHeaderCell className="text-center w-28">Thao tác</TableHeaderCell>
             </tr>
           </thead>
@@ -67,16 +60,22 @@ export function ReturnToWarehouseTable({ data }: ReturnToWarehouseTableProps) {
             {data.map((request) => (
               <TableRow key={request.id}>
                 <TableCell variant="primary">{request.id}</TableCell>
-                <TableCell>{request.bookName}</TableCell>
-                <TableCell className="text-center">{request.quantity}</TableCell>
-                <TableCell className="max-w-[200px] truncate text-muted-foreground">{request.notes}</TableCell>
+                <TableCell className="max-w-[250px] truncate" title={request.reason}>
+                  {request.reason}
+                </TableCell>
+                <TableCell className="text-center">{getTotalQuantity(request)}</TableCell>
                 <TableCell>
                   <Badge className={`${statusConfig[request.status].className} cursor-default`}>
                     {statusConfig[request.status].label}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-muted-foreground">{request.createdBy || '-'}</TableCell>
-                <TableCell className="text-muted-foreground">{request.processedBy || '-'}</TableCell>
+                <TableCell className="text-muted-foreground">
+                  {request.createdBy?.email || '-'}
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {request.processedBy?.email || '-'}
+                </TableCell>
+                <TableCell>{new Date(request.createdAt).toLocaleDateString('vi-VN')}</TableCell>
                 <TableCell className="text-center">
                   <Button
                     variant="default"
@@ -97,6 +96,7 @@ export function ReturnToWarehouseTable({ data }: ReturnToWarehouseTableProps) {
         isOpen={isDetailModalOpen}
         onClose={() => setIsDetailModalOpen(false)}
         request={selectedRequest}
+        onRefresh={onRefresh}
       />
     </>
   )
