@@ -1,5 +1,6 @@
 {
   "nav": {
+    "home": "Trang chủ",
     "books": "Sách",
     "limitedEditions": "Phiên bản giới hạn",
     "gifts": "Quà tặng",
@@ -10,6 +11,7 @@
     "searchPlaceholder": "Tìm kiếm",
     "aria": {
       "searchButton": "Tìm kiếm",
+      "notifications": "Thông báo",
       "language": "Ngôn ngữ và quốc gia",
       "account": "Tài khoản",
       "wishlist": "Yêu thích",
