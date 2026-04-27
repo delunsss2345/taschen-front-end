@@ -37,8 +37,6 @@ export async function PUT(
     const payload = await request.json();
     const headers = getAuthorizationHeader(request);
 
-    console.log('PUT /books/[id] payload:', JSON.stringify(payload, null, 2));
-
     const response = await api.put<BookApiResponse>(`books/${id}`, payload, {
       headers,
     });
@@ -61,15 +59,14 @@ export async function DELETE(
     const { id } = await params;
     const headers = getAuthorizationHeader(request);
 
-    const response = await api.delete<DeleteBookApiResponse>(`books/${id}`, undefined, {
-      headers,
-    });
+    await api.delete<DeleteBookApiResponse>(`books/${id}`, undefined, { headers });
 
-    return ResponseApi.success(response.data, HttpStatusCode.NoContent);
-  } catch {
-    return new Response(JSON.stringify({ success: true, data: { message: "Deleted" } }), {
-      status: 204,
-      headers: { "Content-Type": "application/json" },
-    });
+    return ResponseApi.success(null, HttpStatusCode.Ok);
+  } catch (error: unknown) {
+    return handleRouteError(
+      error,
+      'Có lỗi xảy ra khi xóa sách.',
+      "Delete Book API Error",
+    );
   }
 }
