@@ -22,6 +22,48 @@ import {
 } from "./helpers/response";
 
 export const bookService = {
+  async searchBooks(params: {
+    keyword?: string;
+    categoryId?: number;
+    status?: 'active' | 'deleted' | 'all';
+    page?: number;
+    size?: number;
+    sortBy?: string;
+    sortDir?: string;
+  }): Promise<BookListData> {
+    const query: Record<string, string | number> = {};
+    if (params.keyword) query.keyword = params.keyword;
+    if (params.categoryId) query.categoryId = params.categoryId;
+    if (params.status) query.status = params.status;
+    if (params.page) query.page = params.page;
+    if (params.size) query.size = params.size;
+    if (params.sortBy) query.sortBy = params.sortBy;
+    if (params.sortDir) query.sortDir = params.sortDir;
+
+    const queryString = new URLSearchParams(
+      Object.fromEntries(Object.entries(query).map(([k, v]) => [k, String(v)]))
+    ).toString();
+    const url = queryString ? `books/search?${queryString}` : 'books/search';
+
+    const response = await http.get<{ success: boolean; data: { meta: BookListMeta; result: Book[] } }>(url);
+    const booksResult: Book[] = response.data?.result ?? [];
+    const meta: BookListMeta | undefined = response.data?.meta;
+
+    const categories = await getCategoriesSafe();
+    const suppliers = await getSuppliersSafe();
+    const booksWithCategories = mapBooksWithCategories(booksResult, categories);
+    const booksWithSuppliers = mapBooksWithSuppliers(booksWithCategories, suppliers);
+
+    return {
+      result: booksWithSuppliers,
+      meta: meta ?? { page: 1, pageSize: 10, total: 0, pages: 0 },
+    };
+  },
+
+  async restoreBook(bookId: number | string): Promise<void> {
+    await http.put(`books/${bookId}/restore`, {});
+  },
+
   async getAllBooks(params?: { page?: number; pageSize?: number; search?: string }): Promise<BookListData> {
     const queryParams = new URLSearchParams();
     if (params?.page) queryParams.set('page', params.page.toString());
@@ -72,13 +114,8 @@ export const bookService = {
     return requireResponseData(response, "Update book response is missing data");
   },
 
-  async deleteBook(bookId: number | string): Promise<null> {
-    try {
-      await http.del<ApiResponseEnvelope<null>>(`books/${bookId}`);
-      return null;
-    } catch {
-      return null;
-    }
+  async deleteBook(bookId: number | string): Promise<void> {
+    await http.del(`books/${bookId}`);
   },
 
   async getSortedBooks(): Promise<BookListData> {
