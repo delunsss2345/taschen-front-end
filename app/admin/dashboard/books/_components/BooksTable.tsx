@@ -1,6 +1,6 @@
 'use client'
 
-import { Pencil, Trash2 } from 'lucide-react'
+import { RotateCcw, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
@@ -26,6 +26,7 @@ interface Book {
   author: string
   price: number
   stockQuantity: number
+  isActive?: boolean | null
   categoryIds: number[]
   categories?: {
     id: number
@@ -37,6 +38,7 @@ interface Book {
     name: string
   }
   variantFormats?: {
+    variantId?: number
     formatCode: string
     formatName: string
     price: number
@@ -49,24 +51,43 @@ interface BooksTableProps {
   isLoading?: boolean
   onDeleteSuccess?: (bookId: number) => void
   onEditSuccess?: () => void
+  onRestoreSuccess?: (bookId: number) => void
 }
 
-export function BooksTable({ books, isLoading, onDeleteSuccess, onEditSuccess }: BooksTableProps) {
+export function BooksTable({ books, isLoading, onDeleteSuccess, onEditSuccess, onRestoreSuccess }: BooksTableProps) {
+  const handleRestore = async (book: Book) => {
+    const toastId = toast.loading('Đang khôi phục sách...', { duration: Infinity })
+
+    try {
+      await bookService.restoreBook(book.id)
+      toast.success('Sách đã được khôi phục.', { id: toastId, duration: 3000 })
+      onRestoreSuccess?.(book.id)
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: { message?: string; error?: string } } }
+      const backendMessage = axiosError?.response?.data?.message
+        || axiosError?.response?.data?.error
+        || 'Có lỗi xảy ra khi khôi phục sách.'
+      toast.error(backendMessage, { id: toastId, duration: 4000 })
+    }
+  }
+
   const handleDelete = async (bookId: number) => {
-    const loadingToast = toast.loading('Đang xóa sách...', {
-      duration: Infinity,
-    })
+    const toastId = toast.loading('Đang xóa sách...', { duration: Infinity })
 
     try {
       await bookService.deleteBook(bookId)
-      toast.dismiss(loadingToast)
-      toast.success('Sách đã được xóa thành công.')
+      toast.success('Sách đã được xóa thành công.', { id: toastId })
       onDeleteSuccess?.(bookId)
     } catch (error: unknown) {
-      toast.dismiss(loadingToast)
       const axiosError = error as { response?: { data?: { message?: string; error?: string } } };
       const backendMessage = axiosError?.response?.data?.message
-      toast.error(backendMessage || 'Có lỗi xảy ra khi xóa sách.')
+        || axiosError?.response?.data?.error
+        || 'Có lỗi xảy ra khi xóa sách.';
+      if (process.env.NODE_ENV === 'development') {
+        const e = error as { response?: { status?: number; data?: unknown } };
+        console.error('[deleteBook]', e?.response?.status, e?.response?.data);
+      }
+      toast.error(backendMessage, { id: toastId })
     }
   }
 
@@ -160,63 +181,78 @@ export function BooksTable({ books, isLoading, onDeleteSuccess, onEditSuccess }:
 
               <TableCell className="text-right">
                 <div className="flex items-center justify-end gap-2">
-                  <EditBookModal
-                    book={{
-                      id: book.id,
-                      image: book.imageUrl || '',
-                      title: book.title,
-                      author: book.author,
-                      price: book.price,
-                      quantity: book.stockQuantity,
-                      category: book.categories?.map((cat) => cat.name).join(", ") || "",
-                      supplierId: book.supplierId,
-                      supplierName: book.supplier?.name || "",
-                      formatCode: book.variantFormats?.[0]?.formatCode || '',
-                      variantId: undefined
-                    }}
-                    onSuccess={onEditSuccess}
-                    trigger={
-                      <Button
-                        variant="default"
-                        size="sm"
-                        className="h-8 gap-1 px-3 bg-blue-600 hover:bg-blue-700 cursor-pointer"
-                      >
-                        <Pencil className="h-3 w-3" />
-                        Sửa
-                      </Button>
-                    }
-                  />
+                  {book.isActive === null ? (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="h-8 gap-1 px-3 bg-green-600 hover:bg-green-700 cursor-pointer"
+                      onClick={() => handleRestore(book)}
+                    >
+                      <RotateCcw className="h-3.5 w-3.5" />
+                      Khôi phục
+                    </Button>
+                  ) : (
+                    <>
+                      <EditBookModal
+                        book={{
+                          id: book.id,
+                          image: book.imageUrl || '',
+                          title: book.title,
+                          author: book.author,
+                          price: book.price,
+                          quantity: book.stockQuantity,
+                          category: book.categories?.map((cat) => cat.name).join(", ") || "",
+                          categoryIds: book.categoryIds,
+                          isActive: book.isActive,
+                          supplierId: book.supplierId,
+                          supplierName: book.supplier?.name || "",
+                          formatCode: book.variantFormats?.[0]?.formatCode || '',
+                          variantId: undefined
+                        }}
+                        onSuccess={onEditSuccess}
+                        trigger={
+                          <Button
+                            variant="default"
+                            size="sm"
+                            className="h-8 gap-1 px-3 bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                          >
+                            Sửa
+                          </Button>
+                        }
+                      />
 
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        className="h-8 gap-1 px-3 cursor-pointer"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                        Xóa
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Xác nhận xóa</AlertDialogTitle>
-                      </AlertDialogHeader>
-                      <p className="text-sm text-gray-600">
-                        Bạn có chắc chắn muốn xóa sách <span className="font-medium">{book.title}</span>? 
-                        Hành động này không thể hoàn tác.
-                      </p>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel className="cursor-pointer">Hủy</AlertDialogCancel>
-                        <AlertDialogAction
-                          className="bg-red-600 hover:bg-red-700 cursor-pointer"
-                          onClick={() => handleDelete(book.id)}
-                        >
-                          Xóa
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="h-8 gap-1 px-3 cursor-pointer"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            Xóa
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Xác nhận xóa</AlertDialogTitle>
+                          </AlertDialogHeader>
+                          <p className="text-sm text-gray-600">
+                            Bạn có chắc chắn muốn xóa sách <span className="font-medium">{book.title}</span>?
+                            Hành động này không thể hoàn tác.
+                          </p>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel className="cursor-pointer">Hủy</AlertDialogCancel>
+                            <AlertDialogAction
+                              className="bg-red-600 hover:bg-red-700 cursor-pointer"
+                              onClick={() => handleDelete(book.id)}
+                            >
+                              Xóa
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </>
+                  )}
                 </div>
               </TableCell>
             </TableRow>

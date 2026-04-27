@@ -12,7 +12,6 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Checkbox } from '@/components/ui/checkbox'
 import {
   Select,
   SelectContent,
@@ -55,6 +54,8 @@ type BooksTableRow = {
   price: number
   quantity: number
   category: string
+  categoryIds?: number[]
+  isActive?: boolean | null
   supplierId?: number
   supplierName?: string
   formatCode?: string
@@ -105,8 +106,8 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
     gia: book.price,
     soLuongTon: book.quantity,
     hinhAnh: null,
-    kinhDoanh: true,
-    maTheLoai: [],
+    kinhDoanh: book.isActive === true,
+    maTheLoai: book.categoryIds ?? [],
     dinhDang: book.formatCode || '',
     variantId: book.variantId || null,
     maNhaCungCap: book.supplierId,
@@ -115,67 +116,79 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
   const [previewUrl, setPreviewUrl] = useState<string | null>(book.image || null)
 
   useEffect(() => {
-    if (open) {
-      categoryService.getAllCategories().then((cats) => {
-        setCategories(cats.map((c) => ({ value: c.id, label: c.name })))
-      })
-      supplierService.getAllSuppliers().then((sups) => {
-        setSuppliers(sups.map((s) => ({ value: s.id, label: s.name })))
-      })
-      
-      
-      formatService.getAllFormats().then((fmts) => {
-        const formatOptions = fmts.map((f) => ({ 
-          value: f.id.toString(), 
-          label: f.formatName,    
-          formatCode: f.formatCode 
-        }))
-        setFormats(formatOptions)
-        
-        // gọi song song 2 api để lấy book và variants
-        Promise.all([
-          bookService.getBookById(book.id),
-          bookVariantService.getFullVariantsByBookId(book.id)
-        ]).then(([bookData, variants]) => {
-          // Lấy variantId từ variant đầu tiên (dùng để cập nhật giá và số lượng)
-          const firstVariant = variants[0]
-          const variantId = firstVariant?.variantId || null
-          
-          // Lấy format code từ variant đầu tiên, hoặc dùng format từ props nếu không có variant
-          const currentFormat = firstVariant?.variantFormatName 
-            || bookData.variantFormats?.[0]?.formatCode
-            || bookData.variantFormats?.[0]?.formatName
-            || book.formatCode 
-            || ''
-          
-          const matchedOption = formatOptions.find(f => f.formatCode === currentFormat)
-          const matchedFormat = matchedOption?.value || ''
-          
+    if (!open) return
+
+    categoryService.getAllCategories().then((cats) => {
+      setCategories(cats.map((c) => ({ value: c.id, label: c.name })))
+    })
+
+    Promise.all([
+      supplierService.getAllSuppliers(),
+      formatService.getAllFormats(),
+    ]).then(([sups, fmts]) => {
+      setSuppliers(sups.map((s) => ({ value: s.id, label: s.name })))
+
+      const formatOptions = fmts.map((f) => ({
+        value: f.id.toString(),
+        label: f.formatName,
+        formatCode: f.formatCode,
+      }))
+      setFormats(formatOptions)
+
+      return Promise.all([
+        bookService.getBookById(book.id).catch(() => null),
+        bookVariantService.getFullVariantsByBookId(book.id),
+      ]).then(([bookData, variants]) => {
+        const firstVariant = variants[0]
+        const variantId = firstVariant?.variantId || null
+
+        const currentFormatCode =
+          firstVariant?.variantFormatCode ||
+          bookData?.variantFormats?.[0]?.formatCode ||
+          book.formatCode ||
+          ''
+        const currentFormatName =
+          firstVariant?.variantFormatName ||
+          bookData?.variantFormats?.[0]?.formatName ||
+          ''
+        const matchedFormat =
+          formatOptions.find(f => f.formatCode === currentFormatCode)?.value ||
+          formatOptions.find(f => f.label === currentFormatName)?.value ||
+          ''
+
+        if (!bookData) {
           setForm((p) => ({
             ...p,
-            tenSach: bookData.title,
-            tacGia: bookData.author,
-            moTa: bookData.description || '',
-            namXuatBan: bookData.publicationYear,
-            khoiLuongGram: bookData.weightGrams,
-            soTrang: bookData.pageCount,
-            gia: firstVariant?.price || bookData.price,
-            soLuongTon: firstVariant?.stockQuantity || bookData.stockQuantity,
-            kinhDoanh: bookData.isActive,
-            maTheLoai: bookData.categoryIds || [],
-            dinhDang: matchedFormat,
-            variantId: variantId || book.variantId || null,
-            maNhaCungCap: bookData.supplierId,
-          }))
-          setPreviewUrl(bookData.imageUrl || null)
-        }).catch(() => {
-          setForm((p) => ({
-            ...p,
+            gia: firstVariant?.price ?? p.gia,
+            soLuongTon: firstVariant?.stockQuantity ?? p.soLuongTon,
+            kinhDoanh: book.isActive === true,
+            maTheLoai: book.categoryIds ?? [],
             maNhaCungCap: book.supplierId,
+            dinhDang: matchedFormat,
+            variantId,
           }))
-        })
+          return
+        }
+
+        setForm((p) => ({
+          ...p,
+          tenSach: bookData.title,
+          tacGia: bookData.author,
+          moTa: bookData.description || '',
+          namXuatBan: bookData.publicationYear,
+          khoiLuongGram: bookData.weightGrams,
+          soTrang: bookData.pageCount,
+          gia: firstVariant?.price || bookData.price,
+          soLuongTon: firstVariant?.stockQuantity || bookData.stockQuantity,
+          kinhDoanh: bookData.isActive ?? false,
+          maTheLoai: bookData.categoryIds || [],
+          dinhDang: matchedFormat,
+          variantId: variantId || book.variantId || null,
+          maNhaCungCap: bookData.supplierId,
+        }))
+        setPreviewUrl(bookData.imageUrl || null)
       })
-    }
+    })
   }, [open, book.id, book.supplierId])
 
   const canSubmit = useMemo(() => {
@@ -216,23 +229,23 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
         imageUrl: book.image || '',
         isActive: form.kinhDoanh,
         categoryIds: form.maTheLoai,
-        variantIds: form.dinhDang ? [parseInt(form.dinhDang)] : [],
         supplierId: form.maNhaCungCap || 0,
+        formatId: form.dinhDang ? Number(form.dinhDang) : undefined,
       }
 
-      console.log('Update book payload:', JSON.stringify(bookPayload, null, 2))
-
-      // Chỉ gọi API update book (đã bao gồm variantIds)
       await bookService.updateBook(book.id, bookPayload)
       
       toast.dismiss(loadingToast)
       toast.success('Thông tin sách đã được cập nhật.')
       setOpen(false)
       onSuccess?.()
-    } catch (error) {
-      console.error('Update error:', error)
+    } catch (error: unknown) {
       toast.dismiss(loadingToast)
-      toast.error('Có lỗi xảy ra khi cập nhật sách.')
+      const axiosError = error as { response?: { data?: { message?: string; error?: string } } };
+      const backendMessage = axiosError?.response?.data?.message
+        || axiosError?.response?.data?.error
+        || 'Có lỗi xảy ra khi cập nhật sách.';
+      toast.error(backendMessage)
     } finally {
       setIsSubmitting(false)
     }
@@ -413,16 +426,20 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
                     </SelectContent>
                   </Select>
                 </Field>
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    id={`edit-kinh-doanh-${book.id}`}
-                    checked={form.kinhDoanh}
-                    onCheckedChange={(checked) => setForm((p) => ({ ...p, kinhDoanh: Boolean(checked) }))}
-                  />
-                  <label htmlFor={`edit-kinh-doanh-${book.id}`} className="text-sm font-medium text-gray-700 cursor-pointer">
-                    Kinh doanh
-                  </label>
-                </div>
+                <Field label="Trạng thái">
+                  <Select
+                    value={form.kinhDoanh ? 'true' : 'false'}
+                    onValueChange={(value) => setForm((p) => ({ ...p, kinhDoanh: value === 'true' }))}
+                  >
+                    <SelectTrigger className="cursor-pointer">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="true" className="cursor-pointer">Kinh doanh</SelectItem>
+                      <SelectItem value="false" className="cursor-pointer">Tạm ngưng</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </Field>
               </div>
             </Section>
           </div>
