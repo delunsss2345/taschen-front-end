@@ -47,7 +47,7 @@ const Footer = () => {
 
   return (
     <footer className="w-full bg-white">
-      <div className="mx-auto w-full max-w-[var(--container-main)] px-6">
+      <div className="container-main px-6">
         <div className="py-10">
           <h2 className="text-2xl font-extrabold tracking-tight">
             {t("footer.tagline")}

@@ -6,7 +6,7 @@ const SearchBar = () => {
   const { t } = useTranslator();
 
   return (
-    <div className="relative hidden w-[320px] items-center md:flex">
+    <div className="relative hidden w-full items-center md:flex">
       <Input
         className="h-10 rounded-sm pr-10 text-sm"
         placeholder={t("header.searchPlaceholder")}

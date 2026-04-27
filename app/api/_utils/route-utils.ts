@@ -19,14 +19,36 @@ export const handleRouteError = (
   logLabel: string,
 ) => {
   if (process.env.NODE_ENV === "development") {
-    console.error(`${logLabel}:`, error);
+    console.error(`${logLabel}:`, JSON.stringify(error, null, 2));
   }
 
   if (error instanceof HttpError) {
     let status = error.status;
     const messageLower = error.message.toLowerCase();
+
     if (status === 400 && (messageLower.includes('unauthorized') || messageLower.includes('not authenticated') || messageLower.includes('not authorized'))) {
       status = HttpStatusCode.Unauthorized;
+    }
+
+    const errorData = error.data as { error?: string; message?: string } | undefined;
+    const rawMessage = errorData?.message || errorData?.error || error.message;
+    const rawLower = rawMessage.toLowerCase();
+
+    let userMessage = fallbackMessage;
+    if (rawLower.includes('foreign key') || rawLower.includes('constraint fails')) {
+      if (rawLower.includes('import_stock_details')) {
+        userMessage = 'Không thể xóa sách vì đang có dữ liệu nhập kho liên quan.';
+      } else if (rawLower.includes('order_details')) {
+        userMessage = 'Không thể xóa sách vì đang có đơn hàng liên quan.';
+      } else if (rawLower.includes('cart')) {
+        userMessage = 'Không thể xóa sách vì đang có giỏ hàng liên quan.';
+      } else if (rawLower.includes('favourite') || rawLower.includes('favorite')) {
+        userMessage = 'Không thể xóa sách vì đang có trong danh sách yêu thích.';
+      } else {
+        userMessage = 'Không thể xóa vì có dữ liệu liên quan.';
+      }
+    } else {
+      userMessage = rawMessage || fallbackMessage;
     }
 
     const finalStatus =
@@ -34,7 +56,7 @@ export const handleRouteError = (
         ? (status as HttpStatusCode)
         : HttpStatusCode.BadRequest;
 
-    return ResponseApi.error(error.message || fallbackMessage, finalStatus, error.data);
+    return ResponseApi.error(userMessage, finalStatus, error.data);
   }
 
   return ResponseApi.error(fallbackMessage, HttpStatusCode.BadRequest);

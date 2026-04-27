@@ -36,7 +36,7 @@ function buildUrl(baseURL: string, path: string, query?: Query) {
 
 async function request<T>(method: string, path: string, opt: ApiOptions = {}): Promise<T> {
     const {
-        baseURL = process.env.API_BASE_URL!,
+        baseURL = process.env.BACKEND_API_URL!,
         query,
         body,
         timeoutMs = 15000,
@@ -60,6 +60,7 @@ async function request<T>(method: string, path: string, opt: ApiOptions = {}): P
             body: body !== undefined ? JSON.stringify(body) : undefined,
             signal: abortController.signal,
             cache: init.cache ?? "no-store",
+            redirect: "manual",
         });
     } finally {
         clearTimeout(t); // xong sớm clear timeout với id
@@ -69,7 +70,7 @@ async function request<T>(method: string, path: string, opt: ApiOptions = {}): P
     const isJson = contentType.includes("application/json");
     const data: { message?: string, error?: string } = isJson ? await res.json().catch(() => null) : await res.text().catch(() => "");
 
-    if (!res.ok) {
+    if (!res.ok || res.type === "opaqueredirect") {
         const msg =
             (isJson && data && (data.message || data.error)) ? (data.message || data.error || 'InternalServerError') : `HTTP ${res.status ?? 505}`;
         throw new HttpError(res.status, msg, data);

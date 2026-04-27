@@ -15,14 +15,20 @@ export function AdminBooksPage() {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(5)
   const [search, setSearch] = useState('')
+  const [status, setStatus] = useState<'active' | 'deleted' | 'all'>('active')
 
   const fetchBooks = async () => {
     try {
       setIsLoading(true)
-      const response = await bookService.getAllBooks({ page, pageSize, search: search || undefined })
+      const response = await bookService.searchBooks({
+        keyword: search || undefined,
+        status,
+        page,
+        size: pageSize,
+      })
       setBooks(response.result)
       setMeta(response.meta)
-    } catch (error) {
+    } catch {
       toast.error('Không thể tải danh sách sách')
     } finally {
       setIsLoading(false)
@@ -31,10 +37,15 @@ export function AdminBooksPage() {
 
   useEffect(() => {
     fetchBooks()
-  }, [page, pageSize, search])
+  }, [page, pageSize, search, status])
 
   const handleSearch = (searchTerm: string) => {
     setSearch(searchTerm)
+    setPage(1)
+  }
+
+  const handleStatusChange = (newStatus: string) => {
+    setStatus(newStatus as 'active' | 'deleted' | 'all')
     setPage(1)
   }
 
@@ -47,21 +58,20 @@ export function AdminBooksPage() {
     setPage(1)
   }
 
-  const handleDeleteSuccess = (bookId: number) => {
-    setBooks((prev) => prev.filter((book) => book.id !== bookId))
-    if (meta) {
-      setMeta((prev) => prev ? { ...prev, total: prev.total - 1 } : null)
-    }
-  }
-
   return (
     <div className="space-y-4">
-      <BooksHeader onSuccess={fetchBooks} onSearch={handleSearch} />
-      <BooksTable 
-        books={books} 
+      <BooksHeader
+        onSuccess={fetchBooks}
+        onSearch={handleSearch}
+        status={status}
+        onStatusChange={handleStatusChange}
+      />
+      <BooksTable
+        books={books}
         isLoading={isLoading}
-        onDeleteSuccess={handleDeleteSuccess}
+        onDeleteSuccess={fetchBooks}
         onEditSuccess={fetchBooks}
+        onRestoreSuccess={fetchBooks}
       />
       {meta && (
         <Pagination
