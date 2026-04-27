@@ -14,7 +14,9 @@ import {
   Warehouse,
   RotateCw,
   LayoutGrid,
-  FileText
+  FileText,
+  Shield,
+  ShieldCheck,
 } from 'lucide-react'
 
 export const adminSidebarData = {
@@ -99,6 +101,16 @@ export const adminSidebarData = {
       title: 'Yêu cầu Hoàn/Đổi',
       url: '/admin/dashboard/returns',
       icon: RotateCcw,
+    },
+    {
+      title: 'Quản lý Permission',
+      url: '/admin/dashboard/permissions',
+      icon: ShieldCheck,
+    },
+    {
+      title: 'Quản lý Role',
+      url: '/admin/dashboard/roles',
+      icon: Shield,
     },
   ],
 }
