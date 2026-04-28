@@ -42,3 +42,5 @@ next-env.d.ts
 skill
 postman
 .a*
+
+.cursor/rules/
