@@ -1,5 +1,6 @@
 {
   "nav": {
+    "home": "Home",
     "books": "Books",
     "limitedEditions": "Limited Editions",
     "gifts": "Gifts",
@@ -10,6 +11,7 @@
     "searchPlaceholder": "Search",
     "aria": {
       "searchButton": "Search",
+      "notifications": "Notifications",
       "language": "Language and country",
       "account": "Account",
       "wishlist": "Wishlist",

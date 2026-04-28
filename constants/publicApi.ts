@@ -6,4 +6,6 @@ export const PUBLIC_API_PATHS = [
 "/api/auth/forgot",
 "/api/auth/reset",
 "/api/auth/verify",
+"/api/books",
+"/api/books/sorted",
 ];

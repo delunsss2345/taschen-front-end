@@ -15,6 +15,10 @@ interface NavItem {
 
 const nav: NavItem[] = [
   {
+    key: "home",
+    to: "/",
+  },
+  {
     key: "books",
     to: "/books",
     dropdown: [
@@ -62,50 +66,6 @@ const nav: NavItem[] = [
       },
     ],
   },
-  {
-    key: "limitedEditions",
-    to: "/limited-editions",
-    dropdown: [
-      {
-        items: [
-          { label: "All Limited Editions", href: "/limited-editions" },
-          { label: "New Releases", href: "/limited-editions?sort=new" },
-          { label: "Collector's Editions", href: "/limited-editions/collectors" },
-        ],
-      },
-      {
-        items: [
-          { label: "Art Editions", href: "/limited-editions/art" },
-          { label: "Photography", href: "/limited-editions/photography" },
-          { label: "SUMO", href: "/limited-editions/sumo" },
-        ],
-      },
-    ],
-  },
-  {
-    key: "gifts",
-    to: "/gifts",
-    dropdown: [
-      {
-        items: [
-          { label: "All Gifts", href: "/gifts" },
-          { label: "Gift Cards", href: "/gifts/cards" },
-          { label: "Under $25", href: "/gifts?price=under-25" },
-          { label: "Under $50", href: "/gifts?price=under-50" },
-        ],
-      },
-      {
-        items: [
-          { label: "For Him", href: "/gifts/for-him" },
-          { label: "For Her", href: "/gifts/for-her" },
-          { label: "For Kids", href: "/gifts/for-kids" },
-          { label: "For Couples", href: "/gifts/for-couples" },
-        ],
-      },
-    ],
-  },
-  { key: "stores", to: "/stores" },
-  { key: "about", to: "/about" },
 ];
 
 const Nav = () => {
@@ -154,7 +114,7 @@ const Nav = () => {
           <Link
             key={item.to}
             href={item.to}
-            className={`nav-link text-xs tracking-widest uppercase transition-opacity duration-200 ${activeNav === item.key ? "opacity-100" : "hover:opacity-70"
+            className={`nav-link text-xs font-semibold tracking-widest uppercase transition-opacity duration-200 ${activeNav === item.key ? "opacity-100" : "hover:opacity-70"
               }`}
             onMouseEnter={() => handleMouseEnter(item.key)}
             onMouseLeave={handleMouseLeave}

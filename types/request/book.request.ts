@@ -11,8 +11,9 @@ export type UpdateBookInfoRequest = {
   imageUrl: string;
   isActive: boolean;
   categoryIds: number[];
-  variantIds: number[];
   supplierId: number;
+  formatId?: number;
+  variantIds?: number[];
 };
 
 // Request body cho API PUT /api/book-variants/{variantId}

@@ -24,7 +24,7 @@ export type Book = {
   price: number;
   stockQuantity: number;
   imageUrl: string;
-  isActive: boolean;
+  isActive: boolean | null;
   variantFormats?: {
     variantId?: number;
     formatCode: string;

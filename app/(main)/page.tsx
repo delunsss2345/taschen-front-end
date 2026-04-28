@@ -1,9 +1,7 @@
 'use client'
 
-import Hero from "@/app/(main)/_components/Hero";
+import Hero from "./_components/Hero";
 import QuoteRandom from "@/app/(main)/_components/QuoteRandom";
-
-
 
 const Home = () => {
 

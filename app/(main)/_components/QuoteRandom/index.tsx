@@ -4,7 +4,7 @@ const QuoteRandom = () => {
   const { t } = useTranslator();
   return (
     <section className="w-full bg-[#7f7690]">
-      <div className="mx-auto grid max-w-[var(--container-main)] grid-cols-12 gap-8 px-10 py-20">
+      <div className="container-main grid grid-cols-12 gap-8 px-6 py-20">
         <div className="col-span-12 flex flex-col justify-center md:col-span-7">
           <span className="mb-6 text-sm font-medium text-white">
             {t("quote.sectionLabel")}

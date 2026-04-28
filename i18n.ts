@@ -25,9 +25,10 @@ i18n
       },
     },
     detection: {
-      order: ["localStorage", "navigator"],
-      caches: ["localStorage"],
+      order: ["localStorage", "cookie", "navigator"],
+      caches: ["localStorage", "cookie"],
       lookupLocalStorage: "appLanguage",
+      lookupCookie: "appLanguage",
     },
   });
 
