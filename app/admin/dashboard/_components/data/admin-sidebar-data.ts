@@ -17,6 +17,7 @@ import {
   FileText,
   Shield,
   ShieldCheck,
+  Image as ImageIcon,
 } from 'lucide-react'
 
 export const adminSidebarData = {
@@ -66,6 +67,11 @@ export const adminSidebarData = {
       title: 'Quản lý Khuyến mãi',
       url: '/admin/dashboard/promotions',
       icon: TicketPercent,
+    },
+    {
+      title: 'Quản lý Banner',
+      url: '/admin/dashboard/banners',
+      icon: ImageIcon,
     },
     {
       title: 'Quản lý Nhà cung cấp',
