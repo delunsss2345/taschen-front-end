@@ -23,6 +23,7 @@ import { MultiSelectCombobox } from './MultiSelectCombobox'
 import { ImagePlus } from 'lucide-react'
 import { toast } from 'sonner'
 import { bookService } from '@/services/book.service'
+import { uploadService } from '@/services/upload.service'
 import { categoryService } from '@/services/category.service'
 import { supplierService } from '@/services/supplier.service'
 import { formatService } from '@/services/format.service'
@@ -37,12 +38,11 @@ export type BookEditModel = {
   khoiLuongGram: number
   soTrang: number
   gia: number
-  soLuongTon: number
   hinhAnh: File | null
   kinhDoanh: boolean
   maTheLoai: number[]
   dinhDang: string
-  variantId: number | null  
+  variantId: number | null
   maNhaCungCap?: number
 }
 
@@ -104,7 +104,6 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
     khoiLuongGram: 0,
     soTrang: 0,
     gia: book.price,
-    soLuongTon: book.quantity,
     hinhAnh: null,
     kinhDoanh: book.isActive === true,
     maTheLoai: book.categoryIds ?? [],
@@ -160,7 +159,6 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
           setForm((p) => ({
             ...p,
             gia: firstVariant?.price ?? p.gia,
-            soLuongTon: firstVariant?.stockQuantity ?? p.soLuongTon,
             kinhDoanh: book.isActive === true,
             maTheLoai: book.categoryIds ?? [],
             maNhaCungCap: book.supplierId,
@@ -179,7 +177,6 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
           khoiLuongGram: bookData.weightGrams,
           soTrang: bookData.pageCount,
           gia: firstVariant?.price || bookData.price,
-          soLuongTon: firstVariant?.stockQuantity || bookData.stockQuantity,
           kinhDoanh: bookData.isActive ?? false,
           maTheLoai: bookData.categoryIds || [],
           dinhDang: matchedFormat,
@@ -217,6 +214,12 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
     setIsSubmitting(true)
 
     try {
+      let imageUrl = previewUrl || book.image || ''
+      if (form.hinhAnh) {
+        const uploaded = await uploadService.uploadImage(form.hinhAnh, 'books')
+        if (uploaded) imageUrl = uploaded
+      }
+
       const bookPayload = {
         title: form.tenSach,
         author: form.tacGia,
@@ -225,8 +228,7 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
         weightGrams: form.khoiLuongGram,
         pageCount: form.soTrang,
         price: form.gia,
-        stockQuantity: form.soLuongTon,
-        imageUrl: book.image || '',
+        imageUrl,
         isActive: form.kinhDoanh,
         categoryIds: form.maTheLoai,
         supplierId: form.maNhaCungCap || 0,
@@ -340,13 +342,6 @@ export function EditBookModal({ trigger, book, onSuccess }: EditBookModalProps) 
                     type="number"
                     value={form.gia}
                     onChange={(e) => setForm((p) => ({ ...p, gia: Number(e.target.value || 0) }))}
-                  />
-                </Field>
-                <Field label="Số lượng tồn">
-                  <Input
-                    type="number"
-                    value={form.soLuongTon}
-                    onChange={(e) => setForm((p) => ({ ...p, soLuongTon: Number(e.target.value || 0) }))}
                   />
                 </Field>
               </div>
