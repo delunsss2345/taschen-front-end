@@ -21,6 +21,7 @@ const redirectToLogin = () => {
 
 export const axiosInstance: AxiosInstance = axios.create({
   baseURL,
+  validateStatus: (status) => status >= 200 && status < 300 || status === 204,
 });
 
 const refreshAxiosInstance: AxiosInstance = axios.create({
