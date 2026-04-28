@@ -1,8 +1,8 @@
 
 export const envConfig = {
-  backendApiUrl: process.env.BACKEND_API_URL || 'http://api.phamtra.dev/api',
+  backendApiUrl: process.env.BACKEND_API_URL || 'https://api.phamtra.dev/api',
   
-  publicBaseApi: process.env.NEXT_PUBLIC_BASE_API || 'http://api.phamtra.dev/api',
+  publicBaseApi: process.env.NEXT_PUBLIC_BASE_API || 'https://api.phamtra.dev/api',
   
   // NextAuth
   nextAuth: {
@@ -22,12 +22,12 @@ export const envConfig = {
   
   // API Endpoints
   getApiUrl: (path: string) => {
-    const base = process.env.BACKEND_API_URL || 'http://api.phamtra.dev/api';
+    const base = process.env.BACKEND_API_URL || 'https://api.phamtra.dev/api';
     return `${base}${path.startsWith('/') ? path : `/${path}`}`;
   },
   
   getPublicApiUrl: (path: string) => {
-    const base = process.env.NEXT_PUBLIC_BASE_API || 'http://api.phamtra.dev/api';
+    const base = process.env.NEXT_PUBLIC_BASE_API || 'https://api.phamtra.dev/api';
     return `${base}${path.startsWith('/') ? path : `/${path}`}`;
   },
 } as const;
