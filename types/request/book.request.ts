@@ -7,7 +7,6 @@ export type UpdateBookInfoRequest = {
   weightGrams: number;
   pageCount: number;
   price: number;
-  stockQuantity: number;
   imageUrl: string;
   isActive: boolean;
   categoryIds: number[];
@@ -22,19 +21,17 @@ export type UpdateVariantRequest = {
   stockQuantity: number;
 };
 
-// CreateBookRequest (giữ nguyên nếu cần)
 export type CreateBookRequest = {
   title: string;
-  author: string;
-  description: string;
-  publicationYear: number;
-  weightGrams: number;
-  pageCount: number;
   price: number;
-  stockQuantity: number;
-  imageUrl: string;
-  isActive: boolean;
-  categoryIds: number[];
-  variantIds: number[];
+  author?: string;
+  description?: string;
+  publicationYear?: number;
+  weightGrams?: number;
+  pageCount?: number;
+  imageUrl?: string;
+  isActive?: boolean;
+  categoryIds?: number[];
+  variantIds?: number[];
   supplierId?: number;
 };

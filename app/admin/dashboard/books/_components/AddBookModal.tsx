@@ -39,7 +39,6 @@ export type BookCreateModel = {
   khoiLuongGram: number
   soTrang: number
   gia: number
-  soLuongTon: number
   hinhAnh: File | null
   kichHoat: boolean
   maTheLoai: number[]
@@ -55,7 +54,6 @@ const defaultValues: BookCreateModel = {
   khoiLuongGram: 0,
   soTrang: 0,
   gia: 0,
-  soLuongTon: 0,
   hinhAnh: null,
   kichHoat: true,
   maTheLoai: [],
@@ -172,7 +170,6 @@ export function AddBookModal({
         weightGrams: form.khoiLuongGram,
         pageCount: form.soTrang,
         price: form.gia,
-        stockQuantity: form.soLuongTon,
         imageUrl: imageUrl,
         isActive: form.kichHoat,
         categoryIds: form.maTheLoai,
@@ -316,17 +313,6 @@ export function AddBookModal({
                     value={form.gia}
                     onChange={(e) => setForm((p) => ({ ...p, gia: Number(e.target.value || 0) }))}
                     placeholder="50000"
-                  />
-                </Field>
-
-                <Field label="Số lượng tồn">
-                  <Input
-                    type="number"
-                    value={form.soLuongTon}
-                    onChange={(e) =>
-                      setForm((p) => ({ ...p, soLuongTon: Number(e.target.value || 0) }))
-                    }
-                    placeholder="100"
                   />
                 </Field>
               </div>

@@ -25,65 +25,57 @@ import { useEffect, useState } from "react";
 const books = [
     {
         title: "Homes for Our Time.",
-        subtitle: "Sustainable Living",
+        author: "Sustainable Living",
         price: 80,
-        badge: "NEW",
         imageUrl:
             "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=600&q=80",
     },
     {
         title: "Japanese Woodblock Prints",
-        subtitle: "",
+        author: "",
         price: 150,
-        badge: "NEW",
         imageUrl:
             "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80",
     },
     {
         title: "Hokusai.",
-        subtitle: "Thirty-six Views of Mount Fuji",
+        author: "Thirty-six Views of Mount Fuji",
         price: 80,
-        badge: "NEW",
         imageUrl:
             "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=600&q=80",
     },
     {
         title: "Valentino.",
-        subtitle: "A Grand Italian Epic",
+        author: "A Grand Italian Epic",
         price: 125,
-        badge: "",
         imageUrl:
             "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=600&q=80",
     },
     {
         title: "Caravaggio.",
-        subtitle: "The Complete Works",
+        author: "The Complete Works",
         price: 60,
-        badge: "",
         imageUrl:
             "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=600&q=80",
     },
     {
         title: "Sylvester Stallone.",
-        subtitle: "The Legend",
+        author: "The Legend",
         price: 200,
-        badge: "NEW",
         imageUrl:
             "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=600&q=80",
     },
     {
         title: "Albert Watson.",
-        subtitle: "KAOS",
+        author: "KAOS",
         price: 100,
-        badge: "",
         imageUrl:
             "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80",
     },
     {
         title: "The Gourmand's Mushroom.",
-        subtitle: "A Collection of Recipes",
+        author: "A Collection of Recipes",
         price: 50,
-        badge: "NEW",
         imageUrl:
             "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=600&q=80",
     },
@@ -371,9 +363,8 @@ export default function AllTitlesPage() {
                         <BookCard
                             key={i}
                             title={book.title}
-                            subtitle={book.subtitle}
+                            author={book.author}
                             price={book.price}
-                            badge={book.badge || undefined}
                             imageUrl={book.imageUrl}
                             href={`/detail/${i + 1}`}
                             variant="compact"
