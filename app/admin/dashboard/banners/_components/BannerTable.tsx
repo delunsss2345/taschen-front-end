@@ -99,6 +99,8 @@ export function BannerTable({
           <tr className="text-gray-500 font-medium">
             <TableHeaderCell className="w-20">ID</TableHeaderCell>
             <TableHeaderCell>Tên Banner</TableHeaderCell>
+            <TableHeaderCell>Tag</TableHeaderCell>
+            <TableHeaderCell className="max-w-xs">Subtitle</TableHeaderCell>
             <TableHeaderCell className="w-48">Hình ảnh</TableHeaderCell>
             <TableHeaderCell className="text-center w-48">Thao tác</TableHeaderCell>
           </tr>
@@ -109,6 +111,14 @@ export function BannerTable({
               <TableCell>{banner.id}</TableCell>
               <TableCell className="font-medium text-gray-900 max-w-xs truncate">
                 {banner.name}
+              </TableCell>
+              <TableCell>
+                <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
+                  {banner.tag || 'Featured'}
+                </span>
+              </TableCell>
+              <TableCell className="text-gray-500 max-w-xs truncate">
+                {banner.subtitle || '-'}
               </TableCell>
               <TableCell>
                 <div className="relative h-16 w-32 rounded-md overflow-hidden border border-gray-100 bg-gray-50">
@@ -197,6 +207,8 @@ function EditBannerModal({
 }) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState(banner.name)
+  const [subtitle, setSubtitle] = useState(banner.subtitle)
+  const [tag, setTag] = useState(banner.tag)
   const [imageUrl, setImageUrl] = useState(banner.imageUrl)
   const [previewUrl, setPreviewUrl] = useState<string | null>(
     banner.imageUrl || null,
@@ -239,6 +251,8 @@ function EditBannerModal({
       await bannerService.updateBanner(banner.id, {
         name: name.trim(),
         imageUrl: finalImageUrl,
+        subtitle: subtitle.trim(),
+        tag: tag.trim(),
       })
 
       toast.dismiss(loadingToast)
@@ -256,14 +270,18 @@ function EditBannerModal({
   useEffect(() => {
     if (open) {
       setName(banner.name)
+      setSubtitle(banner.subtitle)
+      setTag(banner.tag)
       setImageUrl(banner.imageUrl)
       setPreviewUrl(banner.imageUrl || null)
       setSelectedFile(null)
     }
-  }, [open, banner.name, banner.imageUrl])
+  }, [open, banner.name, banner.subtitle, banner.tag, banner.imageUrl])
 
   const hasChanged =
-    name.trim() !== banner.name ||
+    name.trim() !== (banner.name || '') ||
+    subtitle.trim() !== (banner.subtitle || '') ||
+    tag.trim() !== (banner.tag || '') ||
     selectedFile !== null
 
   return (
@@ -273,6 +291,8 @@ function EditBannerModal({
         setOpen(val)
         if (val) {
           setName(banner.name)
+          setSubtitle(banner.subtitle)
+          setTag(banner.tag)
           setImageUrl(banner.imageUrl)
           setPreviewUrl(banner.imageUrl || null)
           setSelectedFile(null)
@@ -291,6 +311,24 @@ function EditBannerModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Nhập tên banner"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Dòng phụ (Subtitle)</label>
+            <Input
+              value={subtitle}
+              onChange={(e) => setSubtitle(e.target.value)}
+              placeholder="Nhập dòng phụ mô tả banner (vd: Giảm đến 50%)"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Nhãn (Tag)</label>
+            <Input
+              value={tag}
+              onChange={(e) => setTag(e.target.value)}
+              placeholder="Nhập nhãn cho banner (vd: Featured, Khuyến mãi, Sách mới)"
             />
           </div>
 
