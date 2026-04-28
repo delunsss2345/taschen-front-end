@@ -11,7 +11,10 @@ const SettingsTranslation = () => {
       type="button"
       className="hidden whitespace-nowrap text-sm hover:opacity-70 md:inline-flex cursor-pointer"
       aria-label={t("header.aria.language")}
-      onClick={() => i18n.changeLanguage(nextLanguage)}
+      onClick={() => {
+        document.cookie = `appLanguage=${nextLanguage};path=/;max-age=31536000`;
+        i18n.changeLanguage(nextLanguage);
+      }}
     >
       {t("header.languageToggle")}
     </button>

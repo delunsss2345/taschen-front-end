@@ -24,6 +24,8 @@ interface BannerFormModalProps {
 export function BannerFormModal({ trigger, onSuccess }: BannerFormModalProps) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
+  const [subtitle, setSubtitle] = useState('')
+  const [tag, setTag] = useState('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -32,6 +34,8 @@ export function BannerFormModal({ trigger, onSuccess }: BannerFormModalProps) {
   useEffect(() => {
     if (!open) {
       setName('')
+      setSubtitle('')
+      setTag('')
       setSelectedFile(null)
       if (previewUrl) URL.revokeObjectURL(previewUrl)
       setPreviewUrl(null)
@@ -70,12 +74,16 @@ export function BannerFormModal({ trigger, onSuccess }: BannerFormModalProps) {
       await bannerService.createBanner({
         name: name.trim(),
         imageUrl: uploadedUrl,
+        subtitle: subtitle.trim(),
+        tag: tag.trim(),
       })
 
       toast.dismiss(loadingToast)
       toast.success('Banner mới đã được thêm.')
       setOpen(false)
       setName('')
+      setSubtitle('')
+      setTag('')
       setSelectedFile(null)
       if (previewUrl) URL.revokeObjectURL(previewUrl)
       setPreviewUrl(null)
@@ -102,6 +110,24 @@ export function BannerFormModal({ trigger, onSuccess }: BannerFormModalProps) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Nhập tên banner (vd: Banner Khuyến mãi mùa hè)"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Dòng phụ (Subtitle)</label>
+            <Input
+              value={subtitle}
+              onChange={(e) => setSubtitle(e.target.value)}
+              placeholder="Nhập dòng phụ mô tả banner (vd: Giảm đến 50%)"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Nhãn (Tag)</label>
+            <Input
+              value={tag}
+              onChange={(e) => setTag(e.target.value)}
+              placeholder="Nhập nhãn cho banner (vd: Featured, Khuyến mãi, Sách mới)"
             />
           </div>
 
