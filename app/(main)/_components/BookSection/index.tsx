@@ -34,16 +34,12 @@ export default function BookSection() {
 
   return (
     <section className="container-main py-16">
-      <div className="mb-8 flex items-end justify-between">
-        <h2 className="font-serif text-3xl font-medium tracking-tight text-zinc-900">
+      <div className="mb-8 flex flex-col items-center gap-1">
+        <h2
+          className="text-2xl font-serif font-medium tracking-tight text-zinc-900"
+        >
           Sách nổi bật
         </h2>
-        <Link
-          href="/books"
-          className="text-sm font-medium uppercase tracking-widest text-zinc-500 underline-offset-4 hover:text-zinc-900 hover:underline"
-        >
-          Xem tất cả
-        </Link>
       </div>
 
       <div className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
@@ -60,6 +56,15 @@ export default function BookSection() {
             variant="compact"
           />
         ))}
+      </div>
+
+      <div className="mt-10 flex justify-center">
+        <Link
+          href="/books"
+          className="inline-flex h-9 items-center justify-center border-2 border-zinc-900 bg-zinc-900 px-6 text-xs font-bold uppercase tracking-widest text-white transition-all hover:bg-transparent hover:text-zinc-900"
+        >
+          Xem thêm
+        </Link>
       </div>
     </section>
   )
