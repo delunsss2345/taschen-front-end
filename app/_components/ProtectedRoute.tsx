@@ -4,11 +4,11 @@ import { selectorCurrentUser, useAuthStore } from "@/features/auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
-type AuthGuardProps = {
+type ProtectedRouteProps = {
   children: React.ReactNode;
 };
 
-const AuthGuard = ({ children }: AuthGuardProps) => {
+export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const currentUser = useAuthStore(selectorCurrentUser);
   const router = useRouter();
   const isFirstRender = useRef(true);
@@ -19,12 +19,10 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
       return;
     }
 
-    if (currentUser) {
-      router.push("/");
+    if (currentUser === null) {
+      router.push("/login");
     }
   }, [currentUser, router]);
 
   return <>{children}</>;
-};
-
-export default AuthGuard;
+}

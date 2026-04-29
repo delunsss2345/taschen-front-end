@@ -7,7 +7,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         <div className="w-full max-w-md">
           <div className="rounded-xl border bg-white p-6 shadow-sm">
             <div className="mb-6 text-center">
-              <div className="text-4xl font-extrabold tracking-wide">TASCHEN</div>
+              <div className="font-serif text-4xl font-extrabold tracking-wide">TASCHEN</div>
             </div>
 
             <div className="mb-4" />
@@ -17,6 +17,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       </div>
     </AuthGuard>
   );
-}
+};
 
 export default Layout;

@@ -2,8 +2,6 @@ export interface Banner {
   id: number;
   name: string;
   imageUrl: string;
-  subtitle: string;
-  tag: string;
 }
 
 export interface BannerApiResponse {
