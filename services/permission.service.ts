@@ -25,7 +25,7 @@ export interface CreatePermissionRequest {
   active: boolean;
 }
 
-export interface UpdatePermissionRequest extends Partial<CreatePermissionRequest> {}
+export type UpdatePermissionRequest = Partial<CreatePermissionRequest>;
 
 export interface CreateAssignRequest {
   code: string;
