@@ -92,7 +92,7 @@ const Footer = () => {
         <Separator />
 
         <div className="flex flex-col items-start justify-between gap-4 py-6 md:flex-row md:items-center">
-          <div className="text-lg font-extrabold tracking-wide text-zinc-900">
+          <div className="font-serif text-lg font-extrabold tracking-wide text-zinc-900">
             TASCHEN
           </div>
           <div className="text-xs text-zinc-700">

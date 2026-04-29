@@ -2,7 +2,6 @@
 import CartSheet from "@/app/(main)/_components/Header/CartSheet";
 import ProfileButton from "@/app/(main)/_components/Header/ProfileButton";
 import SearchBar from "@/app/(main)/_components/Header/Search";
-import SettingsTranslation from "@/app/(main)/_components/Header/SettingTranslation";
 import Nav from "@/app/(main)/_components/Nav";
 import useTranslator from "@/hooks/use-translator";
 import { Bell } from "lucide-react";
@@ -16,7 +15,7 @@ const Header = () => {
     <header className="relative z-50 w-full bg-white">
       <div className="container-main flex h-16 w-full items-center justify-between gap-4">
         <div className="flex items-center gap-6">
-          <div className="text-3xl font-black">TASCHEN</div>
+          <div className="font-serif text-3xl font-black">TASCHEN</div>
           <div className="hidden md:block">
             <Nav />
           </div>
@@ -37,7 +36,6 @@ const Header = () => {
 
           <CartSheet />
           <ProfileButton />
-          <SettingsTranslation />
         </div>
       </div>
     </header>
