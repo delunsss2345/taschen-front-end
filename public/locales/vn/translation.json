@@ -124,6 +124,9 @@
   },
   "profile": {
     "header": {
+      "myAccount": "Tài khoản của tôi",
+      "signOut": "Đăng xuất",
+      "signingOut": "Đang đăng xuất...",
       "orderHistory": "Lịch sử đơn hàng",
       "menu": {
         "profile": "Hồ sơ",
@@ -135,6 +138,145 @@
         "france": "Pháp",
         "unitedStates": "Hoa Kỳ",
         "unitedKingdom": "Vương quốc Anh"
+      }
+    },
+    "sidebar": {
+      "info": "Thông tin cá nhân",
+      "password": "Đổi mật khẩu",
+      "addresses": "Địa chỉ",
+      "orders": "Lịch sử đơn hàng"
+    },
+    "info": {
+      "title": "Thông tin cá nhân",
+      "subtitle": "Quản lý thông tin tài khoản và liên hệ của bạn.",
+      "firstName": "Tên",
+      "firstNamePlaceholder": "Nhập tên của bạn",
+      "lastName": "Họ",
+      "lastNamePlaceholder": "Nhập họ của bạn",
+      "email": "Email",
+      "phoneNumber": "Số điện thoại",
+      "phonePlaceholder": "0912345678",
+      "gender": "Giới tính",
+      "genderPlaceholder": "Chọn giới tính",
+      "genders": {
+        "MALE": "Nam",
+        "FEMALE": "Nữ",
+        "OTHER": "Khác"
+      },
+      "uploadAvatar": "Tải lên ảnh đại diện",
+      "changeAvatar": "Đổi ảnh",
+      "save": "Lưu thay đổi",
+      "saving": "Đang lưu...",
+      "saveSuccess": "Cập nhật hồ sơ thành công",
+      "avatar": {
+        "uploadSuccess": "Tải ảnh đại diện thành công"
+      },
+      "errors": {
+        "saveFailed": "Cập nhật hồ sơ thất bại. Vui lòng thử lại.",
+        "uploadFailed": "Tải ảnh thất bại. Vui lòng thử lại.",
+        "invalidImage": "Vui lòng chọn tệp hình ảnh hợp lệ.",
+        "imageTooLarge": "Hình ảnh phải nhỏ hơn 5MB."
+      }
+    },
+    "password": {
+      "title": "Đổi mật khẩu",
+      "subtitle": "Cập nhật mật khẩu để bảo vệ tài khoản của bạn.",
+      "currentPassword": "Mật khẩu hiện tại",
+      "currentPasswordPlaceholder": "Nhập mật khẩu hiện tại",
+      "newPassword": "Mật khẩu mới",
+      "newPasswordPlaceholder": "Nhập mật khẩu mới",
+      "confirmPassword": "Xác nhận mật khẩu mới",
+      "confirmPasswordPlaceholder": "Nhập lại mật khẩu mới",
+      "change": "Đổi mật khẩu",
+      "changing": "Đang đổi...",
+      "success": "Đổi mật khẩu thành công",
+      "errors": {
+        "changeFailed": "Đổi mật khẩu thất bại. Vui lòng kiểm tra mật khẩu hiện tại."
+      }
+    },
+    "addresses": {
+      "title": "Địa chỉ của tôi",
+      "subtitle": "Quản lý địa chỉ giao hàng của bạn.",
+      "add": "Thêm địa chỉ",
+      "addFirst": "Thêm địa chỉ đầu tiên",
+      "noAddresses": "Chưa có địa chỉ nào.",
+      "default": "Mặc định",
+      "edit": "Sửa",
+      "delete": "Xóa",
+      "setDefault": "Đặt mặc định",
+      "addressType": "Loại địa chỉ",
+      "recipientName": "Tên người nhận",
+      "recipientNamePlaceholder": "Họ và tên người nhận",
+      "phoneNumber": "Số điện thoại",
+      "phonePlaceholder": "0912345678",
+      "street": "Địa chỉ",
+      "streetPlaceholder": "Số nhà, tên đường",
+      "district": "Quận/Huyện",
+      "districtPlaceholder": "VD: Quan 1",
+      "ward": "Phường/Xã",
+      "wardPlaceholder": "VD: Phuong Ben Nghe",
+      "city": "Tỉnh/Thành phố",
+      "cityPlaceholder": "VD: Ho Chi Minh",
+      "types": {
+        "HOME": "Nhà riêng",
+        "WORK": "Công ty",
+        "SHIPPING": "Giao hàng",
+        "BILLING": "Thanh toán"
+      },
+      "editTitle": "Chỉnh sửa địa chỉ",
+      "addTitle": "Thêm địa chỉ mới",
+      "save": "Lưu",
+      "saving": "Đang lưu...",
+      "cancel": "Hủy",
+      "update": "Cập nhật",
+      "create": "Thêm địa chỉ",
+      "createSuccess": "Thêm địa chỉ thành công",
+      "editSuccess": "Cập nhật địa chỉ thành công",
+      "deleteSuccess": "Xóa địa chỉ thành công",
+      "setDefaultSuccess": "Đặt địa chỉ mặc định thành công",
+      "deleteTitle": "Xóa địa chỉ",
+      "deleteConfirm": "Bạn có chắc muốn xóa địa chỉ này? Hành động này không thể hoàn tác.",
+      "deleting": "Đang xóa...",
+      "errors": {
+        "saveFailed": "Lưu địa chỉ thất bại. Vui lòng thử lại.",
+        "deleteFailed": "Xóa địa chỉ thất bại. Vui lòng thử lại.",
+        "setDefaultFailed": "Đặt địa chỉ mặc định thất bại. Vui lòng thử lại."
+      }
+    },
+    "orders": {
+      "title": "Lịch sử đơn hàng",
+      "subtitle": "Xem và theo dõi tất cả đơn hàng của bạn.",
+      "noOrders": "Bạn chưa có đơn hàng nào.",
+      "continueShopping": "Tiếp tục mua sắm",
+      "orderId": "Mã đơn",
+      "date": "Ngày",
+      "items": "Sản phẩm",
+      "moreItems": "sản phẩm khác",
+      "total": "Tổng",
+      "status": "Trạng thái",
+      "actions": "Thao tác",
+      "viewDetails": "Chi tiết",
+      "orderDetails": "Chi tiết đơn hàng",
+      "orderDate": "Ngày đặt",
+      "paymentMethod": "Phương thức thanh toán",
+      "deliveryAddress": "Địa chỉ giao hàng",
+      "item": "Sản phẩm",
+      "unitPrice": "Đơn giá",
+      "quantity": "SL",
+      "totalAmount": "Tổng cộng",
+      "promotion": "Khuyến mãi",
+      "paymentMethods": {
+        "VNPAY": "VNPay",
+        "COD": "Thanh toán khi nhận hàng"
+      },
+      "statuses": {
+        "unpaid": "Chưa thanh toán",
+        "pending": "Chờ xác nhận",
+        "processing": "Đang xử lý",
+        "delivering": "Đang giao",
+        "completed": "Hoàn thành",
+        "cancelled": "Đã hủy",
+        "returned": "Đã trả lại"
       }
     },
     "links": {
