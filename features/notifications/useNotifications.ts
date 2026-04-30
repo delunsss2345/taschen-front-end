@@ -57,26 +57,36 @@ export function useNotifications() {
   }, [userId]);
 
   const markAsRead = useCallback(async (id: number) => {
+    // Optimistic update
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+    );
+    setUnreadCount((prev) => Math.max(0, prev - 1));
     try {
       await apiFetch(`/api/notifications/${id}/read`, { method: "PATCH" });
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
-      );
-      setUnreadCount((prev) => Math.max(0, prev - 1));
     } catch {
-      // silent
+      // revert on failure
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, isRead: false } : n))
+      );
+      setUnreadCount((prev) => prev + 1);
     }
   }, []);
 
   const markAllAsRead = useCallback(async () => {
+    // Optimistic update
+    const prevNotifications = notifications;
+    const prevCount = unreadCount;
+    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    setUnreadCount(0);
     try {
       await apiFetch("/api/notifications/read-all", { method: "PATCH" });
-      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
-      setUnreadCount(0);
     } catch {
-      // silent
+      // revert on failure
+      setNotifications(prevNotifications);
+      setUnreadCount(prevCount);
     }
-  }, []);
+  }, [notifications, unreadCount]);
 
   const deleteOne = useCallback(async (id: number) => {
     try {

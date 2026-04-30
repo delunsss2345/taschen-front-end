@@ -43,14 +43,12 @@ export function NotificationBell() {
           <span className="text-sm font-semibold text-gray-900">Thông báo</span>
           {hasItems && (
             <div className="flex items-center gap-3">
-              {unreadCount > 0 && (
-                <button
-                  onClick={markAllAsRead}
-                  className="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors"
-                >
-                  Đọc tất cả
-                </button>
-              )}
+              <button
+                onClick={markAllAsRead}
+                className="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors"
+              >
+                Đọc tất cả
+              </button>
               <button
                 onClick={deleteAll}
                 className="text-xs text-red-500 hover:text-red-600 font-medium transition-colors"
