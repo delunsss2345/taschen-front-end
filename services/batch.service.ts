@@ -64,4 +64,18 @@ export const batchService = {
     const response = await http.post<ApiResponseEnvelope<Batch>>("/batches", payload);
     return requireResponseData(response, "Create batch response is missing data");
   },
+
+  async getBatchesByBookId(bookId: number): Promise<Batch[]> {
+    try {
+      const response = await http.get<ApiResponseEnvelope<Batch[]>>(`/batches/book/${bookId}/available`);
+      const data = getResponseData<Batch[]>(response);
+      if (data && data.length >= 0) return data;
+      throw new Error('empty');
+    } catch {
+      // Fallback: filter from all batches
+      const response = await http.get<ApiResponseEnvelope<Batch[]>>('/batches');
+      const all = getResponseData<Batch[]>(response) ?? [];
+      return all.filter((b) => b.bookId === bookId && b.remainingQuantity > 0);
+    }
+  },
 };
