@@ -16,6 +16,7 @@ import { NotificationBell } from '@/features/notifications/NotificationBell'
 import { Home, LogOut, User, UserPen } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 type AdminHeaderProps = React.HTMLAttributes<HTMLElement>
 
@@ -23,14 +24,17 @@ export function Header({ className, ...props }: AdminHeaderProps) {
   const { currentUser } = useAuthStore()
   const router = useRouter()
   const { mutate: logout } = useLogoutMutation()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => { setMounted(true) }, [])
 
   const handleLogout = () => {
     logout(undefined, { onSuccess: () => router.push('/login') })
   }
 
-  const displayName = currentUser
+  const displayName = mounted && currentUser
     ? `${currentUser.firstName} ${currentUser.lastName}`.trim()
-    : 'Admin'
+    : ''
 
   return (
     <header
@@ -65,7 +69,7 @@ export function Header({ className, ...props }: AdminHeaderProps) {
             <DropdownMenuContent align="end" className="w-52 font-sans">
               <DropdownMenuLabel className="font-normal">
                 <p className="text-sm font-semibold text-gray-900 truncate">{displayName}</p>
-                {currentUser?.email && (
+                {mounted && currentUser?.email && (
                   <p className="text-xs text-gray-500 truncate mt-0.5">{currentUser.email}</p>
                 )}
               </DropdownMenuLabel>
