@@ -11,7 +11,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/features/auth'
-import { Bell, Home, User, UserPen } from 'lucide-react'
+import { NotificationBell } from '@/features/notifications/NotificationBell'
+import { Home, User, UserPen } from 'lucide-react'
 import Link from 'next/link'
 
 type AdminHeaderProps = React.HTMLAttributes<HTMLElement>
@@ -42,10 +43,7 @@ export function Header({ className, ...props }: AdminHeaderProps) {
             Xin chào, <span className="text-gray-900 font-bold">{displayName}</span>
           </div>
 
-          {/* Bell */}
-          <button className="relative h-8 w-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors">
-            <Bell className="h-4.5 w-4.5" />
-          </button>
+          <NotificationBell />
 
           {/* User dropdown */}
           <DropdownMenu>
