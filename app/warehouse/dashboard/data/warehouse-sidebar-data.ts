@@ -5,10 +5,23 @@ import {
   PackageCheck,
   RotateCw,
   ShoppingCart,
-  Trash2
+  Trash2,
+  type LucideIcon,
 } from 'lucide-react'
 
-export const warehouseSidebarData = {
+interface SidebarItem {
+  title: string
+  url?: string
+  icon?: LucideIcon
+  items?: { title: string; url: string }[]
+}
+
+interface SidebarData {
+  header: string
+  items: SidebarItem[]
+}
+
+export const warehouseSidebarData: SidebarData = {
   header: "WAREHOUSE",
   items: [
     {
