@@ -1,5 +1,5 @@
-import { SellerPromotionsPage } from './_components/SellerPromotionsPage'
+import { AdminPromotionsPage } from '@/app/admin/dashboard/promotions/_components/AdminPromotionsPage'
 
 export default function Page() {
-  return <SellerPromotionsPage />
+  return <AdminPromotionsPage />
 }

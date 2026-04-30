@@ -1,5 +1,5 @@
-import { SellerReturnsPage } from './_components/SellerReturnsPage'
+import { ReturnsPage } from '@/app/admin/dashboard/returns/_components/ReturnsPage'
 
 export default function Page() {
-  return <SellerReturnsPage />
+  return <ReturnsPage />
 }

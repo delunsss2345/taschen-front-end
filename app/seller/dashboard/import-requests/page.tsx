@@ -1,5 +1,5 @@
-import { SellerImportRequestsPage } from './_components/SellerImportRequestsPage'
+import { ImportRequestsPage } from '@/app/admin/dashboard/import-requests/_components/ImportRequestsPage'
 
 export default function Page() {
-  return <SellerImportRequestsPage />
+  return <ImportRequestsPage canUpdateStatus={false} />
 }
