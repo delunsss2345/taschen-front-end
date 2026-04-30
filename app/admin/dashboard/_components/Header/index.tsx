@@ -11,14 +11,22 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/features/auth'
+import { useLogoutMutation } from '@/features/auth/hooks'
 import { NotificationBell } from '@/features/notifications/NotificationBell'
-import { Home, User, UserPen } from 'lucide-react'
+import { Home, LogOut, User, UserPen } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 type AdminHeaderProps = React.HTMLAttributes<HTMLElement>
 
 export function Header({ className, ...props }: AdminHeaderProps) {
   const { currentUser } = useAuthStore()
+  const router = useRouter()
+  const { mutate: logout } = useLogoutMutation()
+
+  const handleLogout = () => {
+    logout(undefined, { onSuccess: () => router.push('/login') })
+  }
 
   const displayName = currentUser
     ? `${currentUser.firstName} ${currentUser.lastName}`.trim()
@@ -73,6 +81,14 @@ export function Header({ className, ...props }: AdminHeaderProps) {
                   <Home className="h-4 w-4 text-gray-500" />
                   Trang chủ
                 </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={handleLogout}
+                className="flex items-center gap-2 cursor-pointer text-red-500 focus:text-red-500 focus:bg-red-50"
+              >
+                <LogOut className="h-4 w-4" />
+                Đăng xuất
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
