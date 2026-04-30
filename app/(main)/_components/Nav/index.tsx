@@ -21,50 +21,6 @@ const nav: NavItem[] = [
   {
     key: "books",
     to: "/books",
-    dropdown: [
-      {
-        items: [
-          { label: "All Titles", href: "/books" },
-          { label: "New & Upcoming", href: "/books?sort=new" },
-          { label: "Bestsellers", href: "/books?sort=bestseller" },
-        ],
-      },
-      {
-        items: [
-          { label: "Architecture & Design", href: "/books/architecture-design" },
-          { label: "Art", href: "/books/art" },
-          { label: "Classics", href: "/books/classics" },
-          { label: "Comics", href: "/books/comics" },
-          { label: "Esoterica", href: "/books/esoterica" },
-          { label: "Fashion", href: "/books/fashion" },
-          { label: "Film", href: "/books/film" },
-          { label: "Graphic Design", href: "/books/graphic-design" },
-        ],
-      },
-      {
-        items: [
-          { label: "Kids", href: "/books/kids" },
-          { label: "Music", href: "/books/music" },
-          { label: "Photography", href: "/books/photography" },
-          { label: "Pop Culture", href: "/books/pop-culture" },
-          { label: "Sexy Books", href: "/books/sexy-books" },
-          { label: "Style, Food & Travel", href: "/books/style-food-travel" },
-          { label: "Sports", href: "/books/sports" },
-        ],
-      },
-      {
-        items: [
-          { label: "45th Edition Series", href: "/books/45th-edition" },
-          { label: "Basic Art Series", href: "/books/basic-art" },
-          { label: "Bibliotheca Universalis", href: "/books/bibliotheca-universalis" },
-          { label: "Clothbound Classics", href: "/books/clothbound-classics" },
-          { label: "Fantastic Price", href: "/books/fantastic-price" },
-          { label: "Icons", href: "/books/icons" },
-          { label: "Source Books", href: "/books/source-books" },
-          { label: "XL Books", href: "/books/xl-books" },
-        ],
-      },
-    ],
   },
 ];
 

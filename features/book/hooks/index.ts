@@ -91,3 +91,20 @@ export const useDeleteBookMutation = () => {
     },
   });
 };
+
+export type BookSearchParams = {
+  page?: number;
+  size?: number;
+  keyword?: string;
+  categoryId?: number;
+  status?: "active" | "deleted" | "all";
+  sortBy?: string;
+  sortDir?: string;
+};
+
+export const useSearchBooksQuery = (params: BookSearchParams) => {
+  return useQuery({
+    queryKey: ["books", "search", params],
+    queryFn: () => bookService.searchBooks(params),
+  });
+};
