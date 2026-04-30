@@ -18,21 +18,8 @@ export const warehouseSidebarData = {
     },
     {
       title: 'Yêu cầu nhập kho',
+      url: '/warehouse/dashboard/import-requests',
       icon: ArrowDownToLine,
-      items: [
-        {
-          title: 'Đang chờ',
-          url: '/warehouse/dashboard/import-requests/pending',
-        },
-        {
-          title: 'Đã duyệt',
-          url: '/warehouse/dashboard/import-requests/approved',
-        },
-        {
-          title: 'Từ chối',
-          url: '/warehouse/dashboard/import-requests/rejected',
-        },
-      ],
     },
     {
       title: 'Phiếu Nhập kho',
