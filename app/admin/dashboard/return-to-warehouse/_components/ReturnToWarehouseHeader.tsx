@@ -17,27 +17,31 @@ interface ReturnToWarehouseHeaderProps {
   statusFilter: string
   onStatusChange: (value: string) => void
   onOpenCreateModal?: () => void
+  canCreate?: boolean
 }
 
-export function ReturnToWarehouseHeader({ 
-  searchTerm, 
+export function ReturnToWarehouseHeader({
+  searchTerm,
   onSearchChange,
   statusFilter,
   onStatusChange,
-  onOpenCreateModal 
+  onOpenCreateModal,
+  canCreate = true,
 }: ReturnToWarehouseHeaderProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Yêu cầu trả hàng về kho</h1>
-        <Button 
-          variant="default" 
-          className="h-9 gap-1 px-3 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white"
-          onClick={onOpenCreateModal}
-        >
-          <Plus className="h-4 w-4" />
-          Tạo yêu cầu
-        </Button>
+        {canCreate && (
+          <Button
+            variant="default"
+            className="h-9 gap-1 px-3 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white"
+            onClick={onOpenCreateModal}
+          >
+            <Plus className="h-4 w-4" />
+            Tạo yêu cầu
+          </Button>
+        )}
       </div>
 
       <div className="flex items-center gap-4">
