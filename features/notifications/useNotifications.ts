@@ -89,29 +89,37 @@ export function useNotifications() {
   }, [notifications, unreadCount]);
 
   const deleteOne = useCallback(async (id: number) => {
+    // Optimistic update
+    const target = notifications.find((n) => n.id === id);
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+    if (target && !target.isRead) setUnreadCount((c) => Math.max(0, c - 1));
+
     try {
       await apiFetch(`/api/notifications/${id}`, { method: "DELETE" });
-      setNotifications((prev) => {
-        const target = prev.find((n) => n.id === id);
-        if (target && !target.isRead) {
-          setUnreadCount((c) => Math.max(0, c - 1));
-        }
-        return prev.filter((n) => n.id !== id);
-      });
     } catch {
-      // silent
+      // revert on failure
+      if (target) {
+        setNotifications((prev) => [...prev, target].sort((a, b) => b.id - a.id));
+        if (!target.isRead) setUnreadCount((c) => c + 1);
+      }
     }
-  }, []);
+  }, [notifications]);
 
   const deleteAll = useCallback(async () => {
+    // Optimistic update
+    const prevNotifications = notifications;
+    const prevCount = unreadCount;
+    setNotifications([]);
+    setUnreadCount(0);
+
     try {
       await apiFetch("/api/notifications", { method: "DELETE" });
-      setNotifications([]);
-      setUnreadCount(0);
     } catch {
-      // silent
+      // revert on failure
+      setNotifications(prevNotifications);
+      setUnreadCount(prevCount);
     }
-  }, []);
+  }, [notifications, unreadCount]);
 
   // Initial fetch only when logged in
   useEffect(() => {

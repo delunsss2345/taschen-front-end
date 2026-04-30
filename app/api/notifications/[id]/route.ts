@@ -9,7 +9,7 @@ export async function DELETE(
   try {
     const { id } = await params;
     const headers = getAuthorizationHeader(request);
-    await api.delete(`notifications/${id}`, { headers });
+    await api.delete(`notifications/${id}`, undefined, { headers });
     return new Response(null, { status: 204 });
   } catch (error) {
     return handleRouteError(error, "Không thể xóa thông báo", "Delete Notification API Error");

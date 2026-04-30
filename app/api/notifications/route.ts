@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const headers = getAuthorizationHeader(request);
-    await api.delete("notifications", { headers });
+    await api.delete("notifications", undefined, { headers });
     return new Response(null, { status: 204 });
   } catch (error) {
     return handleRouteError(error, "Không thể xóa thông báo", "Delete All Notifications API Error");
