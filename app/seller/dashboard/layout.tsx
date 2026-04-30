@@ -8,16 +8,14 @@ import { SellerRealtimeSubscriptions } from './_components/SellerRealtimeSubscri
 
 export default function SellerLayout({
   children,
-  username = 'seller',
 }: {
   children: ReactNode
-  username?: string
 }) {
   return (
     <SidebarProvider className="w-full">
       <SellerRealtimeSubscriptions />
       <div className="min-h-screen w-full bg-[#f6f7fb]">
-        <Header username={username} />
+        <Header />
         <div className="flex w-full">
           <div className="h-[calc(100vh-4rem)]">
             <SellerSidebar />
