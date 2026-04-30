@@ -17,7 +17,12 @@ const TAB_STATUS_MAP: Record<string, string[]> = {
   rejected: ['REJECTED'],
 }
 
-export function ImportRequestsPage() {
+interface ImportRequestsPageProps {
+  canCreate?: boolean
+  canUpdateStatus?: boolean
+}
+
+export function ImportRequestsPage({ canCreate = true, canUpdateStatus = true }: ImportRequestsPageProps = {}) {
   const [activeTab, setActiveTab] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [isLoading, setIsLoading] = useState(true)
@@ -85,6 +90,7 @@ export function ImportRequestsPage() {
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         onCreateClick={() => setShowCreateModal(true)}
+        canCreate={canCreate}
       />
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <ImportRequestsTabs
@@ -95,15 +101,17 @@ export function ImportRequestsPage() {
         {isLoading ? (
           <LoadingSpinner />
         ) : (
-          <ImportRequestsTable requests={filteredRequests} mode={getMode()} onRefresh={fetchStockRequests} />
+          <ImportRequestsTable requests={filteredRequests} mode={getMode()} onRefresh={fetchStockRequests} canUpdateStatus={canUpdateStatus} />
         )}
       </div>
 
-      <CreateStockRequestModal
-        open={showCreateModal}
-        onOpenChange={setShowCreateModal}
-        onSuccess={fetchStockRequests}
-      />
+      {canCreate && (
+        <CreateStockRequestModal
+          open={showCreateModal}
+          onOpenChange={setShowCreateModal}
+          onSuccess={fetchStockRequests}
+        />
+      )}
     </div>
   )
 }

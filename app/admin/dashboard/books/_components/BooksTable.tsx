@@ -76,7 +76,7 @@ export function BooksTable({ books, isLoading, onDeleteSuccess, onEditSuccess, o
 
     try {
       await bookService.deleteBook(bookId)
-      toast.success('Sách đã được xóa thành công.', { id: toastId })
+      toast.success('Sách đã được xóa thành công.', { id: toastId, duration: 4000 })
       onDeleteSuccess?.(bookId)
     } catch (error: unknown) {
       const axiosError = error as { response?: { data?: { message?: string; error?: string } } };
@@ -87,7 +87,7 @@ export function BooksTable({ books, isLoading, onDeleteSuccess, onEditSuccess, o
         const e = error as { response?: { status?: number; data?: unknown } };
         console.error('[deleteBook]', e?.response?.status, e?.response?.data);
       }
-      toast.error(backendMessage, { id: toastId })
+      toast.error(backendMessage, { id: toastId, duration: 4000 })
     }
   }
 

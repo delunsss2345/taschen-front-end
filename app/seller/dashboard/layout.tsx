@@ -4,6 +4,7 @@ import { Header } from '@/app/admin/dashboard/_components/Header'
 import { SidebarProvider } from '@/components/ui/sidebar'
 import type { ReactNode } from 'react'
 import { SellerSidebar } from './_components/SellerSidebar'
+import { SellerRealtimeSubscriptions } from './_components/SellerRealtimeSubscriptions'
 
 export default function SellerLayout({
   children,
@@ -14,6 +15,7 @@ export default function SellerLayout({
 }) {
   return (
     <SidebarProvider className="w-full">
+      <SellerRealtimeSubscriptions />
       <div className="min-h-screen w-full bg-[#f6f7fb]">
         <Header username={username} />
         <div className="flex w-full">

@@ -7,7 +7,17 @@ import { CreateDisposalRequestModal } from './CreateDisposalRequestModal'
 import { disposalRequestService, type DisposalRequest } from '@/services/disposal-request.service'
 import { LoadingSpinner } from '@/components/ui/loading'
 
-export default function ReturnToWarehousePage() {
+interface ReturnToWarehousePageProps {
+  canCreate?: boolean
+  canUpdateStatus?: boolean
+  showCreateDisposal?: boolean
+}
+
+export function ReturnToWarehousePage({
+  canCreate = true,
+  canUpdateStatus = true,
+  showCreateDisposal = true,
+}: ReturnToWarehousePageProps = {}) {
   const [requests, setRequests] = useState<DisposalRequest[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
@@ -52,24 +62,32 @@ export default function ReturnToWarehousePage() {
 
   return (
     <div className="space-y-6">
-      <ReturnToWarehouseHeader 
+      <ReturnToWarehouseHeader
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         statusFilter={statusFilter}
         onStatusChange={setStatusFilter}
-        onOpenCreateModal={() => setIsCreateModalOpen(true)} 
+        onOpenCreateModal={() => setIsCreateModalOpen(true)}
+        canCreate={canCreate}
       />
       {isLoading ? (
         <LoadingSpinner />
       ) : (
-        <ReturnToWarehouseTable data={filteredRequests} onRefresh={fetchRequests} />
+        <ReturnToWarehouseTable
+          data={filteredRequests}
+          onRefresh={fetchRequests}
+          canUpdateStatus={canUpdateStatus}
+          showCreateDisposal={showCreateDisposal}
+        />
       )}
 
-      <CreateDisposalRequestModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onSuccess={fetchRequests}
-      />
+      {canCreate && (
+        <CreateDisposalRequestModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onSuccess={fetchRequests}
+        />
+      )}
     </div>
   )
 }

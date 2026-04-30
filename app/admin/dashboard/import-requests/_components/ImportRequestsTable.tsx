@@ -21,9 +21,10 @@ interface ImportRequestsTableProps {
   requests: StockRequest[]
   mode: TableMode
   onRefresh?: () => void
+  canUpdateStatus?: boolean
 }
 
-export function ImportRequestsTable({ requests, mode, onRefresh }: ImportRequestsTableProps) {
+export function ImportRequestsTable({ requests, mode, onRefresh, canUpdateStatus = true }: ImportRequestsTableProps) {
   const [selectedRequest, setSelectedRequest] = useState<StockRequest | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isCreateOrderModalOpen, setIsCreateOrderModalOpen] = useState(false)
@@ -140,17 +141,27 @@ export function ImportRequestsTable({ requests, mode, onRefresh }: ImportRequest
 
   const renderActionButtons = (item: StockRequest) => {
     // For 'all' mode, determine buttons based on item status
-    const effectiveMode = mode === 'all' 
+    const effectiveMode = mode === 'all'
       ? (item.status === 'PENDING' ? 'pending' : item.status === 'ORDERED' ? 'ordered' : item.status === 'APPROVED' ? 'approved' : 'rejected')
       : mode
 
-    // Pending mode: Duyệt / Từ chối buttons
-    if (effectiveMode === 'pending') {
+    const viewDetailBtn = (
+      <Button
+        size="sm"
+        onClick={() => handleViewDetails(item)}
+        className="h-8 gap-1 px-3 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all duration-200"
+      >
+        Xem chi tiết
+      </Button>
+    )
+
+    // Pending mode: Duyệt / Từ chối buttons (only when canUpdateStatus)
+    if (effectiveMode === 'pending' && canUpdateStatus) {
       return (
         <div className="flex items-center justify-center gap-1">
           <Button
             size="sm"
-            className="h-8 cursor-pointer bg-blue-600! hover:bg-blue-700! text-white shadow-sm transition-all duration-200 gap-1"
+            className="h-8 cursor-pointer bg-green-600 hover:bg-green-700 text-white shadow-sm transition-all duration-200 gap-1"
             onClick={() => openResponseDialog(item, 'approve')}
             disabled={approvingId !== null}
           >
@@ -167,12 +178,13 @@ export function ImportRequestsTable({ requests, mode, onRefresh }: ImportRequest
             <X className="h-3.5 w-3.5" />
             {rejectingId === item.id ? 'Đang...' : 'Từ chối'}
           </Button>
+          {viewDetailBtn}
         </div>
       )
     }
 
-    // Approved mode: Đặt hàng ngay / Xem chi tiết buttons
-    if (effectiveMode === 'approved') {
+    // Approved mode: Đặt hàng ngay / Xem chi tiết buttons (only when canUpdateStatus)
+    if (effectiveMode === 'approved' && canUpdateStatus) {
       return (
         <div className="flex items-center justify-center gap-1">
           <Button
@@ -185,40 +197,12 @@ export function ImportRequestsTable({ requests, mode, onRefresh }: ImportRequest
           >
             Đặt hàng ngay
           </Button>
-          <Button
-            size="sm"
-            onClick={() => handleViewDetails(item)}
-            className="h-8 gap-1 px-3 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all duration-200"
-          >
-            Xem chi tiết
-          </Button>
+          {viewDetailBtn}
         </div>
       )
     }
 
-    // Ordered mode: only view details (already ordered)
-    if (effectiveMode === 'ordered') {
-      return (
-        <Button
-          size="sm"
-          onClick={() => handleViewDetails(item)}
-          className="h-8 gap-1 px-3 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all duration-200"
-        >
-          Xem chi tiết
-        </Button>
-      )
-    }
-
-    // Rejected mode: just view details
-    return (
-      <Button
-        size="sm"
-        onClick={() => handleViewDetails(item)}
-        className="h-8 gap-1 px-3 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all duration-200"
-      >
-        Xem chi tiết
-      </Button>
-    )
+    return viewDetailBtn
   }
 
   return (
@@ -338,17 +322,17 @@ export function ImportRequestsTable({ requests, mode, onRefresh }: ImportRequest
           )}
 
           <DialogFooter className="gap-2 border-t pt-4 mt-4">
-            {selectedRequest?.status === 'PENDING' ? (
+            {selectedRequest?.status === 'PENDING' && canUpdateStatus ? (
               <>
-                <Button 
-                  className="cursor-pointer bg-blue-600! hover:bg-blue-700! text-white"
+                <Button
+                  className="cursor-pointer bg-green-600 hover:bg-green-700 text-white"
                   onClick={() => openResponseDialog(selectedRequest, 'approve')}
                   disabled={approvingId !== null}
                 >
                   {approvingId === selectedRequest.id ? 'Đang duyệt...' : 'Duyệt'}
                 </Button>
-                <Button 
-                  variant="destructive" 
+                <Button
+                  variant="destructive"
                   className="cursor-pointer"
                   onClick={() => openResponseDialog(selectedRequest, 'reject')}
                   disabled={rejectingId !== null}

@@ -18,6 +18,7 @@ import {
   Shield,
   ShieldCheck,
   Image as ImageIcon,
+  Trash2,
 } from 'lucide-react'
 
 export const adminSidebarData = {
@@ -107,6 +108,11 @@ export const adminSidebarData = {
       title: 'Yêu cầu Hoàn/Đổi',
       url: '/admin/dashboard/returns',
       icon: RotateCcw,
+    },
+    {
+      title: 'Quản lý Xuất Hủy',
+      url: '/admin/dashboard/disposal-requests',
+      icon: Trash2,
     },
     {
       title: 'Quản lý Permission',

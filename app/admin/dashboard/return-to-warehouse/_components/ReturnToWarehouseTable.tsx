@@ -10,6 +10,8 @@ import type { DisposalRequest } from '@/services/disposal-request.service'
 interface ReturnToWarehouseTableProps {
   data: DisposalRequest[]
   onRefresh?: () => void
+  canUpdateStatus?: boolean
+  showCreateDisposal?: boolean
 }
 
 const statusConfig = {
@@ -27,7 +29,7 @@ const statusConfig = {
   },
 }
 
-export function ReturnToWarehouseTable({ data, onRefresh }: ReturnToWarehouseTableProps) {
+export function ReturnToWarehouseTable({ data, onRefresh, canUpdateStatus = true, showCreateDisposal = true }: ReturnToWarehouseTableProps) {
   const [selectedRequest, setSelectedRequest] = useState<DisposalRequest | null>(null)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
 
@@ -97,6 +99,8 @@ export function ReturnToWarehouseTable({ data, onRefresh }: ReturnToWarehouseTab
         onClose={() => setIsDetailModalOpen(false)}
         request={selectedRequest}
         onRefresh={onRefresh}
+        canUpdateStatus={canUpdateStatus}
+        showCreateDisposal={showCreateDisposal}
       />
     </>
   )

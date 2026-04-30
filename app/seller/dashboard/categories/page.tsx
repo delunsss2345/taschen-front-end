@@ -1,5 +1,5 @@
-import { SellerCategoriesPage } from './_components/SellerCategoriesPage'
+import { AdminCategoriesPage } from '@/app/admin/dashboard/categories/_components/AdminCategoriesPage'
 
 export default function Page() {
-  return <SellerCategoriesPage />
+  return <AdminCategoriesPage />
 }

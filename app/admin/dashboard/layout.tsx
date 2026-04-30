@@ -1,6 +1,7 @@
 "use client";
 
 import { AppSidebar } from '@/app/admin/dashboard/_components/AppSidebar';
+import { AdminRealtimeSubscriptions } from '@/app/admin/dashboard/_components/AdminRealtimeSubscriptions';
 import { Header } from '@/app/admin/dashboard/_components/Header';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import type { ReactNode } from 'react';
@@ -8,6 +9,7 @@ import type { ReactNode } from 'react';
 export default function Layout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <SidebarProvider className="w-full">
+      <AdminRealtimeSubscriptions />
       <div className="min-h-screen w-full bg-[#f6f7fb]">
         <Header username="admin" />
         <div className="flex w-full">

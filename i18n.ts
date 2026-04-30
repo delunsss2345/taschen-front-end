@@ -25,7 +25,7 @@ i18n
       },
     },
     detection: {
-      order: ["localStorage", "cookie", "navigator"],
+      order: ["localStorage", "cookie"],
       caches: ["localStorage", "cookie"],
       lookupLocalStorage: "appLanguage",
       lookupCookie: "appLanguage",

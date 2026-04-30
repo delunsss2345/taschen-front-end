@@ -10,15 +10,18 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { TableCell, TableHeaderCell, TableRow } from '@/components/table'
-import { Calendar, User } from 'lucide-react'
+import { Calendar, User, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { disposalRequestService, type DisposalRequest, type BatchInfo } from '@/services/disposal-request.service'
+import { QuickCreateDisposalModal } from './QuickCreateDisposalModal'
 
 interface ReturnToWarehouseDetailModalProps {
   isOpen: boolean
   onClose: () => void
   request: DisposalRequest | null
   onRefresh?: () => void
+  canUpdateStatus?: boolean
+  showCreateDisposal?: boolean
 }
 
 const statusConfig = {
@@ -41,6 +44,8 @@ export function ReturnToWarehouseDetailModal({
   onClose,
   request,
   onRefresh,
+  canUpdateStatus = true,
+  showCreateDisposal = true,
 }: ReturnToWarehouseDetailModalProps) {
   const [showApproveModal, setShowApproveModal] = useState(false)
   const [showRejectModal, setShowRejectModal] = useState(false)
@@ -49,6 +54,7 @@ export function ReturnToWarehouseDetailModal({
   const [isRejecting, setIsRejecting] = useState(false)
   const [selectedBatch, setSelectedBatch] = useState<BatchInfo | null>(null)
   const [showBatchDetailModal, setShowBatchDetailModal] = useState(false)
+  const [showQuickDisposalModal, setShowQuickDisposalModal] = useState(false)
 
   if (!request) return null
 
@@ -99,7 +105,7 @@ export function ReturnToWarehouseDetailModal({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-[700px] max-h-[95vh]">
+        <DialogContent className="sm:max-w-175 max-h-[95vh]">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">
               Chi tiết yêu cầu trả hàng về kho
@@ -226,7 +232,7 @@ export function ReturnToWarehouseDetailModal({
             )}
           </div>
 
-          {request.status === 'PENDING' && (
+          {request.status === 'PENDING' && canUpdateStatus && (
             <div className="flex justify-end gap-3 pt-4 border-t">
               <Button
                 variant="destructive"
@@ -244,6 +250,18 @@ export function ReturnToWarehouseDetailModal({
               </Button>
             </div>
           )}
+
+          {request.status === 'APPROVED' && showCreateDisposal && (
+            <div className="flex justify-end pt-4 border-t">
+              <Button
+                onClick={() => setShowQuickDisposalModal(true)}
+                className="cursor-pointer bg-red-600 hover:bg-red-700 text-white gap-2"
+              >
+                <Trash2 className="h-4 w-4" />
+                Tạo xuất hủy
+              </Button>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
@@ -258,7 +276,7 @@ export function ReturnToWarehouseDetailModal({
               Ghi chú (không bắt buộc)
             </label>
             <textarea
-              className="w-full min-h-[100px] px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+              className="w-full min-h-25 px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
               placeholder="Nhập ghi chú cho yêu cầu..."
               value={responseNote}
               onChange={(e) => setResponseNote(e.target.value)}
@@ -297,7 +315,7 @@ export function ReturnToWarehouseDetailModal({
               Lý do từ chối
             </label>
             <textarea
-              className="w-full min-h-[100px] px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+              className="w-full min-h-25 px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
               placeholder="Nhập lý do từ chối..."
               value={responseNote}
               onChange={(e) => setResponseNote(e.target.value)}
@@ -325,6 +343,20 @@ export function ReturnToWarehouseDetailModal({
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Quick Create Disposal Modal */}
+      {showQuickDisposalModal && (
+        <QuickCreateDisposalModal
+          isOpen={showQuickDisposalModal}
+          onClose={() => setShowQuickDisposalModal(false)}
+          request={request}
+          onSuccess={() => {
+            setShowQuickDisposalModal(false)
+            onClose()
+            onRefresh?.()
+          }}
+        />
+      )}
 
       {/* Batch Detail Modal */}
       <Dialog open={showBatchDetailModal} onOpenChange={setShowBatchDetailModal}>

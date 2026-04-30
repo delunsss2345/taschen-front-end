@@ -5,10 +5,23 @@ import {
   PackageCheck,
   RotateCw,
   ShoppingCart,
-  Trash2
+  Trash2,
+  type LucideIcon,
 } from 'lucide-react'
 
-export const warehouseSidebarData = {
+interface SidebarItem {
+  title: string
+  url?: string
+  icon?: LucideIcon
+  items?: { title: string; url: string }[]
+}
+
+interface SidebarData {
+  header: string
+  items: SidebarItem[]
+}
+
+export const warehouseSidebarData: SidebarData = {
   header: "WAREHOUSE",
   items: [
     {
@@ -18,21 +31,8 @@ export const warehouseSidebarData = {
     },
     {
       title: 'Yêu cầu nhập kho',
+      url: '/warehouse/dashboard/import-requests',
       icon: ArrowDownToLine,
-      items: [
-        {
-          title: 'Đang chờ',
-          url: '/warehouse/dashboard/import-requests/pending',
-        },
-        {
-          title: 'Đã duyệt',
-          url: '/warehouse/dashboard/import-requests/approved',
-        },
-        {
-          title: 'Từ chối',
-          url: '/warehouse/dashboard/import-requests/rejected',
-        },
-      ],
     },
     {
       title: 'Phiếu Nhập kho',

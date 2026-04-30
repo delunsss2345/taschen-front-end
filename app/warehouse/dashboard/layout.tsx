@@ -2,6 +2,7 @@
 
 import { Header } from '@/app/admin/dashboard/_components/Header'
 import { WarehouseSidebar } from '@/app/warehouse/dashboard/_components/WarehouseSidebar'
+import { WarehouseRealtimeSubscriptions } from '@/app/warehouse/dashboard/_components/WarehouseRealtimeSubscriptions'
 import { SidebarProvider } from '@/components/ui/sidebar'
 import type { ReactNode } from 'react'
 
@@ -14,6 +15,7 @@ export default function WarehouseLayout({
 }) {
   return (
     <SidebarProvider className="w-full">
+      <WarehouseRealtimeSubscriptions />
       <div className="min-h-screen w-full bg-[#f6f7fb]">
         <Header username={username} />
         <div className="flex w-full">

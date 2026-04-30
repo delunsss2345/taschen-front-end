@@ -48,17 +48,6 @@ const Footer = () => {
   return (
     <footer className="w-full bg-white">
       <div className="container-main px-6">
-        <div className="py-10">
-          <h2 className="text-2xl font-extrabold tracking-tight">
-            {t("footer.tagline")}
-          </h2>
-          <p className="mt-4 max-w-[var(--width-md)] text-sm leading-6 text-zinc-700">
-            {t("footer.description")}
-          </p>
-        </div>
-
-        <Separator />
-
         <div className="grid grid-cols-12 gap-y-10 py-10">
           <FooterCol title={t("footer.connectTitle")} links={connectLinks} />
           <FooterCol title={t("footer.companyTitle")} links={companyLinks} />

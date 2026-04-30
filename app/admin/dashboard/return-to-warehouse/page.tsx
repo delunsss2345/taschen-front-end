@@ -1,5 +1,5 @@
-import ReturnToWarehousePage from './_components/ReturnToWarehousePage'
+import { ReturnToWarehousePage } from './_components/ReturnToWarehousePage'
 
 export default function Page() {
-  return <ReturnToWarehousePage />
+  return <ReturnToWarehousePage showCreateDisposal={true} />
 }

@@ -125,6 +125,10 @@
     @apply border-border outline-ring/50;
   }
 
+  button, [role="button"], a, select, label[for], summary {
+    cursor: pointer;
+  }
+
   h1 {
     font-size: 21px;
   }
