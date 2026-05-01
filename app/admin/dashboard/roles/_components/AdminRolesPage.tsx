@@ -3,23 +3,29 @@
 import { useEffect, useState } from 'react'
 import { RoleHeader } from './RoleHeader'
 import { RoleTable } from './RoleTable'
-import { roleService, permissionService, type Role, type Permission } from '@/services/permission.service'
+import { roleService, permissionService, type Role } from '@/services/permission.service'
 import { toast } from 'sonner'
 
 export function AdminRolesPage() {
   const [roles, setRoles] = useState<Role[]>([])
-  const [permissions, setPermissions] = useState<Permission[]>([])
   const [loading, setLoading] = useState(true)
 
   const fetchData = async () => {
     setLoading(true)
     try {
-      const [roleList, permList] = await Promise.all([
+      const [roleList, allPerms] = await Promise.all([
         roleService.getAllRoles(),
-        permissionService.getAllPermissions(),
+        permissionService.getAllPermissionsPaged(),
       ])
-      setRoles(roleList)
-      setPermissions(permList)
+
+      const rolesWithCount = roleList.map((role) => {
+        const count = allPerms.filter(
+          (p) => p.roleCode?.split(',').map((c) => c.trim()).includes(role.code)
+        ).length
+        return { ...role, permissionCount: count }
+      })
+
+      setRoles(rolesWithCount)
     } catch {
       toast.error('Không thể tải danh sách role')
     } finally {
@@ -48,7 +54,6 @@ export function AdminRolesPage() {
       <RoleHeader onCreate={handleCreateRole} />
       <RoleTable
         roles={roles}
-        permissions={permissions}
         loading={loading}
         onUpdate={handleUpdateRole}
         onDelete={handleDeleteRole}
