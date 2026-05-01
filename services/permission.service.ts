@@ -87,7 +87,7 @@ export const permissionService = {
     if (params.keyword) searchParams.set("keyword", params.keyword);
     const url = `permissions${searchParams.toString() ? `?${searchParams}` : ""}`;
     const response = await http.get<ApiResponseEnvelope<{ result: Permission[]; meta: { page: number; pageSize: number; pages: number; total: number } }>>(url);
-    const data = response?.data;
+    const data = response?.data as { result?: Permission[]; meta?: { page: number; pageSize: number; pages: number; total: number } } | undefined;
     return {
       permissions: data?.result ?? [],
       meta: data?.meta ?? { page: 1, pageSize: params.size ?? 20, pages: 1, total: 0 },
