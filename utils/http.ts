@@ -24,8 +24,25 @@ export const axiosInstance: AxiosInstance = axios.create({
   validateStatus: (status) => status >= 200 && status < 300 || status === 204,
 });
 
+const REFRESH_TOKEN_KEY = "refreshToken";
+
 const refreshAxiosInstance: AxiosInstance = axios.create({
   baseURL,
+});
+
+refreshAxiosInstance.interceptors.request.use((config) => {
+  const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+  if (refreshToken) {
+    if (!config.headers) {
+      config.headers = new AxiosHeaders();
+    }
+    if (typeof config.headers.set === "function") {
+      config.headers.set("Authorization", `Bearer ${refreshToken}`);
+    } else {
+      (config.headers as Record<string, string>).Authorization = `Bearer ${refreshToken}`;
+    }
+  }
+  return config;
 });
 
 // Mỗi request đều gắn accessToken
@@ -152,12 +169,6 @@ axiosInstance.interceptors.response.use(
     const hasAccessToken = Boolean(useAuthStore.getState().accessToken);
     const status = error.response?.status;
 
-    // Redirect to login 
-    if ((status === 401 || status === 403) && !isAuthApi) {
-      useAuthStore.getState().clearSession();
-      redirectToLogin();
-    }
-
     // Đánh dấu lỗi
     const shouldRenewToken =
       error.response?.status === 401 &&
@@ -174,11 +185,18 @@ axiosInstance.interceptors.response.use(
       try {
         await getNewToken();
         return axiosInstance(originalRequest); // Trả request
-      } catch (error) {
+      } catch (refreshError) {
         redirectToLogin();
-        return Promise.reject(error); // Lỗi ném reject
+        return Promise.reject(refreshError); // Lỗi ném reject
       }
     }
+
+    // Redirect to login (chỉ cho non-public API khi chưa authenticate)
+    if (status === 401 && !isAuthApi) {
+      useAuthStore.getState().clearSession();
+      redirectToLogin();
+    }
+
     // Đã từng đánh dấu thì ném reject
     return Promise.reject(error);
   },

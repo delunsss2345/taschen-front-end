@@ -26,6 +26,7 @@ export const useLoginMutation = () => {
       setSession({
         currentUser: response.data.user,
         accessToken: response.data.accessToken,
+        refreshToken: response.data.refreshToken,
       });
     },
     onError: () => {
@@ -84,6 +85,7 @@ export const useRefreshTokenMutation = () => {
       setSession({
         currentUser,
         accessToken: response.data.accessToken,
+        refreshToken: response.data.refreshToken,
       });
     },
   });
