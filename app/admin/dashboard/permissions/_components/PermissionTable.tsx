@@ -22,15 +22,13 @@ import {
 } from '@/components/ui/select'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { permissionService, roleService, type Permission, type HttpMethod, type Role } from '@/services/permission.service'
+import { permissionService, type Permission, type HttpMethod } from '@/services/permission.service'
 
 interface PermissionTableProps {
   permissions: Permission[]
   loading?: boolean
-  roles: Role[]
   onUpdate?: (updated: Permission) => void
   onDelete?: (id: number) => void
-  onCreate?: (created: Permission) => void
   onRefresh?: () => void
 }
 
@@ -50,47 +48,37 @@ const METHOD_COLORS: Record<HttpMethod, string> = {
   DELETE: 'bg-red-100 text-red-700 hover:bg-red-100',
 }
 
-const SYSTEM_ROLES = [
-  { code: 'GUEST', name: 'Khách' },
-  { code: 'USER', name: 'Người dùng thường' },
-  { code: 'ADMIN', name: 'Quản trị viên' },
-  { code: 'SELLER', name: 'Nhân viên bán hàng' },
-  { code: 'WAREHOUSE_STAFF', name: 'Nhân viên kho' },
-]
-
-const ROLE_NAME_MAP: Record<string, string> = {
-  GUEST: 'Khách',
-  USER: 'Người dùng',
-  ADMIN: 'Quản trị',
-  SELLER: 'Seller',
-  WAREHOUSE_STAFF: 'Kho',
-}
-
 function getRoleDisplay(code: string | null | undefined): React.ReactNode {
   if (!code) {
     return <Badge variant="outline" className="text-gray-400">Chưa gán</Badge>
   }
-  const name = ROLE_NAME_MAP[code] || code
-  const colorClass =
-    code === 'ADMIN'
+  const codes = code.split(',').map((c) => c.trim()).filter(Boolean)
+  const colorClass = (c: string) =>
+    c === 'ADMIN'
       ? 'bg-red-100 text-red-700 hover:bg-red-100'
-      : code === 'SELLER'
+      : c === 'SELLER'
       ? 'bg-blue-100 text-blue-700 hover:bg-blue-100'
-      : code === 'WAREHOUSE_STAFF'
+      : c === 'WAREHOUSE_STAFF'
       ? 'bg-orange-100 text-orange-700 hover:bg-orange-100'
-      : code === 'USER'
-      ? 'bg-green-100 text-green-700 hover:bg-green-100'
+      : c === 'USER'
+      ? 'bg-green-100 text-green-700 hover:bg-green-700'
       : 'bg-gray-100 text-gray-700 hover:bg-gray-100'
-  return <Badge className={`${colorClass} border-none shadow-none`}>{name}</Badge>
+  return (
+    <div className="flex flex-wrap gap-1 justify-center">
+      {codes.map((c) => (
+        <Badge key={c} className={`${colorClass(c)} border-none shadow-none text-xs font-mono`}>
+          {c}
+        </Badge>
+      ))}
+    </div>
+  )
 }
 
 export function PermissionTable({
   permissions,
   loading = false,
-  roles,
   onUpdate,
   onDelete,
-  onRefresh,
 }: PermissionTableProps) {
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null)
   const [deleting, setDeleting] = useState(false)
@@ -186,7 +174,7 @@ export function PermissionTable({
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center justify-center gap-1.5">
-                    <ViewPermissionDialog permission={perm} roles={roles}>
+                    <ViewPermissionDialog permission={perm}>
                       <Button
                         variant="outline"
                         size="sm"
@@ -197,7 +185,6 @@ export function PermissionTable({
                     </ViewPermissionDialog>
                     <EditPermissionModal
                       permission={perm}
-                      roles={roles}
                       onUpdate={onUpdate}
                     />
                     <Button
@@ -254,11 +241,9 @@ export function PermissionTable({
 
 function ViewPermissionDialog({
   permission,
-  roles,
   children,
 }: {
   permission: Permission
-  roles: Role[]
   children: React.ReactNode
 }) {
   const [open, setOpen] = useState(false)
@@ -322,11 +307,9 @@ function ViewPermissionDialog({
 
 function EditPermissionModal({
   permission,
-  roles,
   onUpdate,
 }: {
   permission: Permission
-  roles: Role[]
   onUpdate?: (updated: Permission) => void
 }) {
   const [open, setOpen] = useState(false)

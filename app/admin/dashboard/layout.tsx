@@ -11,7 +11,7 @@ export default function Layout({ children }: Readonly<{ children: ReactNode }>) 
     <SidebarProvider className="w-full">
       <AdminRealtimeSubscriptions />
       <div className="min-h-screen w-full bg-[#f6f7fb]">
-        <Header username="admin" />
+        <Header />
         <div className="flex w-full">
           <div className="h-[calc(100vh-4rem)]">
             <AppSidebar />

@@ -8,16 +8,14 @@ import type { ReactNode } from 'react'
 
 export default function WarehouseLayout({
   children,
-  username = 'warehouse',
 }: {
   children: ReactNode
-  username?: string
 }) {
   return (
     <SidebarProvider className="w-full">
       <WarehouseRealtimeSubscriptions />
       <div className="min-h-screen w-full bg-[#f6f7fb]">
-        <Header username={username} />
+        <Header />
         <div className="flex w-full">
           <div className="h-[calc(100vh-4rem)]">
             <WarehouseSidebar />

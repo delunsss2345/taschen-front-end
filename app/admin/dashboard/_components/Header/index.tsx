@@ -1,14 +1,41 @@
 'use client'
 
 import { SidebarTrigger } from '@/components/ui/sidebar'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
-import { User } from 'lucide-react'
+import { useAuthStore } from '@/features/auth'
+import { useLogoutMutation } from '@/features/auth/hooks'
+import { NotificationBell } from '@/features/notifications/NotificationBell'
+import { Home, LogOut, User, UserPen } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
-type AdminHeaderProps = React.HTMLAttributes<HTMLElement> & {
-  username?: string
-}
+type AdminHeaderProps = React.HTMLAttributes<HTMLElement>
 
-export function Header({ className, username = 'admin', ...props }: AdminHeaderProps) {
+export function Header({ className, ...props }: AdminHeaderProps) {
+  const { currentUser } = useAuthStore()
+  const router = useRouter()
+  const { mutate: logout } = useLogoutMutation()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => { setMounted(true) }, [])
+
+  const handleLogout = () => {
+    logout(undefined, { onSuccess: () => router.push('/login') })
+  }
+
+  const displayName = mounted && currentUser
+    ? `${currentUser.firstName} ${currentUser.lastName}`.trim()
+    : ''
+
   return (
     <header
       className={cn(
@@ -22,16 +49,53 @@ export function Header({ className, username = 'admin', ...props }: AdminHeaderP
           <SidebarTrigger className="text-gray-500 hover:bg-gray-50" />
           <div className="font-serif text-lg font-semibold text-[#030303]">TASCHEN</div>
         </div>
+
         <div className="ms-auto flex items-center gap-3 text-sm">
           <div className="text-gray-500">
-            Xin chào, <span className="text-gray-900 font-bold">{username}</span>
+            Xin chào, <span className="text-gray-900 font-bold">{displayName}</span>
           </div>
-          <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
-            <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
-              <User className="h-5 w-5" />
-            </div>
-            <span className="text-gray-900 font-medium">{username}</span>
-          </div>
+
+          <NotificationBell />
+
+          {/* User dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-2 rounded-full focus:outline-none hover:opacity-80 transition-opacity">
+                <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                  <User className="h-5 w-5" />
+                </div>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52 font-sans">
+              <DropdownMenuLabel className="font-normal">
+                <p className="text-sm font-semibold text-gray-900 truncate">{displayName}</p>
+                {mounted && currentUser?.email && (
+                  <p className="text-xs text-gray-500 truncate mt-0.5">{currentUser.email}</p>
+                )}
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href="/profile" className="flex items-center gap-2 cursor-pointer">
+                  <UserPen className="h-4 w-4 text-gray-500" />
+                  Chỉnh sửa thông tin
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/" className="flex items-center gap-2 cursor-pointer">
+                  <Home className="h-4 w-4 text-gray-500" />
+                  Trang chủ
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={handleLogout}
+                className="flex items-center gap-2 cursor-pointer text-red-500 focus:text-red-500 focus:bg-red-50"
+              >
+                <LogOut className="h-4 w-4" />
+                Đăng xuất
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>

@@ -10,12 +10,12 @@ import { NextRequest } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ roleCode: string }> }
 ) {
   try {
-    const { id } = await params;
+    const { roleCode } = await params;
     const headers = getAuthorizationHeader(request);
-    const response = await api.get<{ data: unknown }>(`roles/${id}`, { headers });
+    const response = await api.get<{ data: unknown }>(`roles/${roleCode}`, { headers });
 
     return ResponseApi.success(response.data, HttpStatusCode.Ok);
   } catch (error) {
@@ -25,13 +25,13 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ roleCode: string }> }
 ) {
   try {
-    const { id } = await params;
+    const { roleCode } = await params;
     const payload = await request.json();
     const headers = getAuthorizationHeader(request);
-    const response = await api.put<{ data: unknown }>(`roles/${id}`, payload, { headers });
+    const response = await api.put<{ data: unknown }>(`roles/${roleCode}`, payload, { headers });
 
     return ResponseApi.success(response.data, HttpStatusCode.Ok);
   } catch (error) {
@@ -45,12 +45,12 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ roleCode: string }> }
 ) {
   try {
-    const { id } = await params;
+    const { roleCode } = await params;
     const headers = getAuthorizationHeader(request);
-    await api.delete(`roles/${id}`, {}, { headers });
+    await api.delete(`roles/${roleCode}`, {}, { headers });
 
     return ResponseApi.success({ message: "Role deleted successfully" }, HttpStatusCode.Ok);
   } catch (error) {

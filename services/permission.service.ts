@@ -16,6 +16,8 @@ export interface Role {
   id: number;
   code: string;
   name: string;
+  permissions?: Permission[];
+  permissionCount?: number;
 }
 
 export interface CreatePermissionRequest {
@@ -70,6 +72,32 @@ export const permissionService = {
     try {
       const response = await http.get<ApiResponseEnvelope<Permission[]>>(`permissions/role/${roleCode}`);
       return getArrayData<Permission>(response);
+    } catch {
+      return [];
+    }
+  },
+
+  async getPermissionsPaged(params: { page?: number; size?: number; keyword?: string; roleCode?: string }): Promise<{
+    permissions: Permission[];
+    meta: { page: number; pageSize: number; pages: number; total: number };
+  }> {
+    const searchParams = new URLSearchParams();
+    if (params.page) searchParams.set("page", String(params.page));
+    if (params.size) searchParams.set("size", String(params.size));
+    if (params.keyword) searchParams.set("keyword", params.keyword);
+    const url = `permissions${searchParams.toString() ? `?${searchParams}` : ""}`;
+    const response = await http.get<ApiResponseEnvelope<{ result: Permission[]; meta: { page: number; pageSize: number; pages: number; total: number } }>>(url);
+    const data = response?.data as { result?: Permission[]; meta?: { page: number; pageSize: number; pages: number; total: number } } | undefined;
+    return {
+      permissions: data?.result ?? [],
+      meta: data?.meta ?? { page: 1, pageSize: params.size ?? 20, pages: 1, total: 0 },
+    };
+  },
+
+  async getAllPermissionsPaged(): Promise<Permission[]> {
+    try {
+      const result = await this.getPermissionsPaged({ page: 1, size: 100 });
+      return result.permissions;
     } catch {
       return [];
     }
@@ -152,6 +180,26 @@ export const roleService = {
   async deleteRole(id: number): Promise<boolean> {
     try {
       await http.del<ApiResponseEnvelope<null>>(`roles/${id}`);
+      return true;
+    } catch {
+      return false;
+    }
+  },
+
+  async assignPermissions(roleCode: string, permissionIds: number[]): Promise<boolean> {
+    try {
+      await http.post<ApiResponseEnvelope<null>>(`roles/${roleCode}/permissions`, {
+        permissionIds,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  },
+
+  async removePermission(roleCode: string, permissionId: number): Promise<boolean> {
+    try {
+      await http.del<ApiResponseEnvelope<null>>(`roles/${roleCode}/permissions/${permissionId}`);
       return true;
     } catch {
       return false;
