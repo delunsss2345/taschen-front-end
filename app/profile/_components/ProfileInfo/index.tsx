@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { Camera } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -71,14 +71,16 @@ export function ProfileInfo() {
   });
 
   // Re-set form values when profile loads
-  if (!isLoading && profile && form.formState.isDirty === false) {
-    form.reset({
-      firstName: profile.firstName,
-      lastName: profile.lastName,
-      phoneNumber: profile.phoneNumber ?? "",
-      gender: (profile.gender as ProfileFormValues["gender"]) ?? "MALE",
-    });
-  }
+  useEffect(() => {
+    if (!isLoading && profile && form.formState.isDirty === false) {
+      form.reset({
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        phoneNumber: profile.phoneNumber ?? "",
+        gender: (profile.gender as ProfileFormValues["gender"]) ?? "MALE",
+      });
+    }
+  }, [isLoading, profile, form]);
 
   const handleAvatarClick = useCallback(() => {
     fileInputRef.current?.click();
