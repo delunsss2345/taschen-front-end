@@ -10,9 +10,15 @@ import { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const page = searchParams.get("page") ?? "1";
+    const size = searchParams.get("size") ?? "10";
+    const keyword = searchParams.get("keyword") ?? "";
     const headers = getAuthorizationHeader(request);
-    const response = await api.get<{ data: unknown }>("permissions", { headers });
-
+    const response = await api.get<{ data: unknown }>(
+      `permissions?page=${page}&size=${size}&keyword=${encodeURIComponent(keyword)}`,
+      { headers }
+    );
     return ResponseApi.success(response.data, HttpStatusCode.Ok);
   } catch (error) {
     return handleRouteError(error, API_MESSAGE.SYSTEM_TRY_AGAIN, "Get Permissions API Error");
