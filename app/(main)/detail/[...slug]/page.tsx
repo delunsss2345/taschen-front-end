@@ -324,6 +324,7 @@ export default function DetailPage() {
               {similarBooks.map((b) => (
                 <BookCard
                   key={b.id}
+                  bookId={b.id}
                   href={`/detail/${b.id}`}
                   title={b.title}
                   author={b.author}

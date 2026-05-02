@@ -1,11 +1,15 @@
 'use client'
 
+import { useAddToCartMutation } from "@/features/cart";
+import { useAuthStore } from "@/features/auth";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 type BookCardVariant = "default" | "compact";
 
 type BookCardProps = {
+    bookId?: number;
     title: string;
     author: string;
     price: number;
@@ -44,11 +48,48 @@ function getCategoryColor(name: string) {
     return CATEGORY_COLORS[Math.abs(hash) % CATEGORY_COLORS.length];
 }
 
-function CardInner({ title, author, price, stockQuantity, categories, imageUrl, variant = "default", className }: BookCardProps) {
+export default function BookCard({
+    bookId,
+    title,
+    author,
+    price,
+    stockQuantity,
+    categories,
+    imageUrl,
+    href,
+    variant = "default",
+    className,
+}: BookCardProps) {
+    const router = useRouter();
+    const currentUser = useAuthStore((s) => s.currentUser);
+    const addToCartMutation = useAddToCartMutation();
+
     const style = S[variant];
     const outOfStock = stockQuantity !== undefined && stockQuantity === 0;
 
-    return (
+    const handleAddToCart = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        if (!currentUser?.id) {
+            toast.error("Vui lòng đăng nhập để thêm vào giỏ hàng");
+            router.push("/login");
+            return;
+        }
+        if (!bookId) return;
+
+        try {
+            await addToCartMutation.mutateAsync({
+                userId: currentUser.id,
+                payload: { bookId, quantity: 1 },
+            });
+            toast.success("Đã thêm vào giỏ hàng");
+        } catch {
+            toast.error("Không thể thêm vào giỏ hàng");
+        }
+    };
+
+    const inner = (
         <article className={cn("group/card flex flex-col h-full bg-white transition-all duration-300", className)}>
             {/* Image */}
             <figure className={cn(
@@ -79,18 +120,15 @@ function CardInner({ title, author, price, stockQuantity, categories, imageUrl, 
             </figure>
 
             {/* Info */}
-            <div className="flex flex-col flex-grow mt-3 gap-2">
-                {/* Title */}
+            <div className="flex flex-col grow mt-3 gap-2">
                 <h3 className={cn("font-serif font-semibold leading-tight text-neutral-900 line-clamp-2", style.title)}>
                     {title}
                 </h3>
 
-                {/* Author */}
                 <p className={cn("italic text-neutral-400 line-clamp-1", style.author)}>
                     {author}
                 </p>
 
-                {/* Category tags */}
                 {categories && categories.length > 0 && (
                     <div className="flex flex-wrap gap-1">
                         {categories.slice(0, 3).map((cat) => {
@@ -110,7 +148,6 @@ function CardInner({ title, author, price, stockQuantity, categories, imageUrl, 
                     </div>
                 )}
 
-                {/* Price */}
                 <div className="mt-auto pt-2 flex items-center justify-between">
                     <span className="text-[15px] font-semibold tracking-tight text-neutral-900">
                         {formatPrice(price)}
@@ -122,10 +159,10 @@ function CardInner({ title, author, price, stockQuantity, categories, imageUrl, 
                     )}
                 </div>
 
-                {/* Add to Cart button */}
                 <button
                     type="button"
-                    disabled={outOfStock}
+                    disabled={outOfStock || addToCartMutation.isPending || !bookId}
+                    onClick={handleAddToCart}
                     className={cn(
                         "w-full py-2.5 text-[11px] font-bold tracking-[0.15em] uppercase rounded-sm",
                         "border border-zinc-900 bg-transparent text-zinc-900",
@@ -134,24 +171,21 @@ function CardInner({ title, author, price, stockQuantity, categories, imageUrl, 
                         "disabled:cursor-not-allowed disabled:border-neutral-300 disabled:text-neutral-400"
                     )}
                 >
-                    {outOfStock ? "Hết hàng" : "Add to Cart"}
+                    {outOfStock
+                        ? "Hết hàng"
+                        : addToCartMutation.isPending
+                        ? "Đang thêm..."
+                        : "Thêm vào giỏ hàng"}
                 </button>
             </div>
         </article>
     );
-}
-
-export default function BookCard(props: BookCardProps) {
-    const router = useRouter();
-    const { href, title, author } = props;
-
-    const inner = <CardInner {...props} />;
 
     if (!href) return <div className="h-full">{inner}</div>;
 
     return (
         <div
-            onClick={() => setTimeout(() => router.push(href), 150)}
+            onClick={() => router.push(href)}
             className="group block h-full cursor-pointer"
             aria-label={`${title} — ${author}`}
         >
