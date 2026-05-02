@@ -69,6 +69,13 @@ export const useVerifyAccountMutation = (userId: string | number) => {
   });
 };
 
+export const useVerifyEmailMutation = () => {
+  return useMutation({
+    mutationFn: ({ token, userId }: { token: string; userId: string }) =>
+      authService.verifyEmail(token, userId),
+  });
+};
+
 export const useRefreshTokenMutation = () => {
   const setSession = useAuthStore((state) => state.setSession);
 
