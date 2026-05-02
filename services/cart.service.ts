@@ -30,11 +30,11 @@ export const cartService = {
   },
 
   async addToCart(
-    _userId: number | string,
+    userId: number | string,
     payload: AddToCartRequest,
   ): Promise<Cart> {
     const response = await http.post<ApiResponseEnvelope<Cart>>(
-      `/carts/current/items`,
+      `/carts/users/${userId}/items`,
       payload,
     );
     const cart = getResponseData<Cart>(response);
