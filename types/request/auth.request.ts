@@ -4,6 +4,8 @@ export type RegisterRequest = {
   email: string;
   password: string;
   confirmPassword: string;
+  gender: "MALE" | "FEMALE" | "OTHER";
+  phoneNumber: string;
 };
 
 export type LoginRequest = {
