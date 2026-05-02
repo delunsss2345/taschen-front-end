@@ -12,7 +12,7 @@ export async function GET(
   try {
     const { userId } = await params;
     const headers = getAuthorizationHeader(request);
-    const response = await api.get<{ data: unknown }>(`users/${userId}/addresses`, { headers });
+    const response = await api.get<{ data: unknown }>(`users/me/addresses`, { headers });
     return ResponseApi.success(response.data, HttpStatusCode.Ok);
   } catch (error) {
     return handleRouteError(error, API_MESSAGE.SYSTEM_TRY_AGAIN, "Get Addresses API Error");
@@ -27,7 +27,7 @@ export async function POST(
     const { userId } = await params;
     const payload = await request.json();
     const headers = getAuthorizationHeader(request);
-    const response = await api.post<{ data: unknown }>(`users/${userId}/addresses`, payload, { headers });
+    const response = await api.post<{ data: unknown }>(`users/me/addresses`, payload, { headers });
     return ResponseApi.success(response.data, HttpStatusCode.Ok);
   } catch (error) {
     return handleRouteError(error, API_MESSAGE.SYSTEM_TRY_AGAIN, "Create Address API Error");

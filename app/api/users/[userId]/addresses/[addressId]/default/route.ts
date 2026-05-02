@@ -12,7 +12,7 @@ export async function PUT(
   try {
     const { userId, addressId } = await params;
     const headers = getAuthorizationHeader(request);
-    const response = await api.put<{ data: unknown }>(`users/${userId}/addresses/${addressId}/default`, {}, { headers });
+    const response = await api.put<{ data: unknown }>(`users/me/addresses/${addressId}/default`, {}, { headers });
     return ResponseApi.success(response.data, HttpStatusCode.Ok);
   } catch (error) {
     return handleRouteError(error, API_MESSAGE.SYSTEM_TRY_AGAIN, "Set Default Address API Error");

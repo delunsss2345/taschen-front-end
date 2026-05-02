@@ -13,7 +13,7 @@ export async function PUT(
     const { userId, addressId } = await params;
     const payload = await request.json();
     const headers = getAuthorizationHeader(request);
-    const response = await api.put<{ data: unknown }>(`users/${userId}/addresses/${addressId}`, payload, { headers });
+    const response = await api.put<{ data: unknown }>(`users/me/addresses/${addressId}`, payload, { headers });
     return ResponseApi.success(response.data, HttpStatusCode.Ok);
   } catch (error) {
     return handleRouteError(error, API_MESSAGE.SYSTEM_TRY_AGAIN, "Update Address API Error");
@@ -27,7 +27,7 @@ export async function DELETE(
   try {
     const { userId, addressId } = await params;
     const headers = getAuthorizationHeader(request);
-    await api.delete(`users/${userId}/addresses/${addressId}`, undefined, { headers });
+    await api.delete(`users/me/addresses/${addressId}`, undefined, { headers });
     return ResponseApi.success(null, HttpStatusCode.Ok);
   } catch (error) {
     return handleRouteError(error, API_MESSAGE.SYSTEM_TRY_AGAIN, "Delete Address API Error");
