@@ -52,3 +52,14 @@ export async function GET(request: NextRequest) {
     return handleRouteError(error, API_MESSAGE.SYSTEM_TRY_AGAIN, "Get Return Requests API Error");
   }
 }
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const headers = getAuthorizationHeader(request);
+    const response = await api.post<{ data: unknown }>("return-requests", body, { headers });
+    return ResponseApi.success(response.data, HttpStatusCode.Ok);
+  } catch (error) {
+    return handleRouteError(error, API_MESSAGE.SYSTEM_TRY_AGAIN, "Create Return Request API Error");
+  }
+}

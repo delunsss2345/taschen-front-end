@@ -31,6 +31,9 @@ export const authService = {
   verifyAccount: (userId: number | string, payload: VerifyAccountRequest) =>
     http.post<VerifyAccountApiResponse>(`/auth/verify/${userId}`, payload),
 
+  verifyEmail: (token: string, userId: string) =>
+    http.get<unknown>(`/auth/verify?token=${encodeURIComponent(token)}&userId=${encodeURIComponent(userId)}`),
+
   refreshToken: (payload: RefreshTokenRequest) =>
     http.post<RefreshTokenApiResponse>("/auth/refresh", payload),
 };

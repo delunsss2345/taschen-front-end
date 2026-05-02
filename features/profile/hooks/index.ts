@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useShallow } from "zustand/react/shallow";
 import { useProfileStore } from "@/features/profile/store";
 import { profileService } from "@/services/profile.service";
@@ -199,3 +199,25 @@ export const useOrdersStore = () =>
       loading: s.ordersLoading,
     })),
   );
+
+export const useCancelOrderMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (orderId: number) =>
+      profileService.cancelOrder(orderId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["profile", "orders"] });
+    },
+  });
+};
+
+export const useConfirmReceivedMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (orderId: number) =>
+      profileService.confirmReceived(orderId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["profile", "orders"] });
+    },
+  });
+};

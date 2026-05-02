@@ -90,12 +90,7 @@ export const userService = {
     }
   },
 
-  async deleteUser(userId: number | string): Promise<boolean> {
-    try {
-      await http.del<ApiResponseEnvelope<null>>(`users/${userId}`);
-      return true;
-    } catch {
-      return false;
-    }
+  async deleteUser(userId: number | string): Promise<void> {
+    await http.del<ApiResponseEnvelope<null>>(`users/${userId}`);
   },
 };

@@ -1,179 +1,241 @@
 "use client";
 
-import { Heart, Minus, Plus } from "lucide-react";
+import { Minus, Plus, ShoppingCart } from "lucide-react";
 import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
 import * as React from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
-import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
+import BookCard from "@/app/(main)/_components/BookCard";
 
-const formatPrice = (price: number) => `US$ ${price}`;
+import { useBookByIdQuery, useBooksByCategoryQuery } from "@/features/book";
+import { useAddToCartMutation } from "@/features/cart";
+import { useAuthStore } from "@/features/auth";
 
-const relatedTitles = [
-  {
-    title: "Modern Tree Houses",
-    subtitle: "Green Architecture",
-    price: 95,
-    imageUrl:
-      "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80",
-  },
-  {
-    title: "100 Contemporary",
-    subtitle: "Wood Houses",
-    price: 120,
-    imageUrl:
-      "https://images.unsplash.com/photo-1526243741027-444d633d7365?auto=format&fit=crop&w=600&q=80",
-  },
-  {
-    title: "Green Architecture",
-    subtitle: "Now!",
-    price: 110,
-    imageUrl:
-      "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=600&q=80",
-  },
-  {
-    title: "LO-TEK Design",
-    subtitle: "By Radical Indigenousism",
-    price: 85,
-    imageUrl:
-      "https://images.unsplash.com/photo-1531988042231-d39a9cc12a9a?auto=format&fit=crop&w=600&q=80",
-  },
-];
+const fmtPrice = (price: number) =>
+  new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND", minimumFractionDigits: 0 }).format(price);
 
-const gallery = [
-  "https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?auto=format&fit=crop&w=2400&q=85",
-  "https://images.unsplash.com/photo-1541963463532-d68292c34b19?auto=format&fit=crop&w=2400&q=85",
-  "https://images.unsplash.com/photo-1455885666463-212af60f0096?auto=format&fit=crop&w=2400&q=85",
-  "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=2400&q=85",
-];
+function BookCardSkeleton() {
+  return (
+    <div className="flex animate-pulse flex-col gap-3">
+      <div className="aspect-2/3 w-full rounded-md bg-neutral-100" />
+      <div className="h-4 w-3/4 rounded bg-neutral-100" />
+      <div className="h-3 w-1/2 rounded bg-neutral-100" />
+      <div className="h-3 w-1/3 rounded bg-neutral-100" />
+      <div className="mt-auto h-9 w-full rounded-sm bg-neutral-100" />
+    </div>
+  );
+}
+
+function DetailSkeleton() {
+  return (
+    <div className="container-main py-10">
+      <div className="grid grid-cols-1 gap-12 xl:grid-cols-12">
+        <div className="xl:col-span-7">
+          <div className="aspect-2/3 w-full max-w-105 animate-pulse rounded-md bg-neutral-100" />
+        </div>
+        <div className="xl:col-span-5 space-y-4">
+          <div className="h-8 w-3/4 rounded bg-neutral-100 animate-pulse" />
+          <div className="h-5 w-1/3 rounded bg-neutral-100 animate-pulse" />
+          <div className="h-6 w-1/2 rounded bg-neutral-100 animate-pulse" />
+          <div className="h-20 w-full rounded bg-neutral-100 animate-pulse" />
+          <div className="h-10 w-48 rounded bg-neutral-100 animate-pulse" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function DetailPage() {
+  const params = useParams();
+  const router = useRouter();
+  const slugArr = Array.isArray(params.slug) ? params.slug : [params.slug];
+  const bookId = slugArr[0];
+
+  const { data: book, isLoading, error } = useBookByIdQuery(bookId);
+  const addToCartMutation = useAddToCartMutation();
+  const currentUser = useAuthStore((s) => s.currentUser);
+
+  const firstCategoryId = book?.categoryIds?.[0];
+  const { data: similarData } = useBooksByCategoryQuery(firstCategoryId);
+  const similarBooks = (similarData?.result ?? []).filter((b) => b.id !== book?.id).slice(0, 4);
+
   const [qty, setQty] = React.useState(1);
-  const [active, setActive] = React.useState(0);
+  const [activeImg, setActiveImg] = React.useState(0);
   const [readMoreOpen, setReadMoreOpen] = React.useState(true);
   const [reviewsOpen, setReviewsOpen] = React.useState(false);
+  const [selectedVariantId, setSelectedVariantId] = React.useState<number | null>(null);
+
+  const images = book?.imageUrl ? [book.imageUrl] : [];
+  const variants = book?.variantFormats ?? [];
+  const selectedVariant = variants.find((v) => v.variantId === selectedVariantId);
+  const displayPrice = selectedVariant?.price ?? book?.price ?? 0;
+  const displayStock = selectedVariant?.stockQuantity ?? book?.stockQuantity ?? 0;
+
+  const handleAddToCart = async () => {
+    if (!currentUser?.id) {
+      toast.error("Vui lòng đăng nhập để thêm vào giỏ hàng");
+      router.push("/login");
+      return;
+    }
+    if (!book) return;
+    if (displayStock <= 0) {
+      toast.error("Sản phẩm đã hết hàng");
+      return;
+    }
+    try {
+      await addToCartMutation.mutateAsync({
+        userId: currentUser.id,
+        payload: { bookId: book.id, quantity: qty },
+      });
+      toast.success("Đã thêm vào giỏ hàng");
+    } catch {
+      toast.error("Không thể thêm vào giỏ hàng. Vui lòng thử lại.");
+    }
+  };
+
+  if (isLoading) return <DetailSkeleton />;
+
+  if (error || !book) {
+    return (
+      <div className="container-main flex min-h-[40vh] flex-col items-center justify-center gap-4 py-20">
+        <p className="text-muted-foreground">Không tìm thấy sách này.</p>
+        <Button variant="outline" onClick={() => router.back()}>Quay lại</Button>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full bg-white text-neutral-900">
-      <div className="mx-auto max-w-[1540px] px-6 py-3">
-        {/* breadcrumb */}
-        <nav className="text-[12px] tracking-wide text-neutral-500">
-          <span>Home</span> <span className="mx-2 text-neutral-300">|</span>
-          <span>Books</span> <span className="mx-2 text-neutral-300">|</span>
-          <span>Architecture &amp; Design</span> <span className="mx-2 text-neutral-300">|</span>
-          <span className="text-neutral-900">Homes for Our Time. Sustainable Living</span>
+      <div className="container-main py-3">
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-2 text-xs text-zinc-500">
+          <Link href="/" className="hover:text-zinc-900">Trang chủ</Link>
+          <span>/</span>
+          <Link href="/books" className="hover:text-zinc-900">Tất cả sách</Link>
+          {book.categories && book.categories.length > 0 && (
+            <>
+              <span>/</span>
+              <span>{book.categories[0].name}</span>
+            </>
+          )}
+          <span>/</span>
+          <span className="text-zinc-700 line-clamp-1">{book.title}</span>
         </nav>
 
         <div className="mt-10 grid grid-cols-1 gap-12 xl:grid-cols-12">
-          {/* LEFT: gallery */}
+          {/* LEFT: Image */}
           <section className="xl:col-span-7">
-            <div className="bg-white p-6">
-              <div className="relative mx-auto aspect-[3/4] w-full max-w-[420px] overflow-hidden rounded-sm">
-                <Image
-                  src={gallery[active]}
-                  alt="Product image"
-                  fill
-                  priority
-                  className="object-cover"
-                  sizes="(min-width: 1280px) 55vw, 100vw"
+            <div className="relative mx-auto aspect-2/3 w-full max-w-90 overflow-hidden rounded-md bg-neutral-50">
+              {images[activeImg] ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={images[activeImg]}
+                  alt={book.title}
+                  className="h-full w-full object-cover"
                 />
-              </div>
+              ) : (
+                <div className="flex h-full items-center justify-center text-neutral-300">
+                  <ShoppingCart className="h-16 w-16" />
+                </div>
+              )}
             </div>
 
-            <div className="mt-4 flex items-center justify-between">
-              <p className="text-[12px] text-neutral-500">
-                {active + 1} / {gallery.length}
-              </p>
-
-              {/* thumbs */}
-              <div className="flex gap-2">
-                {gallery.map((src, i) => (
+            {images.length > 1 && (
+              <div className="mt-4 flex justify-center gap-2">
+                {images.map((src, i) => (
                   <button
-                    key={src}
+                    key={i}
                     type="button"
-                    onClick={() => setActive(i)}
+                    onClick={() => setActiveImg(i)}
                     className={[
-                      "relative h-14 w-12 overflow-hidden rounded-sm border transition",
-                      i === active ? "border-neutral-900" : "border-neutral-200 hover:border-neutral-400",
+                      "relative h-14 w-10 overflow-hidden rounded-sm border transition",
+                      i === activeImg
+                        ? "border-neutral-900"
+                        : "border-neutral-200 hover:border-neutral-400",
                     ].join(" ")}
-                    aria-label={`Open image ${i + 1}`}
                   >
-                    <Image src={src} alt="" fill className="object-cover" sizes="48px" />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={src} alt="" className="h-full w-full object-cover" />
                   </button>
                 ))}
               </div>
-            </div>
+            )}
           </section>
 
-          {/* RIGHT: info */}
+          {/* RIGHT: Info */}
           <section className="xl:col-span-5">
-            <div className="flex items-start justify-between gap-6">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[12px] font-semibold tracking-widest text-red-600">NEW</span>
-                  <span className="rounded-sm border border-neutral-200 px-2 py-1 text-[12px] tracking-wide text-neutral-700">
-                    XL
+            {book.isActive === false && (
+              <Badge variant="destructive" className="mb-3">Ngừng kinh doanh</Badge>
+            )}
+
+            {book.categories && book.categories.length > 0 && (
+              <div className="mb-3 flex flex-wrap gap-1">
+                {book.categories.map((cat) => (
+                  <span
+                    key={cat.id}
+                    className="rounded-full border border-neutral-200 px-2.5 py-0.5 text-[11px] tracking-wide text-neutral-600"
+                  >
+                    {cat.name}
                   </span>
-                </div>
-
-                <h1 className="mt-4 font-serif text-[34px] leading-[1.1] tracking-tight">
-                  Homes for Our Time.
-                  <br />
-                  Sustainable Living
-                </h1>
-
-                <p className="mt-4 text-[22px] tracking-tight text-neutral-900">{formatPrice(80)}</p>
+                ))}
               </div>
+            )}
 
-              <button
-                type="button"
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-neutral-200 hover:border-neutral-400"
-                aria-label="Add to wishlist"
-              >
-                <Heart className="h-5 w-5" />
-              </button>
-            </div>
+            <h1 className="font-serif text-[28px] leading-[1.15] tracking-tight text-neutral-900">
+              {book.title}
+            </h1>
+            <p className="mt-2 italic text-[14px] text-neutral-400">{book.author}</p>
+            <p className="mt-4 text-[24px] font-semibold tracking-tight text-neutral-900">
+              {fmtPrice(displayPrice)}
+            </p>
 
-            <div className="mt-8 space-y-2 text-[13px] leading-6 text-neutral-700">
-              <p>Edition: Multilingual (English, French, German)</p>
-              <p>Availability: In Stock</p>
-            </div>
-
-            <div className="mt-8 space-y-5 text-[15px] leading-7 text-neutral-800">
+            <div className="mt-6 space-y-1.5 text-[13px] leading-6 text-neutral-700">
+              {book.publicationYear > 0 && <p>Năm xuất bản: {book.publicationYear}</p>}
+              {book.pageCount > 0 && <p>Số trang: {book.pageCount}</p>}
+              {book.weightGrams > 0 && <p>Trọng lượng: {book.weightGrams}g</p>}
               <p>
-                <span className="font-semibold text-neutral-900">The future of resourceful living:</span>{" "}
-                these cutting-edge examples of <span className="font-semibold text-neutral-900">green buildings</span>{" "}
-                combine innovative design with eco-friendly solutions.
+                Tình trạng:{" "}
+                <span className={displayStock > 0 ? "font-medium text-green-600" : "font-medium text-red-500"}>
+                  {displayStock > 0 ? `Còn hàng (${displayStock})` : "Hết hàng"}
+                </span>
               </p>
-              <p className="text-neutral-500">Hardcover, 24.6 × 37.2 cm, 496 pages</p>
             </div>
 
-            {/* ---- Variant selector (UI only) ---- */}
-            <div className="mt-8">
-              <p className="mb-3 text-[13px] font-medium text-neutral-700">Size</p>
-              <div className="flex flex-wrap gap-2">
-                {["36", "37", "38", "39W", "39", "40", "41", "42", "43", "44"].map(
-                  (variant) => (
+            {/* Variants */}
+            {variants.length > 0 && (
+              <div className="mt-6">
+                <p className="mb-3 text-[13px] font-medium text-neutral-700">Phiên bản</p>
+                <div className="flex flex-wrap gap-2">
+                  {variants.map((v) => (
                     <button
-                      key={variant}
+                      key={v.variantId ?? v.formatCode}
                       type="button"
+                      onClick={() =>
+                        setSelectedVariantId(
+                          selectedVariantId === v.variantId ? null : (v.variantId ?? null),
+                        )
+                      }
                       className={[
-                        "flex h-12 min-w-[60px] items-center justify-center rounded-sm border px-3 text-[13px] transition",
-                        variant === "43"
+                        "rounded-sm border px-3 py-2 text-[12px] transition",
+                        selectedVariantId === v.variantId
                           ? "border-neutral-900 bg-neutral-900 font-semibold text-white"
                           : "border-neutral-200 bg-white text-neutral-700 hover:border-neutral-400",
                       ].join(" ")}
                     >
-                      {variant}
+                      {v.formatName} · {fmtPrice(v.price)}
                     </button>
-                  )
-                )}
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="mt-8 flex items-center gap-4">
+            {/* Qty + Add to Cart */}
+            <div className="mt-8 flex items-center gap-3">
               <div className="inline-flex items-center rounded-sm border border-neutral-200">
                 <Button
                   type="button"
@@ -183,125 +245,99 @@ export default function DetailPage() {
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
-
                 <Input
                   className="h-10 w-14 rounded-none border-x border-neutral-200 text-center text-[13px]"
                   value={qty}
                   onChange={(e) => {
                     const next = Number(e.target.value);
-                    setQty(Number.isFinite(next) && next > 0 ? next : 1);
+                    setQty(Number.isFinite(next) && next > 0 ? Math.min(next, displayStock || 99) : 1);
                   }}
                 />
-
                 <Button
                   type="button"
                   variant="ghost"
                   className="h-10 rounded-none px-3"
-                  onClick={() => setQty((p) => p + 1)}
+                  onClick={() => setQty((p) => Math.min(p + 1, displayStock || 99))}
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
 
-              <Button className="h-10 rounded-sm bg-neutral-900 px-6 text-[13px] font-medium tracking-wide hover:bg-neutral-800">
-                Add to Cart
+              <Button
+                className="h-10 flex-1 rounded-none bg-zinc-900 px-6 text-[11px] font-bold tracking-[0.15em] uppercase text-white hover:bg-zinc-700 disabled:opacity-50"
+                onClick={handleAddToCart}
+                disabled={addToCartMutation.isPending || displayStock <= 0 || book.isActive === false}
+              >
+                {addToCartMutation.isPending ? "Đang thêm..." : "Thêm vào giỏ hàng"}
               </Button>
             </div>
-
-            <Button
-              variant="outline"
-              className="mt-8 h-10 rounded-sm border-neutral-200 px-5 text-[13px] tracking-wide text-neutral-900 hover:border-neutral-400"
-            >
-              Leave a review
-            </Button>
-
-            <blockquote className="mt-10 border-l border-neutral-200 pl-6 text-[18px] leading-7 text-neutral-900">
-              “Today, the term ‘sustainability’ concerns not only the environmental cost of operating a home,
-              but also that of building it.”
-              <footer className="mt-3 text-[13px] text-neutral-500">— Philip Jodidio</footer>
-            </blockquote>
           </section>
         </div>
       </div>
 
-      {/* collapsibles */}
+      {/* Collapsibles */}
       <section className="border-t border-neutral-200">
         <Collapsible open={readMoreOpen} onOpenChange={setReadMoreOpen}>
-          <CollapsibleTrigger className="mx-auto flex w-full max-w-[1240px] items-center justify-center gap-3 px-6 py-6 text-[13px] font-medium tracking-widest text-neutral-900">
-            <span className="uppercase">Read more</span>
+          <CollapsibleTrigger className="container-main flex w-full items-center justify-center gap-3 py-6 text-[13px] font-medium tracking-widest text-neutral-900">
+            <span className="uppercase">Mô tả sản phẩm</span>
             <span className="text-neutral-500">{readMoreOpen ? "—" : "+"}</span>
           </CollapsibleTrigger>
-
           <CollapsibleContent>
-            <div className="mx-auto grid max-w-[1240px] grid-cols-1 gap-10 px-6 pb-10 lg:grid-cols-2">
-              <div className="space-y-4 text-[15px] leading-7 text-neutral-800">
-                <h2 className="font-serif text-[26px] leading-tight">The Future of Housing</h2>
-                <p className="text-neutral-600">
-                  The latest trends in green residential architecture from around the world.
+            <div className="container-main pb-10">
+              {book.description ? (
+                <p className="text-[15px] leading-7 text-neutral-700 whitespace-pre-line">
+                  {book.description}
                 </p>
-                <p>
-                  Travel across continents and climates to experience architecture that&apos;s rewriting
-                  sustainability rules.
+              ) : (
+                <p className="text-neutral-500">Chưa có mô tả cho sản phẩm này.</p>
+              )}
+              {book.supplier && (
+                <p className="mt-4 text-sm text-neutral-500">
+                  Nhà cung cấp: <span className="font-medium text-neutral-800">{book.supplier.name}</span>
                 </p>
-              </div>
-
-              <div className="space-y-5 text-[15px] leading-7 text-neutral-800">
-                <div>
-                  <h3 className="font-semibold">The author</h3>
-                  <p className="mt-2 text-neutral-700">
-                    <strong>Philip Jodidio</strong> studied art history and economics at Harvard and edited
-                    Connaissance des Arts for over 20 years.
-                  </p>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold">Product details</h3>
-                  <p className="mt-2 text-neutral-700">Hardcover, 24.6 × 37.2 cm, 496 pages</p>
-                  <p className="text-neutral-700">ISBN 978-3-8365-9689-3</p>
-                  <Link href="#" className="mt-2 inline-block text-neutral-900 underline underline-offset-4">
-                    Download product images here
-                  </Link>
-                </div>
-              </div>
+              )}
             </div>
           </CollapsibleContent>
         </Collapsible>
 
         <Collapsible open={reviewsOpen} onOpenChange={setReviewsOpen} className="border-t border-neutral-200">
-          <CollapsibleTrigger className="mx-auto flex w-full max-w-[1240px] items-center justify-center gap-3 px-6 py-6 text-[13px] font-medium tracking-widest text-neutral-900">
-            <span className="uppercase">Customer reviews</span>
+          <CollapsibleTrigger className="container-main flex w-full items-center justify-center gap-3 py-6 text-[13px] font-medium tracking-widest text-neutral-900">
+            <span className="uppercase">Đánh giá</span>
             <span className="text-neutral-500">{reviewsOpen ? "—" : "+"}</span>
           </CollapsibleTrigger>
-
           <CollapsibleContent>
-            <div className="mx-auto max-w-[1240px] px-6 pb-10">
-              <div className="space-y-3">
-                <p className="font-serif text-[22px]">0 Ratings</p>
-                <p className="text-[14px] text-neutral-600">
-                  No reviews have been posted for this item yet. Be the first to rate this product.
-                </p>
-                <Button variant="outline" className="h-10 rounded-sm border-neutral-200 px-6 text-[13px]">
-                  Submit a review
-                </Button>
-              </div>
+            <div className="container-main pb-10">
+              <p className="text-[14px] text-neutral-600">Chưa có đánh giá nào cho sản phẩm này.</p>
             </div>
           </CollapsibleContent>
         </Collapsible>
       </section>
 
-      {/* related */}
-      <section className="border-t border-neutral-200 py-14">
-        <div className="mx-auto max-w-[1540px] px-6">
-          <h2 className="mb-12 text-center font-serif text-[32px] leading-none">
-            You may also like
-          </h2>
-
-          <div className="grid gap-x-14 gap-y-16 sm:grid-cols-2 xl:grid-cols-4 place-items-start">
-
+      {/* Similar books — reuse BookCard component */}
+      {similarBooks.length > 0 && (
+        <section className="border-t border-neutral-200 py-14">
+          <div className="container-main">
+            <h2 className="mb-10 font-serif text-[28px] leading-none tracking-tight text-neutral-900">
+              Sách tương tự
+            </h2>
+            <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 xl:grid-cols-4">
+              {similarBooks.map((b) => (
+                <BookCard
+                  key={b.id}
+                  href={`/detail/${b.id}`}
+                  title={b.title}
+                  author={b.author}
+                  price={b.price}
+                  stockQuantity={b.stockQuantity}
+                  imageUrl={b.imageUrl}
+                  categories={b.categories?.map((c) => c.name)}
+                  variant="compact"
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
-
+        </section>
+      )}
     </div>
   );
 }

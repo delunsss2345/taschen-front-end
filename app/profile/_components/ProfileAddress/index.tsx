@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -400,9 +400,12 @@ export function ProfileAddresses() {
   const { data: fetchedAddresses, isLoading } = useAddressesQuery(userId);
   const { addresses, loading } = useAddressesStore();
 
+  const [hasMounted, setHasMounted] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Address | null>(null);
+
+  useEffect(() => { setHasMounted(true); }, []);
 
   const deleteMutation = useDeleteAddressMutation();
   const setDefaultMutation = useSetDefaultAddressMutation();
@@ -466,7 +469,7 @@ export function ProfileAddresses() {
     setModalOpen(open);
   };
 
-  if (isLoading || loading) {
+  if (!hasMounted || isLoading || loading) {
     return (
       <div className="space-y-4">
         <h1 className="text-xl font-semibold">{t("profile.addresses.title")}</h1>

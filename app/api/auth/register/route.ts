@@ -6,6 +6,7 @@ import type { RegisterApiResponse } from "@/types/response/auth.response";
 import { RegisterSchema } from "@/validation/auth/registerValidation";
 import { HttpStatusCode } from "axios";
 import { NextRequest } from "next/server";
+import { ZodError } from "zod";
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,16 +14,24 @@ export async function POST(request: NextRequest) {
     const parsed = RegisterSchema.safeParse(payload);
 
     if (!parsed.success) {
+      const errors = parsed.error.issues.map((e) => e.message);
       return ResponseApi.error(
-        API_MESSAGE.REGISTER_VALIDATION_FAILED,
-        HttpStatusCode.UnprocessableEntity,
+        errors[0] || API_MESSAGE.REGISTER_VALIDATION_FAILED,
+        HttpStatusCode.BadRequest,
       );
     }
 
-    const response = await api.post<RegisterApiResponse>("auth/register", payload);
+    const response = await api.post<RegisterApiResponse>("auth/register", parsed.data);
 
     return ResponseApi.success(response.data, HttpStatusCode.Created);
   } catch (error) {
+    if (error instanceof ZodError) {
+      const errors = error.issues.map((e) => e.message);
+      return ResponseApi.error(
+        errors[0] || API_MESSAGE.REGISTER_VALIDATION_FAILED,
+        HttpStatusCode.BadRequest,
+      );
+    }
     return handleRouteError(
       error,
       API_MESSAGE.SYSTEM_TRY_AGAIN,

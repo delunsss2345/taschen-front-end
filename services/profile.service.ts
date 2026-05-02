@@ -138,6 +138,15 @@ export const profileService = {
     }
   },
 
+  // --- Order Actions ---
+  async cancelOrder(orderId: number): Promise<void> {
+    await http.put(`/orders/${orderId}/cancel`, {});
+  },
+
+  async confirmReceived(orderId: number): Promise<void> {
+    await http.put(`/orders/${orderId}/confirm-received`, {});
+  },
+
   // --- Password ---
   async changePassword(payload: ChangePasswordRequest): Promise<boolean> {
     try {
