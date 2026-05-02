@@ -71,6 +71,10 @@ export function AdminAccountsPage() {
     )
   }
 
+  const handleDeleteAccount = (deletedId: number) => {
+    setAccounts((prev) => prev.filter((acc) => acc.id !== deletedId))
+  }
+
   return (
     <div className="space-y-4">
       <AccountHeader 
@@ -78,10 +82,11 @@ export function AdminAccountsPage() {
         onSearch={setSearchTerm}
         searchTerm={searchTerm}
       />
-      <AccountTable 
-        accounts={filteredAccounts} 
-        loading={loading} 
+      <AccountTable
+        accounts={filteredAccounts}
+        loading={loading}
         onUpdate={handleUpdateAccount}
+        onDelete={handleDeleteAccount}
         onRefresh={handleRefresh}
       />
     </div>

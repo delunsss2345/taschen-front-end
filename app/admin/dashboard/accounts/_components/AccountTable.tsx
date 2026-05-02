@@ -12,6 +12,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -23,6 +34,8 @@ import {
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { userService, type Address } from '@/services/user.service'
+import { useAuthStore } from '@/features/auth/store/auth.store'
+import { useRouter } from 'next/navigation'
 
 export interface Account {
   id: number
@@ -39,10 +52,14 @@ interface AccountTableProps {
   accounts: Account[]
   loading?: boolean
   onUpdate?: (updatedAccount: Account) => void
+  onDelete?: (deletedId: number) => void
   onRefresh?: () => void
 }
 
-export function AccountTable({ accounts, loading = false, onUpdate, onRefresh }: AccountTableProps) {
+export function AccountTable({ accounts, loading = false, onUpdate, onDelete, onRefresh }: AccountTableProps) {
+  const currentUser = useAuthStore((state) => state.currentUser)
+  const isAdmin = currentUser?.roles?.includes("ADMIN") ?? false
+
   const getRoleBadge = (role: string) => {
     switch (role) {
       case 'ADMIN':
@@ -149,6 +166,21 @@ export function AccountTable({ accounts, loading = false, onUpdate, onRefresh }:
                       </Button>
                     }
                   />
+                  {isAdmin && (
+                    <DeleteAccountModal
+                      account={acc}
+                      onDelete={onDelete}
+                      trigger={
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="h-8 px-3 cursor-pointer"
+                        >
+                          Xóa
+                        </Button>
+                      }
+                    />
+                  )}
                 </div>
               </TableCell>
             </TableRow>
@@ -311,6 +343,102 @@ function UpdateAccountModal({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function DeleteAccountModal({
+  trigger,
+  account,
+  onDelete,
+}: {
+  trigger: React.ReactNode
+  account: Account
+  onDelete?: (deletedId: number) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const currentUser = useAuthStore((state) => state.currentUser)
+  const clearSession = useAuthStore((state) => state.clearSession)
+  const router = useRouter()
+
+  const isCurrentUser = currentUser?.id === account.id
+
+  const handleDelete = async () => {
+    setDeleting(true)
+
+    const loadingToast = toast.loading("Đang xóa...", {
+      duration: Infinity,
+    })
+
+    try {
+      await userService.deleteUser(account.id)
+
+      toast.dismiss(loadingToast)
+      toast.success("Xóa user thành công.")
+      onDelete?.(account.id)
+      setOpen(false)
+
+      if (isCurrentUser) {
+        clearSession()
+        router.push("/login")
+      }
+    } catch (error: unknown) {
+      toast.dismiss(loadingToast)
+
+      const axiosError = error as {
+        response?: {
+          status?: number
+          data?: { message?: string }
+        }
+      }
+      const status = axiosError?.response?.status
+      const message = axiosError?.response?.data?.message
+
+      if (status === 403) {
+        toast.error("Bạn không có quyền thực hiện hành động này.")
+      } else if (status === 404 || message?.toLowerCase().includes("not found")) {
+        toast.error("User không tồn tại.")
+        onDelete?.(account.id)
+      } else if (status === 400) {
+        toast.error("Không thể xóa user. Vui lòng thử lại sau.")
+      } else {
+        toast.error("Đã xảy ra lỗi, vui lòng thử lại sau.")
+      }
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  return (
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Xóa tài khoản</AlertDialogTitle>
+          <AlertDialogDescription>
+            Bạn có chắc muốn xóa user <strong>{account.username}</strong> không? Hành
+            động này không thể hoàn tác.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel className="cursor-pointer">Hủy</AlertDialogCancel>
+          <AlertDialogAction
+            className="bg-red-600 hover:bg-red-700 cursor-pointer"
+            onClick={handleDelete}
+            disabled={deleting}
+          >
+            {deleting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Đang xóa...
+              </>
+            ) : (
+              "Xóa"
+            )}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }
 
