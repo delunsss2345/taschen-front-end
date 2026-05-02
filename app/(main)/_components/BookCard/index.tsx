@@ -161,7 +161,7 @@ export default function BookCard({
 
                 <button
                     type="button"
-                    disabled={outOfStock || addToCartMutation.isPending || !bookId}
+                    disabled={outOfStock || addToCartMutation.isPending}
                     onClick={handleAddToCart}
                     className={cn(
                         "w-full py-2.5 text-[11px] font-bold tracking-[0.15em] uppercase rounded-sm",
