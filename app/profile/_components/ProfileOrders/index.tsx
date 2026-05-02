@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import {
   Calendar,
-  ChevronDown,
-  ChevronUp,
   MapPin,
   Package,
   ShoppingCart,
+  XCircle,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -19,11 +19,18 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -36,7 +43,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   useOrdersQuery,
   useOrdersStore,
+  useCancelOrderMutation,
+  useConfirmReceivedMutation,
 } from "@/features/profile";
+import { returnRequestService } from "@/services/return-request.service";
 import type { Order, OrderDetail, OrderStatus } from "@/types/profile.type";
 import useTranslator from "@/hooks/use-translator";
 
@@ -230,6 +240,68 @@ function OrderDetailModal({
 }
 
 // ============================================================
+// Return Request Dialog
+// ============================================================
+function ReturnRequestDialog({
+  order,
+  open,
+  onOpenChange,
+}: {
+  order: Order;
+  open: boolean;
+  onOpenChange: (o: boolean) => void;
+}) {
+  const [reason, setReason] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!reason.trim()) {
+      toast.error("Vui lòng nhập lý do hoàn trả");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await returnRequestService.create({ orderId: order.id, reason: reason.trim() });
+      toast.success("Yêu cầu hoàn trả đã được gửi");
+      onOpenChange(false);
+      setReason("");
+    } catch {
+      toast.error("Gửi yêu cầu hoàn trả thất bại");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Yêu cầu hoàn trả đơn #{order.id}</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="return-reason">Lý do hoàn trả</Label>
+            <Textarea
+              id="return-reason"
+              placeholder="Mô tả lý do bạn muốn hoàn trả..."
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              rows={4}
+            />
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => onOpenChange(false)}>Hủy</Button>
+            <Button onClick={handleSubmit} disabled={submitting || !reason.trim()}>
+              {submitting ? "Đang gửi..." : "Gửi yêu cầu"}
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ============================================================
 // Order Row
 // ============================================================
 function OrderRow({
@@ -240,9 +312,33 @@ function OrderRow({
   onViewDetails: (order: Order) => void;
 }) {
   const { t } = useTranslator();
-  const [expanded, setExpanded] = useState(false);
+  const cancelMutation = useCancelOrderMutation();
+  const confirmMutation = useConfirmReceivedMutation();
+  const [returnOpen, setReturnOpen] = useState(false);
   const statusColor = ORDER_STATUS_COLORS[order.status];
   const statusLabelKey = `profile.orders.statuses.${ORDER_STATUS_LABELS[order.status]}`;
+
+  const canCancel = ["UNPAID", "PENDING"].includes(order.status);
+  const canConfirm = order.status === "DELIVERING";
+  const canReturn = order.status === "COMPLETED";
+
+  const handleCancel = async () => {
+    try {
+      await cancelMutation.mutateAsync(order.id);
+      toast.success("Đã hủy đơn hàng");
+    } catch {
+      toast.error("Không thể hủy đơn hàng");
+    }
+  };
+
+  const handleConfirm = async () => {
+    try {
+      await confirmMutation.mutateAsync(order.id);
+      toast.success("Đã xác nhận nhận hàng");
+    } catch {
+      toast.error("Không thể xác nhận nhận hàng");
+    }
+  };
 
   return (
     <>
@@ -289,19 +385,69 @@ function OrderRow({
           </Badge>
         </TableCell>
         <TableCell className="text-right">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 gap-1"
-            onClick={(e) => {
-              e.stopPropagation();
-              onViewDetails(order);
-            }}
-          >
-            {t("profile.orders.viewDetails")}
-          </Button>
+          <div className="flex flex-wrap items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
+            {canCancel && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 gap-1 text-xs text-red-600 hover:bg-red-50"
+                    disabled={cancelMutation.isPending}
+                  >
+                    <XCircle className="h-3 w-3" />
+                    Hủy
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Xác nhận hủy đơn hàng?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Bạn có chắc muốn hủy đơn hàng #{order.id}?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Không</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleCancel} className="bg-red-600 hover:bg-red-700">
+                      Hủy đơn
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+            {canConfirm && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs text-green-600 hover:bg-green-50"
+                onClick={handleConfirm}
+                disabled={confirmMutation.isPending}
+              >
+                Đã nhận
+              </Button>
+            )}
+            {canReturn && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs"
+                onClick={() => setReturnOpen(true)}
+              >
+                Hoàn trả
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 gap-1"
+              onClick={() => onViewDetails(order)}
+            >
+              {t("profile.orders.viewDetails")}
+            </Button>
+          </div>
         </TableCell>
       </TableRow>
+      <ReturnRequestDialog order={order} open={returnOpen} onOpenChange={setReturnOpen} />
     </>
   );
 }

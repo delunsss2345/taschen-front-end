@@ -30,11 +30,35 @@ export interface ReturnRequest {
   items: ReturnRequestItem[];
 }
 
+export interface CreateReturnRequestPayload {
+  orderId: number;
+  reason: string;
+}
+
 async function getReturnRequestsSafe(): Promise<ReturnRequest[]> {
   const response = await http.get<ApiResponseEnvelope<ReturnRequest[]>>(
     "return-requests"
   );
   return getResponseData(response) ?? [];
+}
+
+async function getMyReturnRequests(): Promise<ReturnRequest[]> {
+  try {
+    const response = await http.get<ApiResponseEnvelope<ReturnRequest[]>>(
+      "return-requests/my-requests"
+    );
+    return getResponseData(response) ?? [];
+  } catch {
+    return [];
+  }
+}
+
+async function createReturnRequest(payload: CreateReturnRequestPayload): Promise<ReturnRequest> {
+  const response = await http.post<ApiResponseEnvelope<ReturnRequest>>(
+    "return-requests",
+    payload,
+  );
+  return requireResponseData(response, "Tạo yêu cầu hoàn trả thất bại");
 }
 
 async function approveReturnRequest(returnId: number, responseNote: string): Promise<ReturnRequest> {
@@ -55,6 +79,8 @@ async function rejectReturnRequest(returnId: number, responseNote: string): Prom
 
 export const returnRequestService = {
   getAll: getReturnRequestsSafe,
+  getMyRequests: getMyReturnRequests,
+  create: createReturnRequest,
   approve: approveReturnRequest,
   reject: rejectReturnRequest,
 };
