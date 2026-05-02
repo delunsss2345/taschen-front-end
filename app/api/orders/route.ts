@@ -18,3 +18,14 @@ export async function GET(request: NextRequest) {
     return handleRouteError(error, API_MESSAGE.SYSTEM_TRY_AGAIN, "Get Orders API Error");
   }
 }
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const headers = getAuthorizationHeader(request);
+    const response = await api.post<{ data: unknown }>("orders", body, { headers });
+    return ResponseApi.success(response.data, HttpStatusCode.Ok);
+  } catch (error) {
+    return handleRouteError(error, API_MESSAGE.SYSTEM_TRY_AGAIN, "Create Order API Error");
+  }
+}

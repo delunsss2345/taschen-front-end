@@ -1,14 +1,8 @@
 import { http } from "@/utils/http";
 import { getArrayData, getResponseData, type ApiResponseEnvelope } from "./helpers/response";
+import type { Order, OrderStatus } from "@/types/profile.type";
 
-export type OrderStatus =
-  | "UNPAID"
-  | "PENDING"
-  | "PROCESSING"
-  | "DELIVERING"
-  | "COMPLETED"
-  | "CANCELLED"
-  | (string & {});
+export type { Order, OrderStatus };
 
 export interface OrderDetail {
   id: number;
@@ -19,20 +13,21 @@ export interface OrderDetail {
   totalPrice: number;
 }
 
-export interface Order {
-  id: number;
-  userId: number;
-  userName: string;
-  orderDate: string;
-  totalAmount: number;
-  status: OrderStatus;
-  paymentMethod: string;
-  paymentCode: string | null;
-  promotionId: number | null;
-  promotionCode: string | null;
+export interface CreateOrderRequest {
   addressId: number;
-  deliveryAddress: string;
-  orderDetails: OrderDetail[];
+  paymentMethod: "COD" | "VNPAY";
+  promotionCode?: string;
+}
+
+export interface VNPayCreateResponse {
+  paymentUrl: string;
+}
+
+export interface PromoValidationResult {
+  id: number;
+  code: string;
+  discountPercent: number;
+  isActive: boolean;
 }
 
 export const orderService = {
@@ -46,16 +41,68 @@ export const orderService = {
     }
   },
 
+  async getMyOrders(): Promise<Order[]> {
+    try {
+      const response = await http.get<ApiResponseEnvelope<Order[]>>("orders/my");
+      return getResponseData<Order[]>(response) ?? [];
+    } catch {
+      return [];
+    }
+  },
+
   async getOrderById(orderId: number | string): Promise<Order | null> {
     try {
       const id = typeof orderId === "string" ? Number(orderId) : orderId;
-      if (!Number.isFinite(id)) {
-        return null;
-      }
-
+      if (!Number.isFinite(id)) return null;
       const response = await http.get<ApiResponseEnvelope<Order>>(`orders/${id}`);
-      const data = getResponseData<Order>(response);
-      return data;
+      return getResponseData<Order>(response);
+    } catch {
+      return null;
+    }
+  },
+
+  async createOrder(payload: CreateOrderRequest): Promise<Order> {
+    const response = await http.post<ApiResponseEnvelope<Order>>("orders", payload);
+    const data = getResponseData<Order>(response);
+    if (!data) throw new Error("Tạo đơn hàng thất bại");
+    return data;
+  },
+
+  async cancelOrder(orderId: number | string): Promise<Order | null> {
+    try {
+      const response = await http.put<ApiResponseEnvelope<Order>>(`orders/${orderId}/cancel`, {});
+      return getResponseData<Order>(response);
+    } catch {
+      return null;
+    }
+  },
+
+  async confirmReceived(orderId: number | string): Promise<Order | null> {
+    try {
+      const response = await http.put<ApiResponseEnvelope<Order>>(`orders/${orderId}/confirm-received`, {});
+      return getResponseData<Order>(response);
+    } catch {
+      return null;
+    }
+  },
+
+  async createVNPayPayment(orderId: number | string): Promise<string> {
+    const response = await http.post<ApiResponseEnvelope<VNPayCreateResponse | string>>(
+      `payments/vnpay/create/${orderId}`,
+      {},
+    );
+    const data = getResponseData<VNPayCreateResponse | string>(response);
+    if (!data) throw new Error("Không thể tạo thanh toán VNPay");
+    if (typeof data === "string") return data;
+    return (data as VNPayCreateResponse).paymentUrl;
+  },
+
+  async validatePromoCode(code: string): Promise<PromoValidationResult | null> {
+    try {
+      const response = await http.get<ApiResponseEnvelope<PromoValidationResult>>(
+        `promotions/validate/${encodeURIComponent(code)}`,
+      );
+      return getResponseData<PromoValidationResult>(response);
     } catch {
       return null;
     }
@@ -64,8 +111,7 @@ export const orderService = {
   async updateOrderStatus(orderId: number | string, status: OrderStatus): Promise<Order | null> {
     try {
       const response = await http.put<ApiResponseEnvelope<Order>>(`orders/${orderId}/status`, { status });
-      const data = getResponseData<Order>(response);
-      return data;
+      return getResponseData<Order>(response);
     } catch {
       return null;
     }
