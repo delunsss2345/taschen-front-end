@@ -53,7 +53,7 @@ export async function DELETE(
     const headers = getAuthorizationHeader(request);
     await api.delete(`users/${userId}`, undefined, { headers });
 
-    return ResponseApi.success({ message: "User deleted" }, HttpStatusCode.NoContent);
+    return ResponseApi.success(null, HttpStatusCode.Ok);
   } catch (error) {
     return handleRouteError(
       error,

@@ -32,16 +32,14 @@ export const cartService = {
   async addToCart(
     userId: number | string,
     payload: AddToCartRequest,
-  ): Promise<Cart | null> {
-    try {
-      const response = await http.post<ApiResponseEnvelope<Cart>>(
-        `/carts/users/${userId}/items`,
-        payload,
-      );
-      return getResponseData<Cart>(response);
-    } catch {
-      return null;
-    }
+  ): Promise<Cart> {
+    const response = await http.post<ApiResponseEnvelope<Cart>>(
+      `/carts/users/${userId}/items`,
+      payload,
+    );
+    const cart = getResponseData<Cart>(response);
+    if (!cart) throw new Error("Không thể thêm vào giỏ hàng");
+    return cart;
   },
 
   async clearCart(userId: number | string): Promise<boolean> {
@@ -71,51 +69,40 @@ export const cartService = {
     }
   },
 
-  async increaseCartItemQuantity(cartItemId: number | string): Promise<CartItem | null> {
-    try {
-      const response = await http.patch<ApiResponseEnvelope<CartItem>>(
-        `/cart-items/${cartItemId}/increase`,
-        {},
-      );
-      return getResponseData<CartItem>(response);
-    } catch {
-      return null;
-    }
+  async increaseCartItemQuantity(cartItemId: number | string): Promise<CartItem> {
+    const response = await http.patch<ApiResponseEnvelope<CartItem>>(
+      `/cart-items/${cartItemId}/increase`,
+      {},
+    );
+    const item = getResponseData<CartItem>(response);
+    if (!item) throw new Error("Không thể tăng số lượng");
+    return item;
   },
 
-  async decreaseCartItemQuantity(cartItemId: number | string): Promise<CartItem | null> {
-    try {
-      const response = await http.patch<ApiResponseEnvelope<CartItem>>(
-        `/cart-items/${cartItemId}/decrease`,
-        {},
-      );
-      return getResponseData<CartItem>(response);
-    } catch {
-      return null;
-    }
+  async decreaseCartItemQuantity(cartItemId: number | string): Promise<CartItem> {
+    const response = await http.patch<ApiResponseEnvelope<CartItem>>(
+      `/cart-items/${cartItemId}/decrease`,
+      {},
+    );
+    const item = getResponseData<CartItem>(response);
+    if (!item) throw new Error("Không thể giảm số lượng");
+    return item;
   },
 
   async updateCartItemQuantity(
     cartItemId: number | string,
     payload: UpdateCartItemQuantityRequest,
-  ): Promise<CartItem | null> {
-    try {
-      const response = await http.put<ApiResponseEnvelope<CartItem>>(
-        `/cart-items/${cartItemId}/quantity`,
-        payload,
-      );
-      return getResponseData<CartItem>(response);
-    } catch {
-      return null;
-    }
+  ): Promise<CartItem> {
+    const response = await http.put<ApiResponseEnvelope<CartItem>>(
+      `/cart-items/${cartItemId}/quantity`,
+      payload,
+    );
+    const item = getResponseData<CartItem>(response);
+    if (!item) throw new Error("Không thể cập nhật số lượng");
+    return item;
   },
 
-  async deleteCartItem(cartItemId: number | string): Promise<boolean> {
-    try {
-      await http.del<ApiResponseEnvelope<null>>(`/cart-items/${cartItemId}`);
-      return true;
-    } catch {
-      return false;
-    }
+  async deleteCartItem(cartItemId: number | string): Promise<void> {
+    await http.del<ApiResponseEnvelope<null>>(`/cart-items/${cartItemId}`);
   },
 };

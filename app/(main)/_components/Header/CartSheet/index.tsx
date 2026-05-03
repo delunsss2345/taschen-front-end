@@ -20,6 +20,7 @@ import {
   useDeleteCartItemMutation,
 } from "@/features/cart";
 import { useCartStore } from "@/features/cart/store/cart.store";
+import { useBookByIdQuery } from "@/features/book";
 import type { CartItem } from "@/types/response/cart.response";
 import { toast } from "sonner";
 
@@ -35,10 +36,11 @@ function CartSheetItem({ item }: { item: CartItem }) {
   const decrease = useDecreaseCartItemQuantityMutation();
   const remove = useDeleteCartItemMutation();
 
-  const title = (item as Record<string, unknown>).bookTitle as string | undefined;
-  const imageUrl =
-    ((item as Record<string, unknown>).coverImage as string | undefined) ??
-    ((item as Record<string, unknown>).imageUrl as string | undefined);
+  const imageFromItem = item.coverImage ?? item.imageUrl ?? item.book?.imageUrl ?? item.book?.coverImage;
+  const titleFromItem = item.bookTitle ?? item.book?.title;
+  const { data: bookData } = useBookByIdQuery(!imageFromItem || !titleFromItem ? item.bookId : null);
+  const title = titleFromItem ?? bookData?.title;
+  const imageUrl = imageFromItem ?? bookData?.imageUrl;
   const unitPrice = item.unitPrice ?? 0;
   const isPending = increase.isPending || decrease.isPending || remove.isPending;
 

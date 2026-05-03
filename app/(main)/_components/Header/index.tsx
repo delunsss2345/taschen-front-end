@@ -3,13 +3,9 @@ import CartSheet from "@/app/(main)/_components/Header/CartSheet";
 import ProfileButton from "@/app/(main)/_components/Header/ProfileButton";
 import SearchBar from "@/app/(main)/_components/Header/Search";
 import Nav from "@/app/(main)/_components/Nav";
-import useTranslator from "@/hooks/use-translator";
-import { Bell } from "lucide-react";
-import Link from "next/link";
+import { NotificationBell } from "@/features/notifications/NotificationBell";
 
 const Header = () => {
-  const { t } = useTranslator();
-
 
   return (
     <header className="relative z-50 w-full bg-white">
@@ -26,13 +22,7 @@ const Header = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <Link
-            href="/notifications"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-sm hover:bg-muted"
-            aria-label={t("header.aria.notifications")}
-          >
-            <Bell className="h-5 w-5" />
-          </Link>
+          <NotificationBell />
 
           <CartSheet />
           <ProfileButton />

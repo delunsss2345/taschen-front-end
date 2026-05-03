@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { useCurrentCartQuery } from "@/features/cart";
 import { useAddressesQuery } from "@/features/profile";
 import { useAuthStore } from "@/features/auth";
+import { useBookByIdQuery } from "@/features/book";
 import { orderService } from "@/services/order.service";
 import type { Address } from "@/types/profile.type";
 import type { CartItem } from "@/types/response/cart.response";
@@ -64,14 +65,15 @@ function AddressCard({
 }
 
 function CartSummaryItem({ item }: { item: CartItem }) {
-  const title = (item as Record<string, unknown>).bookTitle as string | undefined;
-  const imageUrl =
-    ((item as Record<string, unknown>).coverImage as string | undefined) ??
-    ((item as Record<string, unknown>).imageUrl as string | undefined);
+  const imageFromItem = item.coverImage ?? item.imageUrl ?? item.book?.imageUrl ?? item.book?.coverImage;
+  const titleFromItem = item.bookTitle ?? item.book?.title;
+  const { data: bookData } = useBookByIdQuery(!imageFromItem || !titleFromItem ? item.bookId : null);
+  const title = titleFromItem ?? bookData?.title;
+  const imageUrl = imageFromItem ?? bookData?.imageUrl;
 
   return (
     <div className="flex items-start gap-4">
-      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100">
+      <div className="relative h-24 w-16 shrink-0 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100">
         {imageUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={imageUrl} alt={title ?? ""} className="h-full w-full object-cover" />
@@ -130,7 +132,7 @@ export default function CheckoutPage() {
     setPromoResult(null);
     try {
       const result = await orderService.validatePromoCode(promoCode.trim());
-      if (result && result.isActive) {
+      if (result) {
         setPromoResult({ discountPercent: result.discountPercent, code: result.code });
         toast.success(`Áp dụng mã giảm giá: -${result.discountPercent}%`);
       } else {

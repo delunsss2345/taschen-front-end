@@ -8,7 +8,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuthStore } from "@/features/auth";
+import { useCartStore } from "@/features/cart/store/cart.store";
 import useTranslator from "@/hooks/use-translator";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   LayoutDashboard,
   LogIn,
@@ -24,6 +26,8 @@ const ProfileButton = () => {
   const { t } = useTranslator();
   const currentUser = useAuthStore((s) => s.currentUser);
   const clearSession = useAuthStore((s) => s.clearSession);
+  const resetCartState = useCartStore((s) => s.resetCartState);
+  const queryClient = useQueryClient();
   const router = useRouter();
 
   const roles = currentUser?.roles ?? [];
@@ -33,6 +37,8 @@ const ProfileButton = () => {
 
   const handleLogout = () => {
     clearSession();
+    resetCartState();
+    queryClient.clear();
     router.push("/");
   };
 

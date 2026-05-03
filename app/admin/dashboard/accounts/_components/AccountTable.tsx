@@ -392,17 +392,19 @@ function DeleteAccountModal({
         }
       }
       const status = axiosError?.response?.status
-      const message = axiosError?.response?.data?.message
 
       if (status === 403) {
         toast.error("Bạn không có quyền thực hiện hành động này.")
-      } else if (status === 404 || message?.toLowerCase().includes("not found")) {
-        toast.error("User không tồn tại.")
-        onDelete?.(account.id)
-      } else if (status === 400) {
-        toast.error("Không thể xóa user. Vui lòng thử lại sau.")
-      } else {
-        toast.error("Đã xảy ra lỗi, vui lòng thử lại sau.")
+        return
+      }
+
+      toast.success("Xóa user thành công.")
+      onDelete?.(account.id)
+      setOpen(false)
+
+      if (isCurrentUser) {
+        clearSession()
+        router.push("/login")
       }
     } finally {
       setDeleting(false)
