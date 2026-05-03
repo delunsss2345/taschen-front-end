@@ -10,10 +10,11 @@ export async function GET(
   { params }: { params: Promise<{ userId: string }> },
 ) {
   try {
-    const { userId } = await params;
+    const { userId: _userId } = await params;
     const headers = getAuthorizationHeader(request);
-    const response = await api.get<{ data: unknown }>(`users/me/addresses`, { headers });
-    return ResponseApi.success(response.data, HttpStatusCode.Ok);
+    const response = await api.get<{ data: { addresses?: unknown[] } }>(`users/me`, { headers });
+    const addresses = response.data?.addresses ?? [];
+    return ResponseApi.success(addresses, HttpStatusCode.Ok);
   } catch (error) {
     return handleRouteError(error, API_MESSAGE.SYSTEM_TRY_AGAIN, "Get Addresses API Error");
   }
@@ -24,7 +25,7 @@ export async function POST(
   { params }: { params: Promise<{ userId: string }> },
 ) {
   try {
-    const { userId } = await params;
+    const { userId: _userId } = await params;
     const payload = await request.json();
     const headers = getAuthorizationHeader(request);
     const response = await api.post<{ data: unknown }>(`users/me/addresses`, payload, { headers });
