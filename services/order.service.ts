@@ -99,10 +99,17 @@ export const orderService = {
 
   async validatePromoCode(code: string): Promise<PromoValidationResult | null> {
     try {
-      const response = await http.get<ApiResponseEnvelope<PromoValidationResult>>(
+      const validateRes = await http.get<ApiResponseEnvelope<{ isValid: boolean }>>(
         `promotions/validate/${encodeURIComponent(code)}`,
       );
-      return getResponseData<PromoValidationResult>(response);
+      const validateData = getResponseData<{ isValid: boolean }>(validateRes);
+      if (!validateData?.isValid) return null;
+
+      const searchRes = await http.get<ApiResponseEnvelope<PromoValidationResult[]>>(
+        `promotions/search?code=${encodeURIComponent(code)}`,
+      );
+      const list = getResponseData<PromoValidationResult[]>(searchRes) ?? [];
+      return list.find((p) => p.code.toLowerCase() === code.toLowerCase()) ?? null;
     } catch {
       return null;
     }
