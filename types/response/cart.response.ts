@@ -16,6 +16,15 @@ export type CartItem = {
   quantity: number;
   unitPrice?: number;
   totalPrice?: number;
+  bookTitle?: string;
+  coverImage?: string;
+  imageUrl?: string;
+  book?: {
+    id?: number;
+    title?: string;
+    imageUrl?: string;
+    coverImage?: string;
+  };
   [key: string]: unknown;
 };
 
