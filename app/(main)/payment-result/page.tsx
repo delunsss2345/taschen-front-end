@@ -3,7 +3,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -38,6 +38,14 @@ function PaymentResultContent() {
               <p className="mt-2 text-sm text-muted-foreground">
                 Cảm ơn bạn đã đặt hàng. Đơn hàng của bạn đang được xử lý.
               </p>
+
+              {orderId && (
+                <div className="mt-6 inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-4 py-3">
+                  <Package className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Mã đơn hàng:</span>
+                  <span className="text-sm font-bold">{orderId}</span>
+                </div>
+              )}
 
               <div className="mt-8 flex flex-col gap-3">
                 <Button asChild size="lg">
