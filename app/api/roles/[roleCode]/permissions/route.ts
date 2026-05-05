@@ -8,7 +8,7 @@ import { ResponseApi } from "@/lib/api/responseHandler";
 import { HttpStatusCode } from "axios";
 import { NextRequest } from "next/server";
 
-export async function POST(
+export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ roleCode: string }> }
 ) {
@@ -16,7 +16,7 @@ export async function POST(
     const { roleCode } = await params;
     const payload = await request.json();
     const headers = getAuthorizationHeader(request);
-    const response = await api.post<{ data: unknown }>(
+    const response = await api.put<{ data: unknown }>(
       `roles/${roleCode}/permissions`,
       payload,
       { headers }

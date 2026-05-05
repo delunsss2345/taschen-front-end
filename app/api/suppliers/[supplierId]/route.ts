@@ -76,7 +76,7 @@ export async function DELETE(
     const { supplierId } = await params;
     const headers = getAuthorizationHeader(request);
     
-    await api.delete(`suppliers/${supplierId}`, { headers });
+    await api.delete(`suppliers/${supplierId}`, undefined, { headers });
 
     return ResponseApi.success({ message: "Xóa nhà cung cấp thành công" }, HttpStatusCode.Ok);
   } catch (error) {
