@@ -118,7 +118,7 @@ export default function CheckoutPage() {
 
   const isLoggedIn = Boolean(currentUser?.id);
   const { data: cart, isLoading: cartLoading } = useCurrentCartQuery();
-  const { data: addresses = [], isLoading: addrLoading } = useAddressesQuery(isLoggedIn ? currentUser?.id : null);
+  const { data: addresses = [], isLoading: addrLoading } = useAddressesQuery(currentUser?.id ?? undefined);
 
   const guestItems = guestCart.items;
   const userItems = cart?.items ?? [];
