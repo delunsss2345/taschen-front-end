@@ -324,7 +324,6 @@ function RoleDetailDialog({
   const [saving, setSaving] = useState(false)
 
   const [allPerms, setAllPerms] = useState<Permission[]>([])
-  const [rolePerms, setRolePerms] = useState<Permission[]>([])
   const [dialogMeta, setDialogMeta] = useState({ total: 0 })
   const [dialogLoading, setDialogLoading] = useState(false)
 
@@ -343,7 +342,6 @@ function RoleDetailDialog({
       ])
 
       setAllPerms(allResult)
-      setRolePerms(roleResult)
       setSelectedPerms(new Set(roleResult.map((p) => p.id)))
       setDialogMeta({ total: allResult.length })
       setDialogLoading(false)
@@ -408,22 +406,7 @@ function RoleDetailDialog({
     const loadingToast = toast.loading('Đang lưu thay đổi...', { duration: Infinity })
 
     try {
-      const toRemove = rolePerms
-        .filter((p) => !selectedPerms.has(p.id))
-        .map((p) => p.id)
-
-      const toAdd = Array.from(selectedPerms)
-        .filter((permId) => !rolePerms.some((rp) => rp.id === permId))
-
-      if (toRemove.length > 0) {
-        for (const permId of toRemove) {
-          await roleService.removePermission(role.code, permId)
-        }
-      }
-
-      if (toAdd.length > 0) {
-        await roleService.assignPermissions(role.code, toAdd)
-      }
+      await roleService.assignPermissions(role.code, Array.from(selectedPerms))
 
       toast.dismiss(loadingToast)
       toast.success('Đã cập nhật permissions cho role thành công.')
