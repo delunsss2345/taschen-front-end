@@ -103,6 +103,32 @@ export const cartService = {
   },
 
   async deleteCartItem(cartItemId: number | string): Promise<void> {
-    await http.del<ApiResponseEnvelope<null>>(`/cart-items/${cartItemId}`);
+    try {
+      await http.del<ApiResponseEnvelope<null>>(`/cart-items/${cartItemId}`);
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { status?: number } };
+      if (axiosErr?.response?.status === 400) return;
+      throw err;
+    }
+  },
+
+  async mergeGuestCart(
+    userId: number | string,
+    guestItems: Array<{ bookId: number; quantity: number }>,
+  ): Promise<Cart | null> {
+    if (guestItems.length === 0) return null;
+    try {
+      let cart: Cart | null = null;
+      for (const item of guestItems) {
+        const response = await http.post<ApiResponseEnvelope<Cart>>(
+          `/carts/users/${userId}/items`,
+          item,
+        );
+        cart = getResponseData<Cart>(response);
+      }
+      return cart;
+    } catch {
+      return null;
+    }
   },
 };
