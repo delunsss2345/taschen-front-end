@@ -87,10 +87,6 @@ export default function BookCard({
             toast.success("Đã thêm vào giỏ hàng");
             return;
         }
-        if (currentUser.roles.includes("GUEST")) {
-            toast.error("Tài khoản GUEST không được phép thêm vào giỏ hàng");
-            return;
-        }
 
         try {
             await addToCartMutation.mutateAsync({
