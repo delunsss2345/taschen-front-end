@@ -27,33 +27,34 @@ const Login = () => {
         return "Đăng nhập thành công";
       },
       error: (err: unknown) => {
-        let message = "Đăng nhập thất bại";
-
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const axiosErr = err as any;
         if (
-          err &&
-          typeof err === "object" &&
-          "response" in err &&
-          err.response &&
-          typeof err.response === "object" &&
-          "data" in err.response &&
-          err.response.data &&
-          typeof err.response.data === "object"
+          axiosErr?.response?.data &&
+          typeof axiosErr.response.data === "object"
         ) {
-          const data = err.response.data as { error?: string; message?: string };
-          const msg = data.error || data.message || "";
+          const data = axiosErr.response.data as {
+            error?: string;
+            message?: string;
+            data?: { error?: string; message?: string };
+          };
+          const msg =
+            data.data?.error ||
+            data.data?.message ||
+            data.error ||
+            data.message ||
+            "";
           if (
             msg.toLowerCase().includes("not verified") ||
-            msg.toLowerCase().includes("chưa được xác minh") ||
-            msg.toLowerCase().includes("xác minh")
+            msg.toLowerCase().includes("chưa được xác minh")
           ) {
             setShowUnverifiedAlert(true);
             return "";
           }
-          message = msg || "Đăng nhập thất bại";
         }
 
         setShowUnverifiedAlert(false);
-        return message;
+        return "Tài khoản hoặc mật khẩu không đúng";
       },
     });
   };

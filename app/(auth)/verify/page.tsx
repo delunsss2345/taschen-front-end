@@ -39,20 +39,20 @@ export default function VerifyEmailPage() {
         onError: (err: unknown) => {
           let msg = "Đã xảy ra lỗi khi xác minh. Vui lòng thử lại.";
 
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const axiosErr = err as any;
           if (
-            err &&
-            typeof err === "object" &&
-            "response" in err &&
-            err.response &&
-            typeof err.response === "object" &&
-            "data" in err.response &&
-            err.response.data &&
-            typeof err.response.data === "object" &&
-            "error" in err.response.data
+            axiosErr?.response?.data &&
+            typeof axiosErr.response.data === "object"
           ) {
-            const e = err.response.data as { error?: string };
-            if (e.error) {
-              msg = e.error;
+            const errData = axiosErr.response.data as {
+              error?: string;
+              message?: string;
+              data?: { error?: string; message?: string };
+            };
+            const e = errData.data?.error || errData.data?.message || errData.error || errData.message || "";
+            if (e) {
+              msg = e;
             }
           }
 

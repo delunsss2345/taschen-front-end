@@ -3,7 +3,7 @@
 import RegisterForm from "@/app/(auth)/_components/RegisterForm";
 import { useRegisterMutation } from "@/features/auth";
 import { Button } from "@/components/ui/button";
-import { Mail, CheckCircle } from "lucide-react";
+import { Mail, CheckCircle, AlertTriangle } from "lucide-react";
 import useTranslator from "@/hooks/use-translator";
 import { RegisterRequest } from "@/types/request/auth.request";
 import Link from "next/link";
@@ -17,13 +17,48 @@ const Register = () => {
   const registerMutation = useRegisterMutation();
   const [registerSuccess, setRegisterSuccess] = useState(false);
   const [countdown, setCountdown] = useState(5);
+  const [existsError, setExistsError] = useState("");
 
   const onSubmit = async (values: RegisterRequest) => {
+    setExistsError("");
     try {
       await registerMutation.mutateAsync(values);
       setRegisterSuccess(true);
-    } catch {
-      // error is handled by mutation
+    } catch (err: unknown) {
+      let msg = "Đăng ký thất bại";
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const axiosErr = err as any;
+      if (
+        axiosErr?.response?.data &&
+        typeof axiosErr.response.data === "object"
+      ) {
+        const data = axiosErr.response.data as {
+          error?: string;
+          message?: string;
+          data?: { error?: string; message?: string };
+        };
+        const raw =
+          data.data?.error ||
+          data.data?.message ||
+          data.error ||
+          data.message ||
+          "";
+        msg = raw;
+
+        if (
+          raw.toLowerCase().includes("exists") ||
+          raw.toLowerCase().includes("already") ||
+          raw.toLowerCase().includes("đã tồn tại") ||
+          raw.toLowerCase().includes("already been taken") ||
+          raw.toLowerCase().includes("đăng ký")
+        ) {
+          setExistsError(raw);
+          return;
+        }
+      }
+
+      toast.error(msg);
     }
   };
 
@@ -102,6 +137,30 @@ const Register = () => {
 
   return (
     <div className="space-y-4">
+      {existsError && (
+        <div className="rounded-md border border-red-200 bg-red-50 p-4 text-left">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-red-800">
+                Email đã được sử dụng
+              </p>
+              <p className="mt-0.5 text-xs text-red-700">
+                {existsError}
+              </p>
+              <div className="mt-3 flex gap-2">
+                <Link
+                  href="/login"
+                  className="text-xs font-medium text-red-700 hover:underline"
+                >
+                  Đăng nhập
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="space-y-1 text-center">
         <h1 className="text-2xl font-semibold">{t("auth.registerTitle")}</h1>
       </div>
