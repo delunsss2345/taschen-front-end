@@ -10,6 +10,7 @@ import type {
 } from "@/types/request/auth.request";
 import { useMutation } from "@tanstack/react-query";
 import { useAuthStore } from "../store/auth.store";
+import { toast } from "sonner";
 
 export const useLoginMutation = () => {
   const setSession = useAuthStore((state) => state.setSession);
@@ -51,6 +52,7 @@ export const useLogoutMutation = () => {
     mutationFn: authService.logout,
     onSuccess: () => {
       clearSession();
+      toast.success("Đã đăng xuất thành công");
     },
   });
 };
