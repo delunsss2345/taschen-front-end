@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const ProfileButton = () => {
   const { t } = useTranslator();
@@ -39,6 +40,7 @@ const ProfileButton = () => {
     clearSession();
     resetCartState();
     queryClient.clear();
+    toast.success("Đã đăng xuất thành công");
     router.push("/");
   };
 

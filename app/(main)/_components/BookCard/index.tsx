@@ -1,6 +1,7 @@
 'use client'
 
 import { useAddToCartMutation } from "@/features/cart";
+import { useGuestCartStore } from "@/features/cart/store/guest-cart.store";
 import { useAuthStore } from "@/features/auth";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
@@ -63,6 +64,7 @@ export default function BookCard({
     const router = useRouter();
     const currentUser = useAuthStore((s) => s.currentUser);
     const addToCartMutation = useAddToCartMutation();
+    const guestCart = useGuestCartStore();
 
     const style = S[variant];
     const outOfStock = stockQuantity !== undefined && stockQuantity === 0;
@@ -71,12 +73,24 @@ export default function BookCard({
         e.stopPropagation();
         e.preventDefault();
 
+        if (!bookId) return;
+
         if (!currentUser?.id) {
-            toast.error("Vui lòng đăng nhập để thêm vào giỏ hàng");
-            router.push("/login");
+            guestCart.addItem({
+                bookId,
+                quantity: 1,
+                bookTitle: title,
+                coverImage: imageUrl,
+                imageUrl,
+                unitPrice: price,
+            });
+            toast.success("Đã thêm vào giỏ hàng");
             return;
         }
-        if (!bookId) return;
+        if (currentUser.roles.includes("GUEST")) {
+            toast.error("Tài khoản GUEST không được phép thêm vào giỏ hàng");
+            return;
+        }
 
         try {
             await addToCartMutation.mutateAsync({

@@ -14,6 +14,7 @@ import BookCard from "@/app/(main)/_components/BookCard";
 
 import { useBookByIdQuery, useBooksByCategoryQuery } from "@/features/book";
 import { useAddToCartMutation } from "@/features/cart";
+import { useGuestCartStore } from "@/features/cart/store/guest-cart.store";
 import { useAuthStore } from "@/features/auth";
 
 const fmtPrice = (price: number) =>
@@ -59,6 +60,7 @@ export default function DetailPage() {
   const { data: book, isLoading, error } = useBookByIdQuery(bookId);
   const addToCartMutation = useAddToCartMutation();
   const currentUser = useAuthStore((s) => s.currentUser);
+  const guestCart = useGuestCartStore();
 
   const firstCategoryId = book?.categoryIds?.[0];
   const { data: similarData } = useBooksByCategoryQuery(firstCategoryId);
@@ -77,14 +79,25 @@ export default function DetailPage() {
   const displayStock = selectedVariant?.stockQuantity ?? book?.stockQuantity ?? 0;
 
   const handleAddToCart = async () => {
-    if (!currentUser?.id) {
-      toast.error("Vui lòng đăng nhập để thêm vào giỏ hàng");
-      router.push("/login");
-      return;
-    }
     if (!book) return;
     if (displayStock <= 0) {
       toast.error("Sản phẩm đã hết hàng");
+      return;
+    }
+    if (!currentUser?.id) {
+      guestCart.addItem({
+        bookId: book.id,
+        quantity: qty,
+        bookTitle: book.title,
+        coverImage: book.imageUrl,
+        imageUrl: book.imageUrl,
+        unitPrice: displayPrice,
+      });
+      toast.success("Đã thêm vào giỏ hàng");
+      return;
+    }
+    if (currentUser.roles.includes("GUEST")) {
+      toast.error("Tài khoản GUEST không được phép thêm vào giỏ hàng");
       return;
     }
     try {

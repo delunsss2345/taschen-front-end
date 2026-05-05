@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,7 +12,11 @@ import { useRouter } from "next/navigation";
 import * as React from "react";
 import { toast } from "sonner";
 
-import { useCurrentCartQuery } from "@/features/cart";
+import {
+  useCurrentCartQuery,
+} from "@/features/cart";
+import { cartService } from "@/services/cart.service";
+import { useGuestCartStore } from "@/features/cart/store/guest-cart.store";
 import { useAddressesQuery } from "@/features/profile";
 import { useAuthStore } from "@/features/auth";
 import { useBookByIdQuery } from "@/features/book";
@@ -64,9 +67,21 @@ function AddressCard({
   );
 }
 
-function CartSummaryItem({ item }: { item: CartItem }) {
-  const imageFromItem = item.coverImage ?? item.imageUrl ?? item.book?.imageUrl ?? item.book?.coverImage;
-  const titleFromItem = item.bookTitle ?? item.book?.title;
+function CartSummaryItem({
+  item,
+  source,
+}: {
+  item: CartItem | { bookId: number; quantity: number; bookTitle: string; coverImage?: string; imageUrl?: string; unitPrice?: number };
+  source: "user" | "guest";
+}) {
+  const isUser = source === "user";
+  const cartItem = item as CartItem;
+  const guestItem = item as { bookId: number; quantity: number; bookTitle: string; coverImage?: string; imageUrl?: string; unitPrice?: number };
+
+  const imageFromItem = isUser
+    ? cartItem.coverImage ?? cartItem.imageUrl ?? cartItem.book?.imageUrl ?? cartItem.book?.coverImage
+    : guestItem.coverImage ?? guestItem.imageUrl;
+  const titleFromItem = isUser ? cartItem.bookTitle ?? cartItem.book?.title : guestItem.bookTitle;
   const { data: bookData } = useBookByIdQuery(!imageFromItem || !titleFromItem ? item.bookId : null);
   const title = titleFromItem ?? bookData?.title;
   const imageUrl = imageFromItem ?? bookData?.imageUrl;
@@ -98,9 +113,33 @@ function CartSummaryItem({ item }: { item: CartItem }) {
 export default function CheckoutPage() {
   const router = useRouter();
   const currentUser = useAuthStore((s) => s.currentUser);
+  const guestCart = useGuestCartStore();
+  const [hasMergedGuest, setHasMergedGuest] = React.useState(false);
 
+  const isLoggedIn = Boolean(currentUser?.id);
   const { data: cart, isLoading: cartLoading } = useCurrentCartQuery();
-  const { data: addresses = [], isLoading: addrLoading } = useAddressesQuery(currentUser?.id);
+  const { data: addresses = [], isLoading: addrLoading } = useAddressesQuery(currentUser?.id ?? undefined);
+
+  const guestItems = guestCart.items;
+  const userItems = cart?.items ?? [];
+  const displayItems = isLoggedIn ? userItems : guestItems;
+
+  React.useEffect(() => {
+    if (!isLoggedIn || hasMergedGuest || guestItems.length === 0) return;
+    const doMerge = async () => {
+      try {
+        await cartService.mergeGuestCart(
+          currentUser!.id,
+          guestItems.map((i) => ({ bookId: i.bookId, quantity: i.quantity })),
+        );
+        guestCart.clearCart();
+        setHasMergedGuest(true);
+      } catch {
+        // ignore merge error
+      }
+    };
+    doMerge();
+  }, [isLoggedIn, hasMergedGuest, guestItems.length]);
 
   const [selectedAddressId, setSelectedAddressId] = React.useState<number | null>(null);
   const [paymentMethod, setPaymentMethod] = React.useState<"COD" | "VNPAY">("COD");
@@ -113,8 +152,12 @@ export default function CheckoutPage() {
   const [promoError, setPromoError] = React.useState("");
   const [placing, setPlacing] = React.useState(false);
 
-  const items = cart?.items ?? [];
-  const subtotal = cart?.totalPrice ?? items.reduce((s, i) => s + (i.totalPrice ?? 0), 0);
+  const subtotal = displayItems.reduce((s, i) => {
+    const unitPrice = isLoggedIn
+      ? (i as CartItem).unitPrice ?? 0
+      : (i as { unitPrice?: number }).unitPrice ?? 0;
+    return s + unitPrice * i.quantity;
+  }, 0);
   const discount = promoResult ? Math.round(subtotal * promoResult.discountPercent / 100) : 0;
   const total = subtotal - discount;
 
@@ -155,7 +198,7 @@ export default function CheckoutPage() {
       toast.error("Vui lòng chọn địa chỉ giao hàng");
       return;
     }
-    if (items.length === 0) {
+    if (displayItems.length === 0) {
       toast.error("Giỏ hàng trống");
       return;
     }
@@ -181,8 +224,11 @@ export default function CheckoutPage() {
         router.push(`/orders`);
       }
     } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { message?: string; details?: { message?: string } } } };
       const msg =
-        err instanceof Error ? err.message : "Đặt hàng thất bại. Vui lòng thử lại.";
+        axiosErr?.response?.data?.details?.message
+        || axiosErr?.response?.data?.message
+        || (err instanceof Error ? err.message : "Đặt hàng thất bại. Vui lòng thử lại.");
       toast.error(msg);
     } finally {
       setPlacing(false);
@@ -191,7 +237,7 @@ export default function CheckoutPage() {
 
   const isLoading = cartLoading || addrLoading;
 
-  if (isLoading) {
+  if (isLoading && isLoggedIn) {
     return (
       <div className="container-main py-10">
         <div className="grid gap-12 lg:grid-cols-[1fr_420px]">
@@ -207,13 +253,26 @@ export default function CheckoutPage() {
     );
   }
 
-  if (!currentUser) {
+  if (!isLoggedIn) {
     return (
       <div className="container-main py-20 text-center">
-        <p className="text-muted-foreground">Vui lòng đăng nhập để thanh toán.</p>
-        <Button className="mt-4" asChild>
-          <Link href="/login">Đăng nhập</Link>
-        </Button>
+        <p className="text-lg font-medium text-muted-foreground mb-2">
+          Vui lòng đăng nhập để tiếp tục thanh toán.
+        </p>
+        <p className="text-sm text-muted-foreground mb-6">
+          Giỏ hàng của bạn đã được lưu.
+        </p>
+        <div className="flex flex-col items-center gap-3">
+          <Button asChild className="px-8">
+            <Link href="/login">Đăng nhập</Link>
+          </Button>
+          <Button variant="outline" asChild className="px-8">
+            <Link href="/register">Tạo tài khoản</Link>
+          </Button>
+          <Button variant="ghost" asChild className="mt-1">
+            <Link href="/cart">← Quay lại giỏ hàng</Link>
+          </Button>
+        </div>
       </div>
     );
   }
@@ -311,7 +370,7 @@ export default function CheckoutPage() {
             <Button
               className="mt-6 h-14 w-full rounded-lg bg-zinc-900 text-base font-semibold text-white hover:bg-zinc-800 disabled:opacity-60"
               onClick={handlePlaceOrder}
-              disabled={placing || items.length === 0 || !selectedAddressId}
+              disabled={placing || displayItems.length === 0 || !selectedAddressId}
             >
               {placing
                 ? "Đang xử lý..."
@@ -326,9 +385,18 @@ export default function CheckoutPage() {
         <aside className="lg:border-l lg:pl-10">
           {/* Cart items */}
           <div className="space-y-5">
-            {items.map((item) => (
-              <CartSummaryItem key={item.id} item={item} />
-            ))}
+            {displayItems.map((item) => {
+              const key = isLoggedIn
+                ? (item as CartItem).id
+                : `guest-${(item as { bookId: number }).bookId}`;
+              return (
+                <CartSummaryItem
+                  key={key}
+                  item={item}
+                  source={isLoggedIn ? "user" : "guest"}
+                />
+              );
+            })}
           </div>
 
           <Separator className="my-6" />
@@ -376,7 +444,7 @@ export default function CheckoutPage() {
           <div className="space-y-2 text-sm">
             <div className="flex items-center justify-between">
               <span className="text-zinc-600">
-                Tạm tính · {items.length} sản phẩm
+                Tạm tính · {displayItems.length} sản phẩm
               </span>
               <span>{fmtVND(subtotal)}</span>
             </div>

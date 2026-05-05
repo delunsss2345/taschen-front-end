@@ -188,7 +188,7 @@ export const roleService = {
 
   async assignPermissions(roleCode: string, permissionIds: number[]): Promise<boolean> {
     try {
-      await http.post<ApiResponseEnvelope<null>>(`roles/${roleCode}/permissions`, {
+      await http.put<ApiResponseEnvelope<null>>(`roles/${roleCode}/permissions`, {
         permissionIds,
       });
       return true;

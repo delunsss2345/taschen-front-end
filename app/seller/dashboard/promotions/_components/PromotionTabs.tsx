@@ -2,22 +2,32 @@
 
 import { cn } from '@/lib/utils'
 
-const tabs = [
-  { id: 'all', label: 'Tất cả', count: 5 },
-  { id: 'active', label: 'Đang hoạt động', count: 1 },
-  { id: 'pending', label: 'Chờ duyệt', count: 0 },
-  { id: 'approved', label: 'Đã duyệt', count: 2 },
-  { id: 'rejected', label: 'Đã từ chối', count: 2 },
-  { id: 'deleted', label: 'Đã xóa mềm', count: 1 },
-  { id: 'logs', label: 'Nhật ký hoạt động', count: null },
-]
+interface TabItem {
+  id: string
+  label: string
+  countKey?: string
+}
+
+interface TabCounts {
+  [key: string]: number
+}
 
 interface PromotionTabsProps {
   activeTab: string
   onTabChange: (id: string) => void
+  counts: TabCounts
+  tabs?: TabItem[]
 }
 
-export function PromotionTabs({ activeTab, onTabChange }: PromotionTabsProps) {
+const defaultTabs: TabItem[] = [
+  { id: 'all', label: 'Tất cả', countKey: 'all' },
+  { id: 'active', label: 'Đang hoạt động', countKey: 'active' },
+  { id: 'pending', label: 'Chờ duyệt', countKey: 'pending' },
+  { id: 'rejected', label: 'Đã từ chối', countKey: 'rejected' },
+  { id: 'paused', label: 'Đã tạm dừng', countKey: 'paused' },
+]
+
+export function PromotionTabs({ activeTab, onTabChange, counts, tabs = defaultTabs }: PromotionTabsProps) {
   return (
     <div className="border-b border-gray-100 bg-white px-4">
       <div className="flex items-center gap-8 overflow-x-auto no-scrollbar">
@@ -29,10 +39,10 @@ export function PromotionTabs({ activeTab, onTabChange }: PromotionTabsProps) {
               'py-4 text-sm font-medium transition-all relative cursor-pointer whitespace-nowrap',
               activeTab === tab.id
                 ? 'text-blue-600'
-                : 'text-gray-500 hover:text-gray-700'
+                : 'text-gray-500 hover:text-gray-700',
             )}
           >
-            {tab.label} {tab.count !== null ? `(${tab.count})` : ''}
+            {tab.label} ({counts[tab.countKey || tab.id] ?? 0})
             {activeTab === tab.id && (
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full" />
             )}

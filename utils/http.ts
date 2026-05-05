@@ -214,7 +214,7 @@ class AxiosHttp {
       const response = await axiosInstance.request<T>({
         method,
         url: path,
-        data,
+        ...(data !== undefined ? { data } : {}),
         ...config,
       });
 

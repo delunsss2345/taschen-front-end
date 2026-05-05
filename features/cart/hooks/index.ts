@@ -156,3 +156,5 @@ export const useDeleteCartItemMutation = () => {
     },
   });
 };
+
+export { useGuestCartItemCount } from "./useGuestCart";

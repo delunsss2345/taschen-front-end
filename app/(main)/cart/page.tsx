@@ -15,11 +15,100 @@ import {
   useDecreaseCartItemQuantityMutation,
   useDeleteCartItemMutation,
 } from "@/features/cart";
+import { useGuestCartStore } from "@/features/cart/store/guest-cart.store";
+import { useAuthStore } from "@/features/auth";
 import { useBookByIdQuery } from "@/features/book";
 import type { CartItem } from "@/types/response/cart.response";
 
 const fmtVND = (n: number) =>
   new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND", minimumFractionDigits: 0 }).format(n);
+
+function GuestCartItemRow({
+  item,
+  onIncrease,
+  onDecrease,
+  onRemove,
+}: {
+  item: { bookId: number; quantity: number; bookTitle: string; coverImage?: string; imageUrl?: string; unitPrice?: number };
+  onIncrease: () => void;
+  onDecrease: () => void;
+  onRemove: () => void;
+}) {
+  const { data: bookData } = useBookByIdQuery(item.bookId);
+  const title = item.bookTitle ?? bookData?.title;
+  const imageUrl = item.coverImage ?? item.imageUrl ?? bookData?.imageUrl;
+  const unitPrice = item.unitPrice ?? 0;
+  const totalPrice = unitPrice * item.quantity;
+
+  return (
+    <div>
+      <div className="grid grid-cols-[1fr_140px_100px_100px] items-start gap-x-4 py-6">
+        {/* Title column */}
+        <div className="flex items-start gap-3">
+          <button
+            type="button"
+            className="mt-8 shrink-0 text-zinc-400 transition-colors hover:text-zinc-900"
+            onClick={onRemove}
+            aria-label="Xóa sản phẩm"
+          >
+            <X className="h-4 w-4" />
+          </button>
+
+          <div className="h-[120px] w-[80px] shrink-0 overflow-hidden border bg-neutral-50">
+            {imageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={imageUrl} alt={title ?? "Sách"} className="h-full w-full object-cover" />
+            ) : (
+              <div className="flex h-full items-center justify-center text-neutral-300">
+                <ShoppingCart className="h-6 w-6" />
+              </div>
+            )}
+          </div>
+
+          <div className="min-w-0 space-y-1">
+            <p className="text-sm font-medium leading-snug">
+              {title ?? `Sách #${item.bookId}`}
+            </p>
+            <Link
+              href={`/detail/${item.bookId}`}
+              className="text-xs text-blue-600 underline underline-offset-2 hover:text-blue-800"
+            >
+              Xem chi tiết
+            </Link>
+          </div>
+        </div>
+
+        {/* Price */}
+        <div className="pt-1 text-center text-sm">{fmtVND(unitPrice)}</div>
+
+        {/* Qty */}
+        <div className="flex items-center justify-center gap-1 pt-1">
+          <button
+            type="button"
+            className="flex h-7 w-7 items-center justify-center border text-zinc-500 transition-colors hover:text-zinc-900"
+            onClick={onDecrease}
+          >
+            <Minus className="h-3 w-3" />
+          </button>
+          <div className="flex h-7 w-8 items-center justify-center border text-xs">
+            {item.quantity}
+          </div>
+          <button
+            type="button"
+            className="flex h-7 w-7 items-center justify-center border text-zinc-500 transition-colors hover:text-zinc-900"
+            onClick={onIncrease}
+          >
+            <Plus className="h-3 w-3" />
+          </button>
+        </div>
+
+        {/* Total */}
+        <div className="pt-1 text-right text-sm font-medium">{fmtVND(totalPrice)}</div>
+      </div>
+      <Separator />
+    </div>
+  );
+}
 
 function CartItemRow({ item }: { item: CartItem }) {
   const increaseMutation = useIncreaseCartItemQuantityMutation();
@@ -141,13 +230,25 @@ function CartItemRow({ item }: { item: CartItem }) {
 
 export default function ShoppingCartPage() {
   const router = useRouter();
+  const currentUser = useAuthStore((s) => s.currentUser);
+  const guestCart = useGuestCartStore();
   const { data: cart, isLoading } = useCurrentCartQuery();
 
-  const items = cart?.items ?? [];
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const subtotal = cart?.totalPrice ?? items.reduce((sum, item) => sum + (item.totalPrice ?? 0), 0);
+  const isLoggedIn = Boolean(currentUser?.id);
+  const userItems = cart?.items ?? [];
+  const guestItems = guestCart.items;
 
-  if (isLoading) {
+  const displayItems = isLoggedIn ? userItems : guestItems;
+
+  const totalItems = displayItems.reduce((sum, item) => sum + item.quantity, 0);
+  const subtotal = displayItems.reduce((sum, item) => {
+    const unitPrice = isLoggedIn
+      ? (item as CartItem).unitPrice ?? 0
+      : (item as { unitPrice?: number }).unitPrice ?? 0;
+    return sum + (isLoggedIn ? ((item as CartItem).totalPrice ?? unitPrice * item.quantity) : (unitPrice * item.quantity));
+  }, 0);
+
+  if (isLoading && isLoggedIn) {
     return (
       <div className="container-main py-10">
         <Skeleton className="h-8 w-48 mb-6" />
@@ -163,6 +264,15 @@ export default function ShoppingCartPage() {
     );
   }
 
+  const handleCheckout = () => {
+    if (!isLoggedIn) {
+      toast.info("Vui lòng đăng nhập để thanh toán");
+      router.push("/login");
+      return;
+    }
+    router.push("/checkout");
+  };
+
   return (
     <div className="container-main py-10">
       <h1 className="text-lg font-bold tracking-tight">Giỏ hàng của bạn</h1>
@@ -177,11 +287,33 @@ export default function ShoppingCartPage() {
             <span className="text-right">Thành tiền</span>
           </div>
 
-          {items.length > 0 ? (
+          {displayItems.length > 0 ? (
             <>
-              {items.map((item) => (
-                <CartItemRow key={item.id} item={item} />
-              ))}
+              {displayItems.map((item) => {
+                if (isLoggedIn) {
+                  return <CartItemRow key={(item as CartItem).id} item={item as CartItem} />;
+                }
+                const gItem = item as { bookId: number; quantity: number };
+                return (
+                  <GuestCartItemRow
+                    key={`guest-${gItem.bookId}`}
+                    item={item as { bookId: number; quantity: number; bookTitle: string; coverImage?: string; imageUrl?: string; unitPrice?: number }}
+                    onIncrease={() => guestCart.updateQuantity(gItem.bookId, gItem.quantity + 1)}
+                    onDecrease={() => {
+                      if (gItem.quantity <= 1) {
+                        guestCart.removeItem(gItem.bookId);
+                        toast.success("Đã xóa khỏi giỏ hàng");
+                      } else {
+                        guestCart.updateQuantity(gItem.bookId, gItem.quantity - 1);
+                      }
+                    }}
+                    onRemove={() => {
+                      guestCart.removeItem(gItem.bookId);
+                      toast.success("Đã xóa khỏi giỏ hàng");
+                    }}
+                  />
+                );
+              })}
               <div className="grid grid-cols-[1fr_140px_100px_100px] items-center py-4 text-sm font-semibold">
                 <span />
                 <span />
@@ -219,10 +351,10 @@ export default function ShoppingCartPage() {
             </div>
 
             <Button
-              onClick={() => router.push("/checkout")}
+              onClick={handleCheckout}
               variant="outline"
               className="mt-5 w-full rounded-none border-zinc-900 py-5 text-xs uppercase tracking-wider"
-              disabled={items.length === 0}
+              disabled={displayItems.length === 0}
             >
               Tiến hành thanh toán
             </Button>

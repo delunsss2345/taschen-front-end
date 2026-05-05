@@ -50,7 +50,7 @@ export async function DELETE(
   try {
     const { id } = await params;
     const headers = getAuthorizationHeader(request);
-    await api.delete(`permissions/${id}`, {}, { headers });
+    await api.delete(`permissions/${id}`, undefined, { headers });
 
     return ResponseApi.success({ message: "Permission deleted successfully" }, HttpStatusCode.Ok);
   } catch (error) {

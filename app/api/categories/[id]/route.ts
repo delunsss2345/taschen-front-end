@@ -51,7 +51,7 @@ export async function DELETE(
   try {
     const { id } = await params;
     const headers = getAuthorizationHeader(request);
-    await api.delete(`categories/${id}`, {}, { headers });
+    await api.delete(`categories/${id}`, undefined, { headers });
 
     return ResponseApi.success({ message: "Category deleted successfully" }, HttpStatusCode.Ok);
   } catch (error) {

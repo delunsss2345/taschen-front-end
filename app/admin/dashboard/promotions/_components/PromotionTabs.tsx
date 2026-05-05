@@ -23,7 +23,6 @@ const defaultTabs: TabItem[] = [
   { id: 'all', label: 'Tất cả', countKey: 'all' },
   { id: 'active', label: 'Đang hoạt động', countKey: 'active' },
   { id: 'pending', label: 'Chờ duyệt', countKey: 'pending' },
-  { id: 'approved', label: 'Đã duyệt', countKey: 'approved' },
   { id: 'rejected', label: 'Đã từ chối', countKey: 'rejected' },
   { id: 'paused', label: 'Đã dừng', countKey: 'paused' },
 ]

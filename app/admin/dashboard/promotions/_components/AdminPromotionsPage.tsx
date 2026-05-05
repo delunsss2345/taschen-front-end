@@ -7,6 +7,7 @@ import { PromotionTable } from './PromotionTable'
 import { PromotionDetailModal } from './PromotionDetailModal'
 import { CreatePromotionModal } from './CreatePromotionModal'
 import { promotionService, type Promotion as PromotionType } from '@/services/promotion.service'
+import type { PromotionStatus } from '@/types/response/promotion.response'
 import { LoadingSpinner } from '@/components/ui/loading'
 import { toast } from 'sonner'
 
@@ -22,14 +23,13 @@ interface Promotion {
   status: string
 }
 
-const TAB_FILTERS: Record<string, string | null> = {
+const TAB_FILTERS: Record<string, PromotionStatus | null> = {
   all: null,
-  active: 'ACTIVE',
-  pending: 'PENDING',
-  approved: 'APPROVED', // Hiển thị khuyến mãi đã duyệt
-  rejected: 'REJECTED',
-  paused: 'PAUSED', // Hiển thị khuyến mãi tạm dừng
-}
+  active: "ACTIVE",
+  pending: "PENDING",
+  rejected: "REJECTED",
+  paused: "PAUSED",
+};
 
 export function AdminPromotionsPage() {
   const [activeTab, setActiveTab] = useState('all')
@@ -96,16 +96,14 @@ export function AdminPromotionsPage() {
 
   // Calculate counts for tabs
   const tabCounts = useMemo(() => {
-    const activeCount = promotions.filter(p => p.status === 'ACTIVE').length
     return {
       all: promotions.length,
-      active: activeCount,
-      pending: promotions.filter(p => p.status === 'PENDING').length,
-      approved: promotions.filter(p => p.status === 'APPROVED').length,
-      rejected: promotions.filter(p => p.status === 'REJECTED').length,
-      paused: promotions.filter(p => p.status === 'PAUSED').length,
-    }
-  }, [promotions])
+      active: promotions.filter((p) => p.status === "ACTIVE").length,
+      pending: promotions.filter((p) => p.status === "PENDING").length,
+      rejected: promotions.filter((p) => p.status === "REJECTED").length,
+      paused: promotions.filter((p) => p.status === "PAUSED").length,
+    } satisfies Record<string, number>;
+  }, [promotions]);
 
   const handleView = (id: number) => {
     setSelectedPromotionId(id)

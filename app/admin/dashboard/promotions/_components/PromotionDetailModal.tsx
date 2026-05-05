@@ -41,52 +41,34 @@ export function PromotionDetailModal({ promotionId, open, onOpenChange }: Promot
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'ACTIVE':
+      case "ACTIVE":
         return (
           <Badge className="bg-green-50 text-green-600 hover:bg-green-50 border-green-100 shadow-none font-normal">
             Đang hoạt động
           </Badge>
-        )
-      case 'PENDING':
+        );
+      case "PENDING":
         return (
           <Badge className="bg-orange-50 text-orange-500 hover:bg-orange-50 border-orange-100 shadow-none font-normal">
             Chờ duyệt
           </Badge>
-        )
-      case 'APPROVED':
-        return (
-          <Badge className="bg-blue-50 text-blue-600 hover:bg-blue-50 border-blue-100 shadow-none font-normal">
-            Đã duyệt
-          </Badge>
-        )
-      case 'REJECTED':
+        );
+      case "REJECTED":
         return (
           <Badge className="bg-red-50 text-red-500 hover:bg-red-50 border-red-100 shadow-none font-normal">
             Đã từ chối
           </Badge>
-        )
-      case 'DELETED':
+        );
+      case "PAUSED":
         return (
-          <Badge className="bg-gray-50 text-gray-400 hover:bg-gray-50 border-gray-200 shadow-none font-normal">
-            Đã dừng
-          </Badge>
-        )
-      case 'PAUSED':
-        return (
-          <Badge className="bg-orange-50 text-orange-500 hover:bg-orange-50 border-orange-100 shadow-none font-normal">
+          <Badge className="bg-gray-100 text-gray-500 hover:bg-gray-100 border-gray-200 shadow-none font-normal">
             Đã tạm dừng
           </Badge>
-        )
-      case 'NOT_STARTED':
-        return (
-          <Badge className="bg-gray-50 text-gray-500 hover:bg-gray-50 border-gray-200 shadow-none font-normal">
-            Chưa bắt đầu
-          </Badge>
-        )
+        );
       default:
-        return <Badge variant="outline">{status}</Badge>
+        return <Badge variant="outline">{status}</Badge>;
     }
-  }
+  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)

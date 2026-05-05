@@ -17,6 +17,7 @@ export async function DELETE(
     const headers = getAuthorizationHeader(request);
     const response = await api.delete<{ data: unknown }>(
       `roles/${roleCode}/permissions/${permissionId}`,
+      undefined,
       { headers }
     );
 

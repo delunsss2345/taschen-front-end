@@ -5,7 +5,11 @@ import { Bell, X } from "lucide-react";
 import { useNotifications } from "./useNotifications";
 
 function formatRelativeTime(dateString: string): string {
-  const diff = Date.now() - new Date(dateString).getTime();
+  const dateMs = new Date(dateString).getTime();
+  const nowMs = Date.now();
+  const diffMs = nowMs - dateMs;
+  const diffTz = new Date().getTimezoneOffset() * 60000;
+  const diff = diffMs + diffTz;
   const minutes = Math.floor(diff / 60000);
   if (minutes < 1) return "Vừa xong";
   if (minutes < 60) return `${minutes} phút trước`;

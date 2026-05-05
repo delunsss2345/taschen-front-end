@@ -59,6 +59,7 @@ interface AccountTableProps {
 export function AccountTable({ accounts, loading = false, onUpdate, onDelete, onRefresh }: AccountTableProps) {
   const currentUser = useAuthStore((state) => state.currentUser)
   const isAdmin = currentUser?.roles?.includes("ADMIN") ?? false
+  const currentUserId = currentUser?.id
 
   const getRoleBadge = (role: string) => {
     switch (role) {
@@ -166,7 +167,7 @@ export function AccountTable({ accounts, loading = false, onUpdate, onDelete, on
                       </Button>
                     }
                   />
-                  {isAdmin && (
+                  {isAdmin && !acc.status && currentUserId !== acc.id && (
                     <DeleteAccountModal
                       account={acc}
                       onDelete={onDelete}
@@ -398,14 +399,8 @@ function DeleteAccountModal({
         return
       }
 
-      toast.success("Xóa user thành công.")
-      onDelete?.(account.id)
-      setOpen(false)
-
-      if (isCurrentUser) {
-        clearSession()
-        router.push("/login")
-      }
+      const errorMessage = axiosError?.response?.data?.message || "Có lỗi xảy ra khi xóa tài khoản."
+      toast.error(errorMessage)
     } finally {
       setDeleting(false)
     }
