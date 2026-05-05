@@ -132,6 +132,7 @@ export function useNotifications() {
   const subRef = useRef<{ unsubscribe: () => void } | null>(null);
   useEffect(() => {
     if (!connected || !client || !userId) return;
+    if (!client.connected) return;
 
     subRef.current = client.subscribe(
       `/topic/notifications/${userId}`,
