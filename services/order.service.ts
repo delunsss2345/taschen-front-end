@@ -91,7 +91,9 @@ export const orderService = {
       `payments/vnpay/create/${orderId}`,
       {},
     );
+    console.log("[createVNPayPayment] raw response:", JSON.stringify(response));
     const data = getResponseData<VNPayCreateResponse | string>(response);
+    console.log("[createVNPayPayment] parsed data:", JSON.stringify(data));
     if (!data) throw new Error("Không thể tạo thanh toán VNPay");
     if (typeof data === "string") return data;
     return (data as VNPayCreateResponse).paymentUrl;
