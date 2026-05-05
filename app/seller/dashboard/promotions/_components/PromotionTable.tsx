@@ -18,9 +18,10 @@ interface Promotion {
 
 interface PromotionTableProps {
   promotions: Promotion[]
+  onViewClick: (id: number) => void
 }
 
-export function PromotionTable({ promotions }: PromotionTableProps) {
+export function PromotionTable({ promotions, onViewClick }: PromotionTableProps) {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'ACTIVE':
@@ -28,22 +29,36 @@ export function PromotionTable({ promotions }: PromotionTableProps) {
           <Badge className="bg-green-50 text-green-600 hover:bg-green-50 border-green-100 shadow-none font-normal">
             Đang hoạt động
           </Badge>
-        )
+        );
       case 'PENDING':
         return (
           <Badge className="bg-orange-50 text-orange-500 hover:bg-orange-50 border-orange-100 shadow-none font-normal">
             Chờ duyệt
           </Badge>
-        )
-      case 'NOT_STARTED':
+        );
+      case 'REJECTED':
         return (
-          <Badge className="bg-gray-50 text-gray-500 hover:bg-gray-50 border-gray-200 shadow-none font-normal">
-            Chưa bắt đầu
+          <Badge className="bg-red-50 text-red-500 hover:bg-red-50 border-red-100 shadow-none font-normal">
+            Đã từ chối
           </Badge>
-        )
+        );
+      case 'PAUSED':
+        return (
+          <Badge className="bg-gray-100 text-gray-500 hover:bg-gray-100 border-gray-200 shadow-none font-normal">
+            Đã tạm dừng
+          </Badge>
+        );
       default:
-        return <Badge variant="outline">{status}</Badge>
+        return <Badge variant="outline">{status}</Badge>;
     }
+  }
+
+  if (promotions.length === 0) {
+    return (
+      <div className="py-12 text-center text-gray-500">
+        Không có khuyến mãi nào
+      </div>
+    )
   }
 
   return (
@@ -53,23 +68,21 @@ export function PromotionTable({ promotions }: PromotionTableProps) {
           <tr className="text-gray-500 font-medium">
             <TableHeaderCell className="w-16">ID</TableHeaderCell>
             <TableHeaderCell>Tên khuyến mãi</TableHeaderCell>
-            <TableHeaderCell>Mã khuyến mãi</TableHeaderCell>
+            <TableHeaderCell className="w-40">Mã khuyến mãi</TableHeaderCell>
             <TableHeaderCell className="text-center">Giảm giá</TableHeaderCell>
             <TableHeaderCell className="text-center">Số lượng</TableHeaderCell>
             <TableHeaderCell>Đơn tối thiểu</TableHeaderCell>
             <TableHeaderCell>Ngày bắt đầu</TableHeaderCell>
             <TableHeaderCell>Ngày kết thúc</TableHeaderCell>
             <TableHeaderCell className="text-center">Trạng thái</TableHeaderCell>
-            <TableHeaderCell className="text-center w-32">Thao tác</TableHeaderCell>
+            <TableHeaderCell className="text-center w-28">Thao tác</TableHeaderCell>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-50 bg-white">
           {promotions.map((promo) => (
             <TableRow key={promo.id}>
               <TableCell>{promo.id}</TableCell>
-              <TableCell className="max-w-[200px] truncate">
-                {promo.name}
-              </TableCell>
+              <TableCell className="max-w-[200px] truncate">{promo.name}</TableCell>
               <TableCell>
                 <Badge variant="outline" className="text-blue-600 border-blue-100 bg-blue-50 font-mono">
                   {promo.code}
@@ -89,9 +102,10 @@ export function PromotionTable({ promotions }: PromotionTableProps) {
                 <Button
                   variant="default"
                   size="sm"
-                  className="bg-blue-600 hover:bg-blue-700 h-8 px-4 cursor-pointer text-[13px]"
+                  className="bg-blue-600 hover:bg-blue-700 h-8 px-2 cursor-pointer text-[13px] w-[55px]"
+                  onClick={() => onViewClick(promo.id)}
                 >
-                  Xem chi tiết
+                  Xem
                 </Button>
               </TableCell>
             </TableRow>
