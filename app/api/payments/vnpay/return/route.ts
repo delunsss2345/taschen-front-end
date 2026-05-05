@@ -6,19 +6,20 @@ export async function GET(request: NextRequest) {
   const queryString = searchParams.toString();
   const responseCode = searchParams.get("vnp_ResponseCode");
 
-  console.log("[VNPay Return] queryString:", queryString);
-
   try {
-    const res = await api.get<unknown>(`payments/vnpay/return?${queryString}`);
-    console.log("[VNPay Return] backend response:", JSON.stringify(res));
+    const res = await api.get<{ orderId?: string }>(`payments/vnpay/return?${queryString}`);
     const success = responseCode === "00";
+    const orderId = res?.orderId;
+    const params = new URLSearchParams({ status: success ? "success" : "failed" });
+    if (orderId) params.set("orderId", orderId);
+    if (!success) params.set("message", `Thanh toán thất bại (mã lỗi: ${responseCode})`);
     return NextResponse.redirect(
-      new URL(`/payment/vnpay/result?success=${success}&${queryString}`, request.url),
+      new URL(`/payment-result?${params.toString()}`, request.url),
     );
-  } catch (error) {
-    console.error("[VNPay Return] error:", error);
+  } catch {
+    const params = new URLSearchParams({ status: "failed", message: "Lỗi xác minh thanh toán từ VNPay" });
     return NextResponse.redirect(
-      new URL(`/payment/vnpay/result?success=false&${queryString}`, request.url),
+      new URL(`/payment-result?${params.toString()}`, request.url),
     );
   }
 }

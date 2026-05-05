@@ -8,8 +8,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Info, MapPin, Tag, Truck } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import * as React from "react";
+import { Suspense } from "react";
 import { toast } from "sonner";
 
 import {
@@ -110,11 +111,21 @@ function CartSummaryItem({
   );
 }
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const currentUser = useAuthStore((s) => s.currentUser);
   const guestCart = useGuestCartStore();
   const [hasMergedGuest, setHasMergedGuest] = React.useState(false);
+
+  React.useEffect(() => {
+    const error = searchParams.get("error");
+    if (error) {
+      const decoded = decodeURIComponent(error);
+      toast.error(decoded);
+      router.replace("/checkout");
+    }
+  }, [searchParams]);
 
   const isLoggedIn = Boolean(currentUser?.id);
   const { data: cart, isLoading: cartLoading } = useCurrentCartQuery();
@@ -476,3 +487,28 @@ export default function CheckoutPage() {
     </div>
   );
 }
+
+function CheckoutSkeleton() {
+  return (
+    <div className="container-main py-10">
+      <div className="grid gap-12 lg:grid-cols-[1fr_420px]">
+        <div className="space-y-6">
+          <Skeleton className="h-8 w-40" />
+          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-8 w-40" />
+          <Skeleton className="h-32 w-full" />
+        </div>
+        <Skeleton className="h-96 w-full" />
+      </div>
+    </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<CheckoutSkeleton />}>
+      <CheckoutContent />
+    </Suspense>
+  );
+}
+
