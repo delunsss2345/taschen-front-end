@@ -86,13 +86,16 @@ async function getImportStocksSafe(filter?: ImportStockFilter): Promise<ImportSt
   if (filter?.purchaseOrderId) {
     url += `?purchaseOrderId=${filter.purchaseOrderId}`;
   }
-  const response = await http.get<ApiResponseEnvelope<ImportStock[]>>(url);
-  const data = getResponseData(response) ?? [];
-  // Map details to items for compatibility
-  return data.map(stock => ({
-    ...stock,
-    items: stock.items || stock.details || []
-  }));
+  try {
+    const response = await http.get<ApiResponseEnvelope<ImportStock[]>>(url);
+    const data = getResponseData(response) ?? [];
+    return data.map(stock => ({
+      ...stock,
+      items: stock.items || stock.details || []
+    }));
+  } catch {
+    return [];
+  }
 }
 
 async function receiveImportStockSafe(

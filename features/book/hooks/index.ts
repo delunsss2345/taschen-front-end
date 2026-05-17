@@ -108,3 +108,15 @@ export const useSearchBooksQuery = (params: BookSearchParams) => {
     queryFn: () => bookService.searchBooks(params),
   });
 };
+
+export const useSimilarBooksQuery = (
+  bookId: number | string | null | undefined,
+  limit = 8,
+) => {
+  return useQuery({
+    queryKey: ["books", "similar", bookId, limit],
+    queryFn: () => bookService.getSimilarBooks(bookId as number | string, limit),
+    enabled: Boolean(bookId),
+    staleTime: 1000 * 60 * 5,
+  });
+};

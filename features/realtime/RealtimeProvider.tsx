@@ -18,6 +18,7 @@ const RealtimeContext = createContext<RealtimeContextValue>({
 
 export function RealtimeProvider({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore(selectorIsAuthenticated);
+  const accessToken = useAuthStore((s) => s.accessToken);
   const clientRef = useRef<Client | null>(null);
   const [connected, setConnected] = useState(false);
 
@@ -29,7 +30,7 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const client = createStompClient();
+    const client = createStompClient(accessToken);
 
     client.onConnect = () => setConnected(true);
     client.onDisconnect = () => setConnected(false);
@@ -45,7 +46,7 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
       clientRef.current = null;
       setConnected(false);
     };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, accessToken]);
 
   return (
     <RealtimeContext.Provider value={{ client: clientRef.current, connected }}>

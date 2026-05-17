@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Calendar, ChevronRight, MapPin, Package, ShoppingCart, XCircle } from "lucide-react";
+import { Calendar, ChevronRight, MapPin, MessageSquare, Package, ShoppingCart, XCircle } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { toast } from "sonner";
@@ -31,6 +31,7 @@ import { toast } from "sonner";
 import { useOrdersQuery } from "@/features/profile";
 import { useCancelOrderMutation, useConfirmReceivedMutation } from "@/features/profile";
 import { returnRequestService } from "@/services/return-request.service";
+import type { ReturnRequest } from "@/services/return-request.service";
 import type { Order, OrderStatus } from "@/types/profile.type";
 
 const fmtVND = (n: number) =>
@@ -139,7 +140,19 @@ function ReturnRequestDialog({
   );
 }
 
-function OrderCard({ order }: { order: Order }) {
+const RETURN_STATUS_LABELS: Record<string, string> = {
+  PENDING: "Chờ xử lý",
+  APPROVED: "Đã duyệt",
+  REJECTED: "Từ chối",
+};
+
+const RETURN_STATUS_COLORS: Record<string, string> = {
+  PENDING: "bg-yellow-50 text-yellow-700 border-yellow-200",
+  APPROVED: "bg-green-50 text-green-700 border-green-200",
+  REJECTED: "bg-red-50 text-red-700 border-red-200",
+};
+
+function OrderCard({ order, returnRequest }: { order: Order; returnRequest?: ReturnRequest }) {
   const cancelMutation = useCancelOrderMutation();
   const confirmMutation = useConfirmReceivedMutation();
   const [detailOpen, setDetailOpen] = React.useState(false);
@@ -233,6 +246,30 @@ function OrderCard({ order }: { order: Order }) {
             </p>
           )}
         </div>
+
+        {/* Shop message (return request response) */}
+        {returnRequest && (
+          <div className="border-t border-neutral-100 px-6 py-4 space-y-3">
+            <div className="flex items-center gap-2 text-xs text-neutral-500">
+              <span>Yêu cầu hoàn trả:</span>
+              <Badge
+                variant="outline"
+                className={`rounded-full px-2 py-0.5 text-xs border ${RETURN_STATUS_COLORS[returnRequest.status] ?? "bg-gray-50 text-gray-600 border-gray-200"}`}
+              >
+                {RETURN_STATUS_LABELS[returnRequest.status] ?? returnRequest.status}
+              </Badge>
+            </div>
+            {returnRequest.responseNote && (
+              <div className="flex items-start gap-2.5 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3">
+                <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-blue-500" />
+                <div>
+                  <p className="text-xs font-semibold text-blue-700 mb-0.5">Tin nhắn từ shop</p>
+                  <p className="text-sm text-blue-800">{returnRequest.responseNote}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Footer */}
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-neutral-100 px-6 py-3">
@@ -368,6 +405,15 @@ function OrderCard({ order }: { order: Order }) {
 export default function OrdersPage() {
   const { data: orders = [], isLoading } = useOrdersQuery();
   const [activeTab, setActiveTab] = React.useState<string>("Tất cả");
+  const [returnRequestMap, setReturnRequestMap] = React.useState<Record<number, ReturnRequest>>({});
+
+  React.useEffect(() => {
+    returnRequestService.getMyRequests().then((reqs) => {
+      const map: Record<number, ReturnRequest> = {};
+      reqs.forEach((r) => { map[r.orderId] = r; });
+      setReturnRequestMap(map);
+    });
+  }, []);
 
   const filtered = filterByTab(orders, activeTab);
 
@@ -414,7 +460,9 @@ export default function OrdersPage() {
               </Button>
             </div>
           ) : (
-            filtered.map((order) => <OrderCard key={order.id} order={order} />)
+            filtered.map((order) => (
+              <OrderCard key={order.id} order={order} returnRequest={returnRequestMap[order.id]} />
+            ))
           )}
         </div>
       </div>
