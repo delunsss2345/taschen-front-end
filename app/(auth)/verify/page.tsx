@@ -20,6 +20,7 @@ export default function VerifyEmailPage() {
 
   const token = searchParams.get("token");
   const userId = searchParams.get("userId");
+  const { mutate } = verifyMutation;
 
   useEffect(() => {
     if (!token || !userId) {
@@ -30,46 +31,43 @@ export default function VerifyEmailPage() {
       return;
     }
 
-    verifyMutation.mutate(
+    mutate(
       { token, userId },
       {
         onSuccess: () => {
           setState("success");
         },
         onError: (err: unknown) => {
-          let msg = "Đã xảy ra lỗi khi xác minh. Vui lòng thử lại.";
-
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const axiosErr = err as any;
+          const errData = axiosErr?.response?.data;
+          const raw =
+            errData?.data?.error ||
+            errData?.data?.message ||
+            errData?.error ||
+            errData?.message ||
+            "";
+
+          // "already verified" → tài khoản đã xác minh thành công trước đó → coi là success
           if (
-            axiosErr?.response?.data &&
-            typeof axiosErr.response.data === "object"
+            raw.toLowerCase().includes("already") ||
+            raw.includes("đã được xác minh")
           ) {
-            const errData = axiosErr.response.data as {
-              error?: string;
-              message?: string;
-              data?: { error?: string; message?: string };
-            };
-            const e = errData.data?.error || errData.data?.message || errData.error || errData.message || "";
-            if (e) {
-              msg = e;
-            }
+            setState("success");
+            return;
           }
 
-          if (
-            msg.includes("expired") ||
-            msg.toLowerCase().includes("expired")
-          ) {
-            msg =
-              "Link xác minh đã hết hạn (2 phút). Vui lòng đăng ký lại.";
+          let msg = "Đã xảy ra lỗi khi xác minh. Vui lòng thử lại.";
+          if (raw.toLowerCase().includes("expired")) {
+            msg = "Link xác minh đã hết hạn (2 phút). Vui lòng đăng ký lại.";
           } else if (
-            msg.includes("Invalid") ||
-            msg.includes("does not belong") ||
-            msg.includes("không hợp lệ")
+            raw.includes("Invalid") ||
+            raw.includes("does not belong") ||
+            raw.includes("không hợp lệ")
           ) {
             msg = "Link xác minh không hợp lệ.";
-          } else if (msg.includes("already") || msg.includes("đã được xác minh")) {
-            msg = "Tài khoản đã được xác minh trước đó.";
+          } else if (raw) {
+            msg = raw;
           }
 
           setErrorMessage(msg);
@@ -77,7 +75,7 @@ export default function VerifyEmailPage() {
         },
       },
     );
-  }, [token, userId, verifyMutation]);
+  }, [token, userId, mutate]);
 
   useEffect(() => {
     if (state !== "success") return;
