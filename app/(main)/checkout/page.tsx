@@ -1,11 +1,10 @@
 "use client";
-
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Info, MapPin, Tag, Truck } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -13,14 +12,14 @@ import * as React from "react";
 import { Suspense } from "react";
 import { toast } from "sonner";
 
+import { useAuthStore } from "@/features/auth";
+import { useBookByIdQuery } from "@/features/book";
 import {
   useCurrentCartQuery,
 } from "@/features/cart";
-import { cartService } from "@/services/cart.service";
 import { useGuestCartStore } from "@/features/cart/store/guest-cart.store";
 import { useAddressesQuery } from "@/features/profile";
-import { useAuthStore } from "@/features/auth";
-import { useBookByIdQuery } from "@/features/book";
+import { cartService } from "@/services/cart.service";
 import { orderService } from "@/services/order.service";
 import type { Address } from "@/types/profile.type";
 import type { CartItem } from "@/types/response/cart.response";
@@ -386,8 +385,8 @@ function CheckoutContent() {
               {placing
                 ? "Đang xử lý..."
                 : paymentMethod === "VNPAY"
-                ? "Tiến hành thanh toán VNPay"
-                : "Đặt hàng"}
+                  ? "Tiến hành thanh toán VNPay"
+                  : "Đặt hàng"}
             </Button>
           </section>
         </div>

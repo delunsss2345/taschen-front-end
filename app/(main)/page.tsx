@@ -1,7 +1,7 @@
 'use client'
 
-import Hero from "./_components/Hero";
 import BookSection from "./_components/BookSection";
+import Hero from "./_components/Hero";
 
 const Home = () => {
   return (

@@ -1,23 +1,21 @@
 "use client";
-
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Minus, Plus, X, ShoppingCart } from "lucide-react";
+import { Minus, Plus, ShoppingCart, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import * as React from "react";
 import { toast } from "sonner";
 
-import {
-  useCurrentCartQuery,
-  useIncreaseCartItemQuantityMutation,
-  useDecreaseCartItemQuantityMutation,
-  useDeleteCartItemMutation,
-} from "@/features/cart";
-import { useGuestCartStore } from "@/features/cart/store/guest-cart.store";
 import { useAuthStore } from "@/features/auth";
 import { useBookByIdQuery } from "@/features/book";
+import {
+  useCurrentCartQuery,
+  useDecreaseCartItemQuantityMutation,
+  useDeleteCartItemMutation,
+  useIncreaseCartItemQuantityMutation,
+} from "@/features/cart";
+import { useGuestCartStore } from "@/features/cart/store/guest-cart.store";
 import type { CartItem } from "@/types/response/cart.response";
 
 const fmtVND = (n: number) =>
