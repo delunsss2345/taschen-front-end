@@ -79,7 +79,7 @@ export function CreateStockRequestModal({ open, onOpenChange, onSuccess }: Creat
   const fetchBooks = async () => {
     setIsLoadingBooks(true)
     try {
-      const data = await bookService.getAllBooks({ page: 1, pageSize: 1000 })
+      const data = await bookService.searchBooks({ status: 'active', size: 1000 })
       setBooks(data.result || [])
     } catch (error) {
       console.error('Failed to fetch books:', error)

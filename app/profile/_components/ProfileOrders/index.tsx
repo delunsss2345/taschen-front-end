@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import {
   Calendar,
   MapPin,
+  MessageSquare,
   Package,
   ShoppingCart,
   XCircle,
@@ -47,7 +48,8 @@ import {
   useConfirmReceivedMutation,
 } from "@/features/profile";
 import { returnRequestService } from "@/services/return-request.service";
-import type { Order, OrderDetail, OrderStatus } from "@/types/profile.type";
+import type { ReturnRequest } from "@/services/return-request.service";
+import type { Order, OrderStatus } from "@/types/profile.type";
 import useTranslator from "@/hooks/use-translator";
 
 // ============================================================
@@ -97,14 +99,28 @@ function formatDate(dateString: string): string {
 // ============================================================
 // Order Detail Modal
 // ============================================================
+const RETURN_STATUS_LABELS: Record<string, string> = {
+  PENDING: "Chờ xử lý",
+  APPROVED: "Đã duyệt",
+  REJECTED: "Từ chối",
+};
+
+const RETURN_STATUS_COLORS: Record<string, string> = {
+  PENDING: "bg-yellow-50 text-yellow-700 border-yellow-200",
+  APPROVED: "bg-green-50 text-green-700 border-green-200",
+  REJECTED: "bg-red-50 text-red-700 border-red-200",
+};
+
 function OrderDetailModal({
   order,
   open,
   onOpenChange,
+  returnRequest,
 }: {
   order: Order | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  returnRequest?: ReturnRequest;
 }) {
   const { t } = useTranslator();
 
@@ -233,6 +249,30 @@ function OrderDetailModal({
               </p>
             </div>
           </div>
+
+          {/* Return request info */}
+          {returnRequest && (
+            <div className="space-y-3 border-t pt-4">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span>Yêu cầu hoàn trả:</span>
+                <Badge
+                  variant="outline"
+                  className={`rounded-full px-2 py-0.5 text-xs border ${RETURN_STATUS_COLORS[returnRequest.status] ?? "bg-gray-50 text-gray-600 border-gray-200"}`}
+                >
+                  {RETURN_STATUS_LABELS[returnRequest.status] ?? returnRequest.status}
+                </Badge>
+              </div>
+              {returnRequest.responseNote && (
+                <div className="flex items-start gap-2.5 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3">
+                  <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-blue-500" />
+                  <div>
+                    <p className="text-xs font-semibold text-blue-700 mb-0.5">Tin nhắn từ shop</p>
+                    <p className="text-sm text-blue-800">{returnRequest.responseNote}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
@@ -461,8 +501,17 @@ export function ProfileOrders() {
   const { orders: storeOrders, loading } = useOrdersStore();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [returnRequestMap, setReturnRequestMap] = useState<Record<number, ReturnRequest>>({});
 
   const displayOrders = isLoading ? [] : storeOrders.length ? storeOrders : orders ?? [];
+
+  useEffect(() => {
+    returnRequestService.getMyRequests().then((reqs) => {
+      const map: Record<number, ReturnRequest> = {};
+      reqs.forEach((r) => { map[r.orderId] = r; });
+      setReturnRequestMap(map);
+    });
+  }, []);
 
   const handleViewDetails = (order: Order) => {
     setSelectedOrder(order);
@@ -535,6 +584,7 @@ export function ProfileOrders() {
         order={selectedOrder}
         open={detailModalOpen}
         onOpenChange={setDetailModalOpen}
+        returnRequest={selectedOrder ? returnRequestMap[selectedOrder.id] : undefined}
       />
     </div>
   );

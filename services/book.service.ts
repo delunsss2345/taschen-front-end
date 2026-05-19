@@ -161,6 +161,17 @@ export const bookService = {
       return [];
     }
   },
+
+  async getSimilarBooks(bookId: number | string, limit = 8): Promise<Book[]> {
+    try {
+      const response = await http.get<ApiResponseEnvelope<Book[]>>(
+        `books/${bookId}/similar?limit=${limit}`,
+      );
+      return getArrayData<Book>(response);
+    } catch {
+      return [];
+    }
+  },
 };
 
 async function getCategoriesSafe(): Promise<Category[]> {

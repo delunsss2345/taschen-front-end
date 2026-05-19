@@ -18,7 +18,7 @@ export async function GET(
     const headers = getAuthorizationHeader(request);
 
     const response = await api.get<BooksApiResponse>(
-      `api/books/category/${categoryId}`,
+      `books/category/${categoryId}`,
       { headers },
     );
 

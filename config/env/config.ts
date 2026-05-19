@@ -1,8 +1,8 @@
 
 export const envConfig = {
-  backendApiUrl: process.env.BACKEND_API_URL,
+  backendApiUrl: process.env.BACKEND_API_URL || 'https://api.phamtra.dev/api',
 
-  publicBaseApi: process.env.NEXT_PUBLIC_BASE_API,
+  publicBaseApi: process.env.NEXT_PUBLIC_BASE_API || 'https://api.phamtra.dev/api',
 
   // NextAuth
   nextAuth: {
