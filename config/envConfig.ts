@@ -1,3 +1,6 @@
+// Server-only config: contains BACKEND_API_URL + auth/google secrets. This import makes the
+// bundler throw if any client component tries to import this module (keeps secrets off the client).
+import 'server-only';
 import { config } from 'dotenv';
 import { envConfig as defaultEnv } from './env/config';
 config();

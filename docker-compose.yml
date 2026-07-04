@@ -1,0 +1,24 @@
+services:
+  web:
+    build:
+      context: .
+      args:
+        # NEXT_PUBLIC_* are inlined at build time (baked into the browser bundle).
+        # Client calls the Next BFF at the same origin, so a relative /api is best.
+        NEXT_PUBLIC_BASE_API: /api
+        # Browser connects to the backend WebSocket directly (not via the BFF).
+        # This is reached from the USER'S browser, so it uses localhost:8080.
+        NEXT_PUBLIC_WS_URL: http://localhost:8080/ws
+    container_name: taschen-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      # Server-side only: the Next BFF (inside the container) calls the Spring backend.
+      # The backend runs on the HOST at :8080, so from the container use host.docker.internal.
+      # MUST end with a trailing slash (fetchHandler resolves paths with new URL()).
+      BACKEND_API_URL: http://host.docker.internal:8080/api/
+    extra_hosts:
+      # Lets the container resolve the host machine (needed on Linux).
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
