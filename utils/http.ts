@@ -1,4 +1,4 @@
-import { envConfig } from "@/config/envConfig";
+import { publicEnv } from "@/config/publicEnv";
 import { useAuthStore } from "@/features/auth/store/auth.store";
 import type { PromiseHandlers } from "@/types/lib/axios";
 import type { RefreshTokenResponseData, UserLoginResponse } from "@/types/response/auth.response";
@@ -10,7 +10,7 @@ import axios, {
 } from "axios";
 import { isPublicApi } from "./isPublicPath";
 
-const baseURL = envConfig.NEXT_PUBLIC_BASE_API ?? "";
+const baseURL = publicEnv.baseApi;
 
 // Hàm redirect to login (chỉ chạy trên browser)
 const redirectToLogin = () => {
